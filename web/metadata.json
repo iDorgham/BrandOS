@@ -1,0 +1,8 @@
+
+{
+  "name": "Brand OS",
+  "description": "An intelligent operating system for brand-aligned AI creativity, ensuring visual doctrine and brand grammar are preserved in every generative output.",
+  "requestFramePermissions": [
+    "camera"
+  ]
+}
