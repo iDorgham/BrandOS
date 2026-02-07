@@ -1,25 +1,121 @@
 import React, { useState, useEffect } from 'react';
 import { Box, Zap } from 'lucide-react';
 import { Sidebar, Header } from './components/layout';
-import { DashboardView } from './features/dashboard/DashboardView';
-import { DoctrineView } from './features/doctrine/DoctrineView';
-import { StudioView } from './features/studio/StudioView';
-import { LibraryView } from './features/library/LibraryView';
-import { SettingsView } from './features/settings/SettingsView';
-import { BrandProfile, GeneratedAsset, PromptHistoryItem } from './types';
-import { INITIAL_BRANDS } from './constants';
+import { AuthGuard } from './components/auth/Auth';
+import { AuthProvider, useAuth } from './contexts/AuthContext';
+import { SettingsProvider, useSettings } from './contexts/SettingsContext';
+import { BrandProfile, GeneratedAsset } from './types';
 import { checkApiKeyStatus, openApiKeyDialog } from './services/gemini.service';
-import { useLocalStorage } from './hooks';
-
+import { useSupabaseBrands, useSupabaseAssets, useSupabasePromptHistory } from './hooks';
+import { useTheme } from './contexts/ThemeContext';
 import { Toaster } from 'sonner';
+import { ErrorBoundary } from './components/common/ErrorBoundary';
 
-const App: React.FC = () => {
+// Lazy load feature views for performance
+const ProfileView = React.lazy(() => import('./features/profile/ProfileView').then(m => ({ default: m.ProfileView })));
+const DashboardView = React.lazy(() => import('./features/dashboard/DashboardView').then(m => ({ default: m.DashboardView })));
+const DoctrineView = React.lazy(() => import('./features/doctrine/DoctrineView').then(m => ({ default: m.DoctrineView })));
+const StudioView = React.lazy(() => import('./features/studio/StudioView').then(m => ({ default: m.StudioView })));
+const LibraryView = React.lazy(() => import('./features/library/LibraryView').then(m => ({ default: m.LibraryView })));
+const SettingsView = React.lazy(() => import('./features/settings/SettingsView').then(m => ({ default: m.SettingsView })));
+const MoodBoardView = React.lazy(() => import('./features/moodboard/MoodBoardView'));
+const DeploymentView = React.lazy(() => import('./features/deployment/DeploymentView'));
+const TeamView = React.lazy(() => import('./features/team/TeamView').then(m => ({ default: m.TeamView })));
+const TrainingView = React.lazy(() => import('./features/training/TrainingView').then(m => ({ default: m.TrainingView })));
+const AuditView = React.lazy(() => import('./features/audit/AuditView').then(m => ({ default: m.AuditView })));
+const AnalyticsView = React.lazy(() => import('./features/analytics/AnalyticsView').then(m => ({ default: m.AnalyticsView })));
+const IdentityView = React.lazy(() => import('./features/identity/IdentityView').then(m => ({ default: m.IdentityView })));
+
+// Loading component for Suspense
+const ViewLoader = () => (
+    <div className="flex-1 flex items-center justify-center bg-background/50 backdrop-blur-sm">
+        <div className="flex flex-col items-center gap-4">
+            <Zap className="w-8 h-8 text-primary animate-pulse" />
+            <div className="text-[10px] font-mono uppercase tracking-[0.2em] text-primary/60">
+                Initializing Protocol...
+            </div>
+        </div>
+    </div>
+);
+
+const AppContent: React.FC = () => {
+    const { theme } = useTheme();
+    const { user, brands, assets, promptHistory, activeWorkspace } = useAuth();
+    const { visibleTabs } = useSettings();
     const [activeTab, setActiveTab] = useState('dashboard');
+    const [headerActions, setHeaderActions] = useState<React.ReactNode>(null);
     const [apiKeyReady, setApiKeyReady] = useState<boolean | null>(null);
-    const [brands, setBrands] = useState<BrandProfile[]>(INITIAL_BRANDS);
-    const [selectedBrand, setSelectedBrand] = useState<BrandProfile>(INITIAL_BRANDS[0]);
-    const [assets, setAssets] = useState<GeneratedAsset[]>([]);
-    const [promptHistory, setPromptHistory] = useLocalStorage<PromptHistoryItem[]>('brand_os_prompt_history', []);
+
+    // Reset header actions when tab changes
+    useEffect(() => {
+        setHeaderActions(null);
+    }, [activeTab]);
+
+    // Persist selected brand ID to localStorage
+    const SELECTED_BRAND_KEY = 'brandos_selected_brand_id';
+
+    // Initialize selectedBrand from localStorage if possible
+    const [selectedBrand, setSelectedBrand] = useState<BrandProfile>(() => {
+        const savedBrandId = localStorage.getItem(SELECTED_BRAND_KEY);
+        if (savedBrandId && brands.length > 0) {
+            const savedBrand = brands.find(b => b.id === savedBrandId);
+            if (savedBrand) return savedBrand;
+        }
+        // Default to first brand from database
+        return brands[0] || {
+            id: '',
+            name: 'Create your first identity',
+            doctrine: 'Initialize a new brand DNA protocol to begin.',
+            palette: [],
+            background: '#393939',
+            negativeSpace: 50,
+            safeZones: [],
+            emotionalTags: [],
+            forbiddenElements: [],
+            grammarRules: [],
+            extractedPatterns: [],
+            stylisticSignatures: [],
+        } as BrandProfile;
+    });
+    const [refinementContext, setRefinementContext] = useState<{ subject: string, feedback: string } | null>(null);
+    const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
+
+    // Update selected brand when brands change (e.g., after data loads)
+    useEffect(() => {
+        const savedBrandId = localStorage.getItem(SELECTED_BRAND_KEY);
+        if (savedBrandId && brands.length > 0) {
+            const savedBrand = brands.find(b => b.id === savedBrandId);
+            if (savedBrand) {
+                setSelectedBrand(savedBrand);
+                return;
+            }
+        }
+        // Fallback to first brand if no saved brand found
+        if (brands.length > 0 && (!selectedBrand.id || !brands.find(b => b.id === selectedBrand.id))) {
+            setSelectedBrand(brands[0]);
+        }
+    }, [brands]);
+
+    // Save selected brand ID to localStorage when it changes
+    useEffect(() => {
+        if (selectedBrand?.id) {
+            localStorage.setItem(SELECTED_BRAND_KEY, selectedBrand.id);
+        }
+    }, [selectedBrand?.id]);
+
+    // Dynamic title update for SEO and A11y
+    useEffect(() => {
+        const tabTitle = activeTab.charAt(0).toUpperCase() + activeTab.slice(1);
+        document.title = `${tabTitle} | Brand OS`;
+    }, [activeTab]);
+
+
+    // Redirect to dashboard if current tab becomes hidden
+    useEffect(() => {
+        if (activeTab !== 'dashboard' && activeTab !== 'settings' && activeTab !== 'profile' && visibleTabs[activeTab] === false) {
+            setActiveTab('dashboard');
+        }
+    }, [visibleTabs, activeTab]);
 
     useEffect(() => {
         checkApiKeyStatus().then(setApiKeyReady);
@@ -30,74 +126,155 @@ const App: React.FC = () => {
         if (success) setApiKeyReady(true);
     };
 
-    if (apiKeyReady === false) {
-        return (
-            <div className="min-h-screen bg-background flex flex-col items-center justify-center p-12 text-center">
-                <div className="w-20 h-20 brand-gradient rounded-xl flex items-center justify-center mb-8 shadow-[0_0_60px_rgba(16,185,129,0.3)] animate-pulse">
-                    <Box size={40} className="text-primary-foreground" />
-                </div>
-                <h1 className="text-4xl font-display font-black mb-4 tracking-tight">INITIALIZATION REQUIRED</h1>
-                <p className="text-muted-foreground max-w-sm mb-8 text-sm">
-                    Please authenticate with your AI Studio API key to activate the creative core.
-                </p>
-                <button
-                    onClick={handleAuth}
-                    className="px-10 py-5 brand-gradient text-primary-foreground font-black rounded-full hover:scale-105 transition-all shadow-2xl flex items-center gap-4 text-sm tracking-widest uppercase"
-                >
-                    <Zap size={20} />
-                    ACTIVATE CORE
-                </button>
-            </div>
-        );
+    const { addBrand, updateBrand } = useSupabaseBrands();
+    const { addAsset } = useSupabaseAssets();
+    const { addToHistory } = useSupabasePromptHistory();
+
+    const handleRefinePrompt = (asset: GeneratedAsset, customFeedback?: string) => {
+        setRefinementContext({
+            subject: asset.subject || asset.prompt,
+            feedback: customFeedback || asset.auditDetails?.feedback || 'Improve brand alignment'
+        });
+        setActiveTab('creative');
+    };
+
+    if (!user) {
+        return <AuthGuard />;
     }
 
     return (
-        <div className="min-h-screen flex bg-background text-foreground selection:bg-primary/30 font-sans">
-            <Toaster position="top-right" theme="dark" richColors />
-            <Sidebar activeTab={activeTab} onTabChange={setActiveTab} />
+        <div className="min-h-screen flex bg-background text-foreground selection:bg-primary/30 font-sans relative">
+            <div className="cinematic-noise" />
+            <Toaster position="top-right" theme={theme} richColors />
+            <Sidebar
+                activeTab={activeTab}
+                onTabChange={setActiveTab}
+                isCollapsed={isSidebarCollapsed}
+                onToggle={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
+            />
 
-            <main className="flex-1 ml-16 md:ml-64 min-w-0 flex flex-col">
-                <Header activeTab={activeTab} />
+            <main
+                className={`flex-1 min-w-0 flex flex-col transition-all duration-500 ease-in-out ${isSidebarCollapsed ? 'ml-[48px]' : 'ml-[48px] md:ml-[240px]'}`}
+            >
+                <Header
+                    activeTab={activeTab}
+                    activeBrand={selectedBrand}
+                    onNavigate={setActiveTab}
+                    actions={headerActions}
+                />
 
-                <div className="flex-1 overflow-y-auto custom-scrollbar p-6 md:p-10 max-w-7xl mx-auto w-full">
-                    {activeTab === 'dashboard' && (
-                        <DashboardView
-                            brands={brands}
-                            selectedBrand={selectedBrand}
-                            onSelectBrand={setSelectedBrand}
-                            onAddBrand={(brand) => setBrands([...brands, brand])}
-                        />
-                    )}
+                <div className={`
+                    flex-1 w-full mx-auto transition-all duration-300 min-h-0
+                    ${['moodboard'].includes(activeTab)
+                        ? 'p-0 max-w-none overflow-hidden h-full'
+                        : ['dashboard', 'library', 'profile', 'identity', 'doctrine', 'creative', 'training', 'audit', 'analytics', 'team', 'deployment', 'settings'].includes(activeTab)
+                            ? 'p-0 max-w-none overflow-y-auto custom-scrollbar h-full'
+                            : 'p-6 md:p-10 w-full max-w-[2400px] overflow-y-auto custom-scrollbar'
+                    }
+                `}>
+                    <ErrorBoundary>
+                        <React.Suspense fallback={<ViewLoader />}>
+                            {activeTab === 'dashboard' && (
+                                <DashboardView
+                                    brands={brands}
+                                    selectedBrand={selectedBrand}
+                                    onSelectBrand={setSelectedBrand}
+                                    onAddBrand={addBrand}
+                                    onViewDoctrine={() => setActiveTab('doctrine')}
+                                    onInviteTeam={() => setActiveTab('team')}
+                                    onViewAudit={() => setActiveTab('audit')}
+                                    workspaceId={activeWorkspace?.id}
+                                />
+                            )}
 
-                    {activeTab === 'profiles' && (
-                        <DoctrineView
-                            brand={selectedBrand}
-                            onUpdateBrand={setSelectedBrand}
-                        />
-                    )}
+                            {activeTab === 'identity' && (
+                                <IdentityView brand={selectedBrand} />
+                            )}
 
-                    {activeTab === 'creative' && (
-                        <StudioView
-                            brand={selectedBrand}
-                            onAssetGenerated={(asset) => {
-                                setAssets([asset, ...assets]);
-                                setActiveTab('library');
-                            }}
-                            promptHistory={promptHistory}
-                            onUpdateHistory={setPromptHistory}
-                        />
-                    )}
+                            {activeTab === 'doctrine' && (
+                                <DoctrineView
+                                    brand={selectedBrand}
+                                    onUpdateBrand={async (brand) => {
+                                        // Ensure the brand is associated with the active workspace
+                                        const brandWithWorkspace = {
+                                            ...brand,
+                                            workspaceId: brand.workspaceId || activeWorkspace?.id,
+                                        };
+                                        await updateBrand(brandWithWorkspace);
+                                        setSelectedBrand(brandWithWorkspace);
+                                    }}
+                                />
+                            )}
 
-                    {activeTab === 'library' && (
-                        <LibraryView assets={assets} />
-                    )}
+                            {activeTab === 'profile' && (
+                                <ProfileView />
+                            )}
 
-                    {activeTab === 'settings' && (
-                        <SettingsView onAuth={handleAuth} />
-                    )}
+                            {activeTab === 'moodboard' && (
+                                <MoodBoardView brand={selectedBrand} setHeaderActions={setHeaderActions} />
+                            )}
+
+                            {activeTab === 'creative' && (
+                                <StudioView
+                                    brand={selectedBrand}
+                                    onAssetGenerated={async (asset) => {
+                                        await addAsset(asset);
+                                        setActiveTab('library');
+                                        setRefinementContext(null);
+                                    }}
+                                    promptHistory={promptHistory}
+                                    onUpdateHistory={(history) => {
+                                        // History is managed by context now
+                                    }}
+                                    initialContext={refinementContext}
+                                />
+                            )}
+
+                            {activeTab === 'library' && (
+                                <LibraryView
+                                    assets={assets}
+                                    onRefine={handleRefinePrompt}
+                                />
+                            )}
+
+                            {activeTab === 'training' && (
+                                <TrainingView brand={selectedBrand} assets={assets} setHeaderActions={setHeaderActions} />
+                            )}
+
+                            {activeTab === 'audit' && (
+                                <AuditView brand={selectedBrand} />
+                            )}
+
+                            {activeTab === 'analytics' && (
+                                <AnalyticsView brand={selectedBrand} assets={assets} />
+                            )}
+
+                            {activeTab === 'deployment' && (
+                                <DeploymentView brand={selectedBrand} assets={assets} />
+                            )}
+
+                            {activeTab === 'team' && (
+                                <TeamView />
+                            )}
+
+                            {activeTab === 'settings' && (
+                                <SettingsView onAuth={handleAuth} />
+                            )}
+                        </React.Suspense>
+                    </ErrorBoundary>
                 </div>
             </main>
         </div>
+    );
+};
+
+const App: React.FC = () => {
+    return (
+        <AuthProvider>
+            <SettingsProvider>
+                <AppContent />
+            </SettingsProvider>
+        </AuthProvider>
     );
 };
 

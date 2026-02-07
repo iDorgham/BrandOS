@@ -11,7 +11,7 @@ import {
     Image as ImageIcon,
     Tablet
 } from 'lucide-react';
-import { GrammarRule, EmotionalIntent, BrandProfile, AssetType } from '../types';
+import { GrammarRule, EmotionalIntent, BrandProfile, AssetType, Workspace } from '../types';
 
 /**
  * Initial set of grammar rules for brand alignment
@@ -48,25 +48,42 @@ export const ASSET_TYPES: AssetType[] = [
 ];
 
 /**
- * Initial mock brand profiles
+ * Initial mock brand profiles (Empty to ensure new workspaces start fresh)
  */
-export const INITIAL_BRANDS: BrandProfile[] = [
+export const INITIAL_BRANDS: BrandProfile[] = [];
+
+/**
+ * Mock Workspace data for demonstration
+ */
+export const MOCK_WORKSPACES: Workspace[] = [
     {
-        id: 'noir-01',
-        name: 'NOIR Nightlife',
-        doctrine: 'High-contrast luxury minimalism with wabi-sabi textures. Focus on deep shadows and emerald highlights.',
-        palette: [
-            { id: '1', label: 'Primary', hex: '#0a0e17' },
-            { id: '2', label: 'Secondary', hex: '#1a1a1a' },
-            { id: '3', label: 'Accent', hex: '#10b981' }
-        ],
-        background: '#050505',
-        negativeSpace: 65,
-        safeZones: ['bottom_25%', 'top_right_10%'],
-        emotionalTags: [EmotionalIntent.MYSTERIOUS, EmotionalIntent.SOPHISTICATED],
-        forbiddenElements: ['gradients', 'centered_logos', 'bright_red'],
-        extractedPatterns: ['Shadow-heavy compositions', 'Off-center subject focus'],
-        stylisticSignatures: ['Brutalist typography zones', 'Film grain texture'],
-        grammarRules: [...DEFAULT_GRAMMAR_RULES]
+        id: '123e4567-e89b-12d3-a456-426614174000',
+        name: 'Nexus Alpha',
+        slug: 'nexus-alpha',
+        ownerId: '123e4567-e89b-12d3-a456-426614174001',
+        createdAt: Date.now() - 86400000 * 30
+    },
+    {
+        id: '123e4567-e89b-12d3-a456-426614174002',
+        name: 'Creative Studio',
+        slug: 'creative-studio',
+        ownerId: '123e4567-e89b-12d3-a456-426614174001',
+        createdAt: Date.now() - 86400000 * 5
     }
 ];
+
+/**
+ * Mock User Profile for demonstration
+ */
+export const MOCK_USER_PROFILE = {
+    id: 'demo-user',
+    name: 'Art Director',
+    email: 'director@brand-os.ai',
+    role: 'art_director',
+    avatarUrl: '',
+    preferences: {
+        notifications: true,
+        theme: 'dark',
+        compactMode: false
+    }
+};

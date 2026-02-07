@@ -43,6 +43,11 @@ export const generateBrandAlignedPrompt = async (
     - Emotional Intent: ${brand.emotionalTags.join(', ')}.
     - Forbidden Elements: ${brand.forbiddenElements.join(', ')}.
 
+    HIGH-FIDELITY DESIGN SPECIFICATIONS:
+    - Typography: ${brand.typography ? `${brand.typography.fontFamily}, weights: ${brand.typography.weightScale.join('/')}, spacing: ${brand.typography.letterSpacing}` : 'Clean typography consistent with brand doctrine'}
+    - Lighting Setup: ${brand.lighting ? `${brand.lighting.setup} configuration, Contrast Ratio: ${brand.lighting.contrastRatio}, Temp: ${brand.lighting.colorTemperature}` : 'Sophisticated studio lighting'}
+    - Structural Grid: ${brand.grid ? `${brand.grid.type} grid system with ${brand.grid.gutterRatio}x spacing` : 'Rule of thirds composition'}
+
     ADVANCED GRAMMAR RULES (Apply these conditionally based on the subject):
     ${grammarStrings}
     
@@ -67,6 +72,7 @@ export const generateBrandAlignedPrompt = async (
     If assetType is 'Stock Image', focus on lighting, lens specs, and photographic realism within brand bounds.
     Incorporate the specific stylistic signatures and compositional patterns identified above.
     Ensure "Wabi-Sabi" intentionality (asymmetry, natural textures, intentional imperfection).
+    You MUST explicitly reference the Lighting Setup and structural grid directives in your technical description.
   `;
 
     try {
@@ -128,7 +134,8 @@ export const auditCompliance = async (imageUrl: string, brand: BrandProfile): Pr
 
     Return a JSON object with:
     - scores (0-100) for colorMatch, spatialCompliance, vibeCheck.
-    - feedback: A short 1-sentence critique on how to improve brand alignment.
+    - feedback: A short 1-sentence critique.
+    - suggestedFixes: An array of 3 specific technical prompt fragments that would improve the score (e.g., "increase negative space in top right", "add #10b981 highlights").
   `;
 
     try {
@@ -148,17 +155,18 @@ export const auditCompliance = async (imageUrl: string, brand: BrandProfile): Pr
                         colorMatch: { type: Type.NUMBER },
                         spatialCompliance: { type: Type.NUMBER },
                         vibeCheck: { type: Type.NUMBER },
-                        feedback: { type: Type.STRING }
+                        feedback: { type: Type.STRING },
+                        suggestedFixes: { type: Type.ARRAY, items: { type: Type.STRING } }
                     },
-                    required: ["colorMatch", "spatialCompliance", "vibeCheck", "feedback"]
+                    required: ["colorMatch", "spatialCompliance", "vibeCheck", "feedback", "suggestedFixes"]
                 }
             }
         });
 
         const text = response.text?.trim();
-        return JSON.parse(text || '{"colorMatch": 80, "spatialCompliance": 80, "vibeCheck": 80, "feedback": "Validation complete."}');
+        return JSON.parse(text || '{"colorMatch": 80, "spatialCompliance": 80, "vibeCheck": 80, "feedback": "Validation complete.", "suggestedFixes": []}');
     } catch (error) {
-        return { colorMatch: 75, spatialCompliance: 75, vibeCheck: 75, feedback: "Audit service unavailable." };
+        return { colorMatch: 75, spatialCompliance: 75, vibeCheck: 75, feedback: "Audit service unavailable.", suggestedFixes: [] };
     }
 };
 
@@ -170,9 +178,12 @@ export const analyzeReferenceAsset = async (base64Data: string): Promise<Partial
     Return the following in JSON format:
     - dominantColors: Array of hex codes and suggested labels (e.g. [{"hex": "#000000", "label": "Deep Space"}]). Up to 6 colors.
     - background: The most suitable background hex code.
-    - compositionalPatterns: 3 distinct rules for spatial layout (e.g. 'wide margins', 'geometric symmetry').
-    - stylisticSignatures: 3 core artistic characteristics (e.g. 'high-grain film texture', 'vector-based brutalism', 'organic brushwork').
+    - compositionalPatterns: 3 distinct rules for spatial layout.
+    - stylisticSignatures: 3 core artistic characteristics.
     - moodTags: 3 emotional descriptive keywords.
+    - typography: { fontFamily, weightScale: string[], letterSpacing: string }
+    - lighting: { setup: "Rembrandt" | "High-key" | "Noir" | "Natural", contrastRatio: string, colorTemperature: string }
+    - grid: { type: "thirds" | "golden" | "modular" | "minimalist", gutterRatio: number }
   `;
 
     try {
@@ -204,7 +215,7 @@ export const analyzeReferenceAsset = async (base64Data: string): Promise<Partial
                         stylisticSignatures: { type: Type.ARRAY, items: { type: Type.STRING } },
                         moodTags: { type: Type.ARRAY, items: { type: Type.STRING } }
                     },
-                    required: ["dominantColors", "compositionalPatterns", "stylisticSignatures", "background"]
+                    required: ["dominantColors", "compositionalPatterns", "stylisticSignatures", "background", "typography", "lighting", "grid"]
                 }
             }
         });
@@ -216,9 +227,12 @@ export const analyzeReferenceAsset = async (base64Data: string): Promise<Partial
                 hex: c.hex,
                 label: c.label || `Color ${i + 1}`
             })),
-            background: data.background || '#050505',
+            background: data.background || '#262626',
             extractedPatterns: data.compositionalPatterns,
-            stylisticSignatures: data.stylisticSignatures
+            stylisticSignatures: data.stylisticSignatures,
+            typography: data.typography,
+            lighting: data.lighting,
+            grid: data.grid
         };
     } catch (error) {
         console.error("Reference analysis failed:", error);

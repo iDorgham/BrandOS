@@ -1,6 +1,9 @@
 import React, { useState } from 'react';
 import { Target } from 'lucide-react';
 
+export { default as ReferenceAnalysisModal } from './ReferenceAnalysisModal';
+export { DNAVisualization } from './DNAVisualization';
+
 interface NegativeSpaceVisualizerProps {
     percentage: number;
     size?: 'sm' | 'md' | 'lg';
@@ -20,7 +23,7 @@ export const NegativeSpaceVisualizer: React.FC<NegativeSpaceVisualizerProps> = (
                 style={{ backgroundImage: 'linear-gradient(hsl(142.1 70.6% 45.3% / 0.2) 1px, transparent 1px), linear-gradient(90deg, hsl(142.1 70.6% 45.3% / 0.2) 1px, transparent 1px)', backgroundSize: '20px 20px' }} />
 
             <div
-                className="bg-primary/5 border border-primary/40 transition-all duration-700 ease-[cubic-bezier(0.34,1.56,0.64,1)] rounded-md shadow-[0_0_40px_rgba(16,185,129,0.1)] flex flex-col items-center justify-center relative z-10 overflow-hidden"
+                className="bg-primary/5 border border-primary/40 transition-all duration-700 ease-[cubic-bezier(0.34,1.56,0.64,1)] rounded-md shadow-[0_0_40px_rgba(15,98,254,0.1)] flex flex-col items-center justify-center relative z-10 overflow-hidden"
                 style={{ width: `${innerScale * 100}%`, height: `${innerScale * 100}%` }}
             >
                 <div className="absolute top-0 left-0 w-full h-px bg-primary/40 animate-[scan_3s_infinite_linear]" />
