@@ -25,6 +25,7 @@ const TrainingView = React.lazy(() => import('./features/training/TrainingView')
 const AuditView = React.lazy(() => import('./features/audit/AuditView').then(m => ({ default: m.AuditView })));
 const AnalyticsView = React.lazy(() => import('./features/analytics/AnalyticsView').then(m => ({ default: m.AnalyticsView })));
 const IdentityView = React.lazy(() => import('./features/identity/IdentityView').then(m => ({ default: m.IdentityView })));
+const LandingPage = React.lazy(() => import('./features/landing/LandingPage').then(m => ({ default: m.LandingPage })));
 
 // Loading component for Suspense
 const ViewLoader = () => (
@@ -139,7 +140,11 @@ const AppContent: React.FC = () => {
     };
 
     if (!user) {
-        return <AuthGuard />;
+        return (
+            <React.Suspense fallback={<ViewLoader />}>
+                <LandingPage />
+            </React.Suspense>
+        );
     }
 
     return (
