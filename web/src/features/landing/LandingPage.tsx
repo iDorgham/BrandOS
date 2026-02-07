@@ -372,13 +372,13 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onLoginClick }) => {
             </section>
 
             {/* 5. TRUST & PRICING: THE NEW STANDARD */}
-            <section id="pricing" className="py-64 px-8 border-t border-[#1a1a1a]">
+            <section id="pricing" className="py-32 px-8 border-t border-[#1a1a1a]">
                 <div className="max-w-[1800px] mx-auto flex flex-col items-center">
-                    <motion.div {...fastFadeIn} className="text-center mb-32">
-                        <h2 className="text-[clamp(3rem,8vw,10rem)] font-black tracking-tighter uppercase leading-none mb-12">
+                    <motion.div {...fastFadeIn} className="text-center mb-16">
+                        <h2 className="text-[clamp(3rem,6vw,8rem)] font-black tracking-tighter uppercase leading-none mb-6">
                             The New Standard.
                         </h2>
-                        <p className="text-2xl text-[#c6c6c6] font-light max-w-4xl mx-auto">
+                        <p className="text-xl text-[#c6c6c6] font-light max-w-4xl mx-auto">
                             Used by forward-thinking teams to eliminate manual overhead and build the future of branding.
                         </p>
                     </motion.div>
@@ -392,16 +392,16 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onLoginClick }) => {
                             <motion.div
                                 key={i}
                                 whileHover={{ scale: 1.02, zIndex: 10 }}
-                                className="p-20 bg-[#000] flex flex-col h-full relative overflow-hidden group"
+                                className="p-12 bg-[#000] flex flex-col h-full relative overflow-hidden group"
                             >
-                                <div className="text-[10px] font-black uppercase tracking-[0.4em] text-[#525252] mb-12">Protocol_Tier_0{i + 1}</div>
-                                <h3 className="text-5xl font-black uppercase mb-4 tracking-tighter">{plan.name}</h3>
-                                <div className="text-7xl font-black mb-12 tracking-tighter">{plan.price}<span className="text-lg opacity-30">/mo</span></div>
-                                <p className="text-xl font-light text-[#c6c6c6] mb-20 flex-1 leading-tight">{plan.desc}</p>
+                                <div className="text-[10px] font-black uppercase tracking-[0.4em] text-[#525252] mb-8">Protocol_Tier_0{i + 1}</div>
+                                <h3 className="text-4xl font-black uppercase mb-2 tracking-tighter">{plan.name}</h3>
+                                <div className="text-6xl font-black mb-10 tracking-tighter">{plan.price}<span className="text-sm opacity-30 tracking-normal font-normal">/mo</span></div>
+                                <p className="text-lg font-light text-[#c6c6c6] mb-12 flex-1 leading-tight">{plan.desc}</p>
                                 <Button
                                     onClick={onLoginClick}
                                     style={{ backgroundColor: i === 1 ? '#0f62fe' : 'transparent', border: i === 1 ? 'none' : '1px solid #393939' }}
-                                    className="w-full h-16 rounded-none text-sm font-black uppercase tracking-widest"
+                                    className="w-full h-14 rounded-none text-xs font-black uppercase tracking-widest"
                                 >
                                     Select Access
                                 </Button>
