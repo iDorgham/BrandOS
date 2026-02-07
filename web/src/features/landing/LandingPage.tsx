@@ -9,6 +9,7 @@ import { Button } from '@/components/ui';
 
 interface LandingPageProps {
     onLoginClick: () => void;
+    onInfoClick: (topic: 'terms' | 'privacy' | 'faq' | 'help') => void;
 }
 
 export const LandingPage: React.FC<LandingPageProps> = ({ onLoginClick }) => {
@@ -83,7 +84,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onLoginClick }) => {
 
                         <div className="hidden lg:flex items-center gap-10 text-[11px] font-bold text-[#6f6f6f] uppercase tracking-[0.2em]">
                             <a href="#problem" className="hover:text-white transition-colors">Problem</a>
-                            <a href="#solution" className="hover:text-white transition-colors">Protocol</a>
+                            <a href="#solution" className="hover:text-white transition-colors">Technology</a>
                             <a href="#control" className="hover:text-white transition-colors">Control</a>
                             <a href="#pricing" className="hover:text-white transition-colors">Contact</a>
                         </div>
@@ -443,40 +444,77 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onLoginClick }) => {
                 </div>
             </section>
 
-            {/* FOOTER */}
-            <footer className="py-32 px-8 border-t border-[#1a1a1a] bg-[#000] relative z-20">
-                <div className="max-w-[1800px] mx-auto grid grid-cols-1 md:grid-cols-12 gap-24">
-                    <div className="md:col-span-6">
-                        <div className="flex items-center gap-4 mb-12">
-                            <div className="w-12 h-12 bg-[#0f62fe] flex items-center justify-center aura-glow">
-                                <Zap className="text-white" size={24} fill="currentColor" />
+            {/* FOOTER: REDESIGNED FOR ENTERPRISE AUTHORITY */}
+            <footer className="py-48 px-8 border-t border-[#1a1a1a] bg-[#000] relative z-20">
+                <div className="max-w-[1800px] mx-auto">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-24 mb-32">
+                        <div className="lg:col-span-4">
+                            <div className="flex items-center gap-4 mb-12">
+                                <div className="w-12 h-12 bg-[#0f62fe] flex items-center justify-center aura-glow">
+                                    <Zap className="text-white" size={24} fill="currentColor" />
+                                </div>
+                                <span className="font-black tracking-tighter uppercase text-3xl">Brand OS</span>
                             </div>
-                            <span className="font-black tracking-tighter uppercase text-3xl">Brand OS</span>
+                            <p className="text-[#525252] text-sm max-w-sm leading-loose uppercase tracking-[0.2em] font-black mb-12">
+                                Engineered in 2026. <br />
+                                Optimized for Maximum Precision. <br />
+                                V3.0.0_STABLE_BUILD.
+                            </p>
+                            <div className="flex gap-8 text-[#333]">
+                                <a href="#" className="hover:text-white transition-all"><Twitter size={24} strokeWidth={1.5} /></a>
+                                <a href="#" className="hover:text-white transition-all"><Github size={24} strokeWidth={1.5} /></a>
+                            </div>
                         </div>
-                        <p className="text-[#525252] text-sm max-w-md leading-loose uppercase tracking-[0.2em] font-black">
-                            Engineered in 2026. <br />
-                            Optimized for Maximum Precision. <br />
-                            V3.0.0_STABLE_BUILD.
-                        </p>
+
+                        <div className="lg:col-span-8 grid grid-cols-2 md:grid-cols-4 gap-12">
+                            <div>
+                                <h4 className="text-[10px] font-black uppercase tracking-[0.4em] text-white mb-10">Product</h4>
+                                <ul className="space-y-4 text-[11px] text-[#525252] font-mono uppercase tracking-[0.2em] font-black">
+                                    <li><a href="#solution" className="hover:text-[#0f62fe] transition-colors line-through opacity-30 cursor-not-allowed">Changelog</a></li>
+                                    <li><a href="#control" className="hover:text-[#0f62fe] transition-colors">Audit_Feed</a></li>
+                                    <li><a href="#pricing" className="hover:text-[#0f62fe] transition-colors">Pricing</a></li>
+                                    <li><a href="#" className="hover:text-[#0f62fe] transition-colors">Docs_v3</a></li>
+                                </ul>
+                            </div>
+                            <div>
+                                <h4 className="text-[10px] font-black uppercase tracking-[0.4em] text-white mb-10">Technical</h4>
+                                <ul className="space-y-4 text-[11px] text-[#525252] font-mono uppercase tracking-[0.2em] font-black">
+                                    <li><a href="#" className="hover:text-[#0f62fe] transition-colors">API_Reference</a></li>
+                                    <li><a href="#" className="hover:text-[#0f62fe] transition-colors">Uptime_Status</a></li>
+                                    <li><a href="#" className="hover:text-[#0f62fe] transition-colors">Nodes_Globe</a></li>
+                                    <li><a href="#" className="hover:text-[#0f62fe] transition-colors">Security_Whitepaper</a></li>
+                                </ul>
+                            </div>
+                            <div>
+                                <h4 className="text-[10px] font-black uppercase tracking-[0.4em] text-white mb-10">Support</h4>
+                                <ul className="space-y-4 text-[11px] text-[#525252] font-mono uppercase tracking-[0.2em] font-black">
+                                    <li><button onClick={() => onInfoClick('faq')} className="hover:text-[#f1c21b] transition-colors">Q&A_System</button></li>
+                                    <li><button onClick={() => onInfoClick('help')} className="hover:text-[#f1c21b] transition-colors">Help_Center</button></li>
+                                    <li><button className="hover:text-[#f1c21b] transition-colors">Engineering_Direct</button></li>
+                                    <li><button className="hover:text-[#f1c21b] transition-colors">Community</button></li>
+                                </ul>
+                            </div>
+                            <div>
+                                <h4 className="text-[10px] font-black uppercase tracking-[0.4em] text-white mb-10">Legal</h4>
+                                <ul className="space-y-4 text-[11px] text-[#525252] font-mono uppercase tracking-[0.2em] font-black">
+                                    <li><button onClick={() => onInfoClick('privacy')} className="hover:text-white transition-colors">Privacy_Shield</button></li>
+                                    <li><button onClick={() => onInfoClick('terms')} className="hover:text-white transition-colors">Terms_of_Protocol</button></li>
+                                    <li><button className="hover:text-white transition-colors">Cookie_Audit</button></li>
+                                    <li><button className="hover:text-white transition-colors">User_Rights</button></li>
+                                </ul>
+                            </div>
+                        </div>
                     </div>
 
-                    <div className="md:col-span-6 grid grid-cols-2 gap-20">
-                        <div>
-                            <h4 className="text-[10px] font-black uppercase tracking-[0.4em] text-white mb-12">Security</h4>
-                            <div className="flex flex-col gap-6 text-[12px] text-[#525252] font-mono uppercase tracking-[0.2em] font-black">
-                                <a href="#" className="hover:text-white transition-colors">Privacy_Protocol</a>
-                                <a href="#" className="hover:text-white transition-colors">Audit_Logs</a>
-                                <a href="#" className="hover:text-white transition-colors">Compliance</a>
+                    <div className="pt-16 border-t border-[#1a1a1a] flex flex-col md:flex-row justify-between items-center gap-8">
+                        <div className="flex items-center gap-6">
+                            <div className="flex gap-1">
+                                {[1, 2, 3, 4, 5].map(i => <div key={i} className="w-1 h-3 bg-[#1a1a1a]" />)}
                             </div>
+                            <span className="text-[10px] font-mono text-[#333] font-black tracking-[0.5em] uppercase">ALL_SYSTEMS_OPERATIONAL [ BUILT_BY_DNA_GLOBAL ]</span>
                         </div>
-                        <div className="flex flex-col items-end justify-between">
-                            <div className="flex gap-10 text-[#525252]">
-                                <a href="#" className="hover:text-white transition-all"><Twitter size={28} strokeWidth={1} /></a>
-                                <a href="#" className="hover:text-white transition-all"><Github size={28} strokeWidth={1} /></a>
-                            </div>
-                            <div className="text-[10px] font-mono text-[#333] font-black letter-spacing-[0.5em] text-right">
-                                © 2026 DNA_SYSTEMS_GLOBAL
-                            </div>
+                        <div className="text-[10px] font-mono text-[#333] font-black tracking-[0.5em] text-right uppercase">
+                            © 2026 DNA_SYSTEMS_GLOBAL // EST_2024
                         </div>
                     </div>
                 </div>

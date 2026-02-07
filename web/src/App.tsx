@@ -10,6 +10,7 @@ import { useSupabaseBrands, useSupabaseAssets, useSupabasePromptHistory } from '
 import { useTheme } from './contexts/ThemeContext';
 import { Toaster } from 'sonner';
 import { ErrorBoundary } from './components/common/ErrorBoundary';
+import { InfoPage, InfoTopic } from './features/info/InfoPage';
 
 // Lazy load feature views for performance
 const ProfileView = React.lazy(() => import('./features/profile/ProfileView').then(m => ({ default: m.ProfileView })));
@@ -47,6 +48,7 @@ const AppContent: React.FC = () => {
     const [headerActions, setHeaderActions] = useState<React.ReactNode>(null);
     const [apiKeyReady, setApiKeyReady] = useState<boolean | null>(null);
     const [showAuth, setShowAuth] = useState(false);
+    const [infoView, setInfoView] = useState<InfoTopic | null>(null);
 
     // Reset header actions when tab changes
     useEffect(() => {
@@ -142,16 +144,24 @@ const AppContent: React.FC = () => {
 
     // Reset showAuth when user becomes present
     useEffect(() => {
-        if (user) setShowAuth(false);
+        if (user) {
+            setShowAuth(false);
+            setInfoView(null);
+        }
     }, [user]);
 
     if (!user) {
         return (
             <React.Suspense fallback={<ViewLoader />}>
-                {showAuth ? (
+                {infoView ? (
+                    <InfoPage topic={infoView} onBack={() => setInfoView(null)} />
+                ) : showAuth ? (
                     <AuthGuard onBack={() => setShowAuth(false)} />
                 ) : (
-                    <LandingPage onLoginClick={() => setShowAuth(true)} />
+                    <LandingPage
+                        onLoginClick={() => setShowAuth(true)}
+                        onInfoClick={(topic: InfoTopic) => setInfoView(topic)}
+                    />
                 )}
             </React.Suspense>
         );
@@ -210,7 +220,6 @@ const AppContent: React.FC = () => {
                                 <DoctrineView
                                     brand={selectedBrand}
                                     onUpdateBrand={async (brand) => {
-                                        // Ensure the brand is associated with the active workspace
                                         const brandWithWorkspace = {
                                             ...brand,
                                             workspaceId: brand.workspaceId || activeWorkspace?.id,
