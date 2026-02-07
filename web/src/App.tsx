@@ -43,7 +43,7 @@ const ViewLoader = () => (
 
 const AppContent: React.FC = () => {
     const { theme } = useTheme();
-    const { user, brands, assets, promptHistory, activeWorkspace } = useAuth();
+    const { user, loading, brands, assets, promptHistory, activeWorkspace } = useAuth();
     const { visibleTabs } = useSettings();
     const [activeTab, setActiveTab] = useState('dashboard');
     const [headerActions, setHeaderActions] = useState<React.ReactNode>(null);
@@ -152,6 +152,10 @@ const AppContent: React.FC = () => {
             setProductView(null);
         }
     }, [user]);
+
+    if (loading) {
+        return <ViewLoader />;
+    }
 
     if (!user) {
         return (

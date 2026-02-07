@@ -3,7 +3,7 @@ import { motion, AnimatePresence, useScroll, useSpring, useTransform } from 'fra
 import {
     Zap, Shield, ArrowRight, Github, Twitter,
     Layers, Code, ChevronDown, Activity, Cpu,
-    Target, Command, Globe, Info, Menu, X
+    Target, Command, Globe, Info, Menu, X, ChevronRight
 } from 'lucide-react';
 import { Button } from '@/components/ui';
 
@@ -492,25 +492,25 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onLoginClick, onInfoCl
                         <div className="lg:col-span-8 grid grid-cols-2 md:grid-cols-4 gap-12">
                             <div>
                                 <h4 className="text-[10px] font-black uppercase tracking-[0.4em] text-white mb-10">Product</h4>
-                                <ul className="space-y-4 text-[11px] text-[#525252] font-mono uppercase tracking-[0.2em] font-black">
-                                    <li><a href="#solution" className="hover:text-[#0f62fe] transition-colors line-through opacity-30 cursor-not-allowed">Changelog</a></li>
-                                    <li><a href="#control" className="hover:text-[#0f62fe] transition-colors">Audit_Feed</a></li>
-                                    <li><a href="#pricing" className="hover:text-[#0f62fe] transition-colors">Pricing</a></li>
-                                    <li><a href="#" className="hover:text-[#0f62fe] transition-colors">Docs_v3</a></li>
+                                <ul className="space-y-4 text-[11px] text-[#8e8e8e] font-mono uppercase tracking-[0.2em] font-black">
+                                    <li><button onClick={() => onProductClick('identity')} className="hover:text-[#0f62fe] transition-colors">Identity_Node</button></li>
+                                    <li><button onClick={() => onProductClick('doctrine')} className="hover:text-[#0f62fe] transition-colors">Doctrine_Engine</button></li>
+                                    <li><button onClick={() => onProductClick('studio')} className="hover:text-[#0f62fe] transition-colors">Studio_API</button></li>
+                                    <li><button onClick={() => onProductClick('audit')} className="hover:text-[#0f62fe] transition-colors">Audit_Protocol</button></li>
                                 </ul>
                             </div>
                             <div>
-                                <h4 className="text-[10px] font-black uppercase tracking-[0.4em] text-white mb-10">Technical</h4>
-                                <ul className="space-y-4 text-[11px] text-[#525252] font-mono uppercase tracking-[0.2em] font-black">
+                                <h4 className="text-[10px] font-black uppercase tracking-[0.4em] text-white mb-10">Platform</h4>
+                                <ul className="space-y-4 text-[11px] text-[#8e8e8e] font-mono uppercase tracking-[0.2em] font-black">
+                                    <li><a href="#pricing" className="hover:text-[#0f62fe] transition-colors">Pricing_Plans</a></li>
                                     <li><a href="#" className="hover:text-[#0f62fe] transition-colors">API_Reference</a></li>
-                                    <li><a href="#" className="hover:text-[#0f62fe] transition-colors">Uptime_Status</a></li>
-                                    <li><a href="#" className="hover:text-[#0f62fe] transition-colors">Nodes_Globe</a></li>
-                                    <li><a href="#" className="hover:text-[#0f62fe] transition-colors">Security_Whitepaper</a></li>
+                                    <li><a href="#" className="hover:text-[#0f62fe] transition-colors">Market_Impact</a></li>
+                                    <li><a href="#" className="hover:text-[#0f62fe] transition-colors">Docs_v3.0</a></li>
                                 </ul>
                             </div>
                             <div>
                                 <h4 className="text-[10px] font-black uppercase tracking-[0.4em] text-white mb-10">Support</h4>
-                                <ul className="space-y-4 text-[11px] text-[#525252] font-mono uppercase tracking-[0.2em] font-black">
+                                <ul className="space-y-4 text-[11px] text-[#8e8e8e] font-mono uppercase tracking-[0.2em] font-black">
                                     <li><button onClick={() => onInfoClick('faq')} className="hover:text-[#f1c21b] transition-colors">Q&A_System</button></li>
                                     <li><button onClick={() => onInfoClick('help')} className="hover:text-[#f1c21b] transition-colors">Help_Center</button></li>
                                     <li><button className="hover:text-[#f1c21b] transition-colors">Engineering_Direct</button></li>
@@ -519,7 +519,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onLoginClick, onInfoCl
                             </div>
                             <div>
                                 <h4 className="text-[10px] font-black uppercase tracking-[0.4em] text-white mb-10">Legal</h4>
-                                <ul className="space-y-4 text-[11px] text-[#525252] font-mono uppercase tracking-[0.2em] font-black">
+                                <ul className="space-y-4 text-[11px] text-[#8e8e8e] font-mono uppercase tracking-[0.2em] font-black">
                                     <li><button onClick={() => onInfoClick('privacy')} className="hover:text-white transition-colors">Privacy_Shield</button></li>
                                     <li><button onClick={() => onInfoClick('terms')} className="hover:text-white transition-colors">Terms_of_Protocol</button></li>
                                     <li><button className="hover:text-white transition-colors">Cookie_Audit</button></li>
