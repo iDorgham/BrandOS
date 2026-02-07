@@ -27,6 +27,58 @@ interface BatchItem {
     result?: GeneratedAsset;
 }
 
+interface IntensityMatrixProps {
+    intensities: { energy: number; warmth: number; sophistication: number };
+    onChange: (key: string, value: number) => void;
+}
+
+const IntensityMatrix = React.memo<IntensityMatrixProps>(({ intensities, onChange }) => {
+    return (
+        <div className="grid grid-cols-1 gap-14 relative">
+            <div className="absolute inset-y-0 left-0 w-[1px] bg-border/20" />
+            {['energy', 'warmth', 'sophistication'].map(key => (
+                <div key={key} className="space-y-6 relative pl-6">
+                    <div className="absolute left-0 top-1.5 w-1.5 h-[1px] bg-primary/50" />
+                    <div className="flex justify-between items-end">
+                        <span className="flex items-center gap-3 text-[10px] font-mono font-black text-foreground/80 uppercase tracking-[0.2em]">
+                            {key === 'energy' && <Zap size={14} className="text-primary" />}
+                            {key === 'warmth' && <Monitor size={14} className="text-primary" />}
+                            {key === 'sophistication' && <Cpu size={14} className="text-primary" />}
+                            {key}
+                        </span>
+                        <div className="flex items-baseline gap-1 font-mono text-primary">
+                            <span className="text-xl font-bold">{(intensities as any)[key]}</span>
+                            <span className="text-[9px] opacity-60">/ 100</span>
+                        </div>
+                    </div>
+
+                    <div className="relative h-8 group">
+                        {/* Track */}
+                        <div className="absolute top-1/2 left-0 right-0 h-[2px] bg-muted/30 -translate-y-1/2 overflow-hidden">
+                            <div className="absolute inset-0 bg-[repeating-linear-gradient(90deg,transparent,transparent_4px,currentColor_4px,currentColor_5px)] text-muted-foreground/10" />
+                        </div>
+                        <div className="absolute top-1/2 left-0 h-[2px] bg-primary -translate-y-1/2 transition-all" style={{ width: `${(intensities as any)[key]}%` }} />
+
+                        {/* Thumb */}
+                        <input
+                            type="range"
+                            className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+                            value={(intensities as any)[key]}
+                            onChange={(e) => onChange(key, parseInt(e.target.value))}
+                        />
+                        <div
+                            className="absolute top-1/2 w-4 h-6 bg-background border border-primary z-0 -translate-y-1/2 -translate-x-1/2 pointer-events-none transition-all group-hover:scale-110 shadow-[0_0_15px_rgba(var(--primary-rgb),0.3)]"
+                            style={{ left: `${(intensities as any)[key]}%` }}
+                        >
+                            <div className="absolute top-1/2 left-1/2 w-1.5 h-1.5 bg-primary -translate-x-1/2 -translate-y-1/2 rounded-full" />
+                        </div>
+                    </div>
+                </div>
+            ))}
+        </div>
+    );
+});
+
 export const StudioView = React.memo<StudioViewProps>(({
     brand,
     onAssetGenerated,
@@ -43,6 +95,10 @@ export const StudioView = React.memo<StudioViewProps>(({
     const [view, setView] = useState<'selection' | 'parameters' | 'batch_review'>('selection');
     const [refinementFeedback, setRefinementFeedback] = useState(initialContext?.feedback || '');
     const [showAIGenerator, setShowAIGenerator] = useState(false);
+
+    const handleIntensityChange = (key: string, value: number) => {
+        setIntensities(prev => ({ ...prev, [key]: value }));
+    };
 
     React.useEffect(() => {
         if (initialContext?.subject) {
@@ -415,48 +471,10 @@ export const StudioView = React.memo<StudioViewProps>(({
                                         <h3 className="text-[12px] font-mono font-black uppercase tracking-[0.3em]">Intensity Matrix</h3>
                                     </div>
 
-                                    <div className="grid grid-cols-1 gap-14 relative">
-                                        <div className="absolute inset-y-0 left-0 w-[1px] bg-border/20" />
-                                        {['energy', 'warmth', 'sophistication'].map(key => (
-                                            <div key={key} className="space-y-6 relative pl-6">
-                                                <div className="absolute left-0 top-1.5 w-1.5 h-[1px] bg-primary/50" />
-                                                <div className="flex justify-between items-end">
-                                                    <span className="flex items-center gap-3 text-[10px] font-mono font-black text-foreground/80 uppercase tracking-[0.2em]">
-                                                        {key === 'energy' && <Zap size={14} className="text-primary" />}
-                                                        {key === 'warmth' && <Monitor size={14} className="text-primary" />}
-                                                        {key === 'sophistication' && <Cpu size={14} className="text-primary" />}
-                                                        {key}
-                                                    </span>
-                                                    <div className="flex items-baseline gap-1 font-mono text-primary">
-                                                        <span className="text-xl font-bold">{(intensities as any)[key]}</span>
-                                                        <span className="text-[9px] opacity-60">/ 100</span>
-                                                    </div>
-                                                </div>
-
-                                                <div className="relative h-8 group">
-                                                    {/* Track */}
-                                                    <div className="absolute top-1/2 left-0 right-0 h-[2px] bg-muted/30 -translate-y-1/2 overflow-hidden">
-                                                        <div className="absolute inset-0 bg-[repeating-linear-gradient(90deg,transparent,transparent_4px,currentColor_4px,currentColor_5px)] text-muted-foreground/10" />
-                                                    </div>
-                                                    <div className="absolute top-1/2 left-0 h-[2px] bg-primary -translate-y-1/2 transition-all" style={{ width: `${(intensities as any)[key]}%` }} />
-
-                                                    {/* Thumb */}
-                                                    <input
-                                                        type="range"
-                                                        className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
-                                                        value={(intensities as any)[key]}
-                                                        onChange={(e) => setIntensities({ ...intensities, [key]: parseInt(e.target.value) })}
-                                                    />
-                                                    <div
-                                                        className="absolute top-1/2 w-4 h-6 bg-background border border-primary z-0 -translate-y-1/2 -translate-x-1/2 pointer-events-none transition-all group-hover:scale-110 shadow-[0_0_15px_rgba(var(--primary-rgb),0.3)]"
-                                                        style={{ left: `${(intensities as any)[key]}%` }}
-                                                    >
-                                                        <div className="absolute top-1/2 left-1/2 w-1.5 h-1.5 bg-primary -translate-x-1/2 -translate-y-1/2 rounded-full" />
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        ))}
-                                    </div>
+                                    <IntensityMatrix
+                                        intensities={intensities}
+                                        onChange={handleIntensityChange}
+                                    />
 
                                     <motion.button
                                         whileHover={{ scale: 1.01 }}
@@ -529,9 +547,9 @@ export const StudioView = React.memo<StudioViewProps>(({
 
                                         <div className="flex items-center gap-2 px-2 py-1 bg-background/50 rounded-full border border-border/50">
                                             <div className={`w-1.5 h-1.5 rounded-full ${item.status === 'complete' ? 'bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]' :
-                                                    item.status === 'failed' ? 'bg-destructive shadow-[0_0_8px_rgba(239,68,68,0.5)]' :
-                                                        item.status === 'pending' ? 'bg-muted-foreground' :
-                                                            'bg-amber-500 animate-pulse shadow-[0_0_8px_rgba(245,158,11,0.5)]'
+                                                item.status === 'failed' ? 'bg-destructive shadow-[0_0_8px_rgba(239,68,68,0.5)]' :
+                                                    item.status === 'pending' ? 'bg-muted-foreground' :
+                                                        'bg-amber-500 animate-pulse shadow-[0_0_8px_rgba(245,158,11,0.5)]'
                                                 }`} />
                                             <span className="text-[9px] font-mono font-bold uppercase tracking-wider text-muted-foreground">
                                                 {item.status}

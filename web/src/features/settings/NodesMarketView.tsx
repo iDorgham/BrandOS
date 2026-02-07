@@ -3,22 +3,26 @@ import { Card, Button, Input, EmptyState } from '@/components/ui';
 import { Sparkles, Download, Check, ExternalLink, Box, Search, Filter } from 'lucide-react';
 import { useNodeManager } from '@/hooks/useNodeManager';
 import { NodeCategory } from '@/features/moodboard/NodeRegistry';
+import { useDebounce } from '@/hooks/useDebounce';
 
 export const NodesMarketView = () => {
     const { allNodes, isInstalled, installNode, uninstallNode } = useNodeManager();
     const [searchQuery, setSearchQuery] = useState('');
     const [activeFilter, setActiveFilter] = useState<NodeCategory | 'All'>('All');
 
+    // Debounce search query to optimize filtering
+    const debouncedSearchQuery = useDebounce(searchQuery, 300);
+
     const categories: NodeCategory[] = ['Foundation', 'Orchestration', 'Generative', 'Utility', 'External'];
 
     const filteredNodes = useMemo(() => {
         return allNodes.filter(node => {
-            const matchesSearch = node.label.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                node.description.toLowerCase().includes(searchQuery.toLowerCase());
+            const matchesSearch = node.label.toLowerCase().includes(debouncedSearchQuery.toLowerCase()) ||
+                node.description.toLowerCase().includes(debouncedSearchQuery.toLowerCase());
             const matchesFilter = activeFilter === 'All' || node.category.toLowerCase() === activeFilter.toLowerCase();
             return matchesSearch && matchesFilter;
         });
-    }, [allNodes, searchQuery, activeFilter]);
+    }, [allNodes, debouncedSearchQuery, activeFilter]);
 
     const groupedNodes = useMemo(() => {
         const groups: Record<string, typeof allNodes> = {};

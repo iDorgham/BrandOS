@@ -5,6 +5,7 @@ import { Image as ImageIcon, Download, RefreshCw, Archive, Shield, Zap } from 'l
 import { Button, Card } from '@/components/ui';
 import { GeneratedAsset } from '@/types';
 import { downloadFile } from '@/utils';
+import { LazyImage } from '@/components/ui/LazyImage';
 
 interface LibraryViewProps {
     assets: GeneratedAsset[];
@@ -63,9 +64,9 @@ export const LibraryView = React.memo<LibraryViewProps>(({ assets, onRefine }) =
                         <Card key={asset.id} className="overflow-hidden group hover:border-primary/50 transition-all flex flex-col relative bg-card border-border rounded-none shadow-xl">
                             {/* Asset Preview */}
                             <div className="relative aspect-square overflow-hidden bg-muted/20">
-                                <img
+                                <LazyImage
                                     src={asset.url}
-                                    className="w-full h-full object-cover transition-transform group-hover:scale-105 duration-700"
+                                    className="w-full h-full transition-transform group-hover:scale-105 duration-700"
                                     alt="Generated"
                                 />
 
