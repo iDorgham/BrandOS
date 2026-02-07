@@ -10,9 +10,10 @@ import { Button } from '@/components/ui';
 interface LandingPageProps {
     onLoginClick: () => void;
     onInfoClick: (topic: 'terms' | 'privacy' | 'faq' | 'help') => void;
+    onProductClick: (slug: 'identity' | 'doctrine' | 'studio' | 'audit') => void;
 }
 
-export const LandingPage: React.FC<LandingPageProps> = ({ onLoginClick }) => {
+export const LandingPage: React.FC<LandingPageProps> = ({ onLoginClick, onInfoClick, onProductClick }) => {
     const [openFaq, setOpenFaq] = useState<number | null>(null);
     const { scrollYProgress } = useScroll();
 
@@ -216,48 +217,70 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onLoginClick }) => {
                 </div>
             </section>
 
-            {/* 3. THE SOLUTION: THE 2026 WAY */}
+            {/* 3. THE SOLUTION: THE PLATFORM HUB */}
             <section id="solution" className="py-64 px-8 bg-[#0f62fe] text-white">
                 <div className="max-w-[1800px] mx-auto">
                     <motion.div {...fastFadeIn} className="mb-48">
+                        <div className="inline-flex items-center gap-4 bg-white/10 border border-white/20 px-6 py-2 mb-12">
+                            <div className="w-2 h-2 rounded-full bg-white animate-pulse" />
+                            <span className="text-[10px] font-black uppercase tracking-[0.3em]">System_Architecture // V3.0</span>
+                        </div>
                         <h2 className="text-[clamp(4rem,10vw,12rem)] font-black tracking-tighter leading-[0.85] uppercase mb-12">
-                            One Protocol. <br /> Total Control.
+                            The Platform Hub. <br /> Total Control.
                         </h2>
-                        <p className="text-3xl md:text-5xl font-light leading-tight max-w-5xl">
-                            We bridge the gap between human guidelines and AI execution.
-                            Your brand DNA becomes the operating system for everything you create.
+                        <p className="text-3xl md:text-5xl font-light leading-tight max-w-5xl italic opacity-90">
+                            We bridge the gap between human intent and AI execution.
+                            Your brand DNA becomes the operating system for every pixel you generate.
                         </p>
                     </motion.div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-1px bg-white/20 border border-white/20">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-px bg-white/20 border border-white/20">
                         {[
                             {
+                                id: "identity",
                                 num: "01",
-                                title: "Ingest DNA",
-                                desc: "Upload 5 assets. Our AI learns your colors, patterns, and soul instantly."
+                                title: "Identity_Core",
+                                desc: "Centralize your global brand DNA into an immutable, live protocol.",
+                                icon: <Shield size={24} />
                             },
                             {
+                                id: "doctrine",
                                 num: "02",
-                                title: "Enforce Rules",
-                                desc: "Define rigid 'Grammar Rules' that AI can never break. Ever."
+                                title: "Doctrine_Engine",
+                                desc: "Rigid AI grammar rules that enforce your style in real-time.",
+                                icon: <Cpu size={24} />
                             },
                             {
+                                id: "studio",
                                 num: "03",
-                                title: "Automate Output",
-                                desc: "Generate thousands of perfectly branded assets in milliseconds."
+                                title: "Studio_API",
+                                desc: "High-velocity creative generation without an ounce of brand drift.",
+                                icon: <Layers size={24} />
+                            },
+                            {
+                                id: "audit",
+                                num: "04",
+                                title: "Audit_Protocol",
+                                desc: "Automated pixels-to-policy enforcement for total brand safety.",
+                                icon: <Activity size={24} />
                             }
-                        ].map((step, i) => (
-                            <motion.div
+                        ].map((product, i) => (
+                            <motion.button
                                 key={i}
-                                initial={{ opacity: 0, y: 20 }}
-                                whileInView={{ opacity: 1, y: 0 }}
-                                transition={{ delay: i * 0.1 }}
-                                className="p-16 bg-[#0f62fe] hover:bg-[#0043ce] transition-colors group cursor-default"
+                                onClick={() => onProductClick(product.id as any)}
+                                whileHover={{ backgroundColor: 'rgba(255,255,255,0.1)' }}
+                                className="p-12 flex flex-col items-start bg-transparent text-left transition-all group relative overflow-hidden"
                             >
-                                <div className="text-xl font-mono font-black mb-12 opacity-50 group-hover:opacity-100 transition-opacity">[{step.num}]</div>
-                                <h3 className="text-5xl font-black uppercase mb-8 leading-none tracking-tighter">{step.title}</h3>
-                                <p className="text-xl font-light leading-snug text-white/80">{step.desc}</p>
-                            </motion.div>
+                                <div className="text-[10px] font-black text-white/40 uppercase tracking-[0.3em] mb-12 group-hover:text-white transition-colors">NODE_{product.num}</div>
+                                <div className="w-12 h-12 border border-white/20 flex items-center justify-center mb-10 group-hover:border-white transition-all transform group-hover:rotate-90">
+                                    {product.icon}
+                                </div>
+                                <h3 className="text-3xl font-black uppercase mb-6 tracking-tighter group-hover:translate-x-2 transition-transform">{product.title}</h3>
+                                <p className="text-xl font-light leading-tight opacity-70 group-hover:opacity-100 transition-opacity mb-12">{product.desc}</p>
+                                <div className="mt-auto flex items-center gap-4 text-[10px] font-black uppercase tracking-widest opacity-0 group-hover:opacity-100 transition-all translate-y-4 group-hover:translate-y-0 text-[#f1c21b]">
+                                    Initialize_Deep_Dive <ChevronRight size={14} />
+                                </div>
+                            </motion.button>
                         ))}
                     </div>
                 </div>

@@ -11,6 +11,7 @@ import { useTheme } from './contexts/ThemeContext';
 import { Toaster } from 'sonner';
 import { ErrorBoundary } from './components/common/ErrorBoundary';
 import { InfoPage, InfoTopic } from './features/info/InfoPage';
+import { ProductPage, ProductSlug } from './features/info/ProductPage';
 
 // Lazy load feature views for performance
 const ProfileView = React.lazy(() => import('./features/profile/ProfileView').then(m => ({ default: m.ProfileView })));
@@ -49,6 +50,7 @@ const AppContent: React.FC = () => {
     const [apiKeyReady, setApiKeyReady] = useState<boolean | null>(null);
     const [showAuth, setShowAuth] = useState(false);
     const [infoView, setInfoView] = useState<InfoTopic | null>(null);
+    const [productView, setProductView] = useState<ProductSlug | null>(null);
 
     // Reset header actions when tab changes
     useEffect(() => {
@@ -142,18 +144,25 @@ const AppContent: React.FC = () => {
         setActiveTab('creative');
     };
 
-    // Reset showAuth when user becomes present
+    // Reset views when user becomes present
     useEffect(() => {
         if (user) {
             setShowAuth(false);
             setInfoView(null);
+            setProductView(null);
         }
     }, [user]);
 
     if (!user) {
         return (
             <React.Suspense fallback={<ViewLoader />}>
-                {infoView ? (
+                {productView ? (
+                    <ProductPage
+                        slug={productView}
+                        onBack={() => setProductView(null)}
+                        onLoginClick={() => setShowAuth(true)}
+                    />
+                ) : infoView ? (
                     <InfoPage topic={infoView} onBack={() => setInfoView(null)} />
                 ) : showAuth ? (
                     <AuthGuard onBack={() => setShowAuth(false)} />
@@ -161,6 +170,7 @@ const AppContent: React.FC = () => {
                     <LandingPage
                         onLoginClick={() => setShowAuth(true)}
                         onInfoClick={(topic: InfoTopic) => setInfoView(topic)}
+                        onProductClick={(slug: ProductSlug) => setProductView(slug)}
                     />
                 )}
             </React.Suspense>
