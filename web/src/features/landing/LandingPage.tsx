@@ -47,7 +47,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onLoginClick }) => {
         initial: { opacity: 0, y: 20 },
         whileInView: { opacity: 1, y: 0 },
         viewport: { once: true, margin: "-100px" },
-        transition: { duration: 0.4, ease: [0.23, 1, 0.32, 1] }
+        transition: { duration: 0.4, ease: [0.23, 1, 0.32, 1] as any }
     };
 
     return (
@@ -179,18 +179,18 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onLoginClick }) => {
                         </h2>
                         <div className="space-y-12">
                             <div className="flex gap-8 group">
-                                <div className="w-1 px-1 bg-[#da1e28] h-full" />
+                                <div className="w-1 px-1 bg-[#f1c21b] h-full" />
                                 <div>
-                                    <h3 className="text-3xl font-bold uppercase mb-4 text-[#da1e28]">Manual Speed</h3>
+                                    <h3 className="text-3xl font-bold uppercase mb-4 text-[#f1c21b]">Manual Speed</h3>
                                     <p className="text-xl text-[#c6c6c6] font-light max-w-lg">
                                         Humans are too slow for the AI era. Review loops kill momentum.
                                     </p>
                                 </div>
                             </div>
                             <div className="flex gap-8 group">
-                                <div className="w-1 px-1 bg-[#da1e28] h-full" />
+                                <div className="w-1 px-1 bg-[#f1c21b] h-full" />
                                 <div>
-                                    <h3 className="text-3xl font-bold uppercase mb-4 text-[#da1e28]">AI Drift</h3>
+                                    <h3 className="text-3xl font-bold uppercase mb-4 text-[#f1c21b]">AI Drift</h3>
                                     <p className="text-xl text-[#c6c6c6] font-light max-w-lg">
                                         Raw AI doesn't know your style. It creates junk that dilutes your brand.
                                     </p>
@@ -206,9 +206,9 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onLoginClick }) => {
                         className="aspect-square bg-[#161616] border border-[#393939] relative flex items-center justify-center aura-glow"
                     >
                         <div className="absolute inset-0 opacity-[0.2]"
-                            style={{ backgroundImage: 'radial-gradient(#da1e28 2px, transparent 2px)', backgroundSize: '24px 24px' }} />
+                            style={{ backgroundImage: 'radial-gradient(#f1c21b 2px, transparent 2px)', backgroundSize: '24px 24px' }} />
                         <div className="relative text-center p-12 z-10">
-                            <div className="text-[clamp(10rem,20vw,20rem)] font-black text-[#da1e28] leading-none mb-4 tracking-tighter">LOST</div>
+                            <div className="text-[clamp(10rem,20vw,20rem)] font-black text-[#f1c21b] leading-none mb-4 tracking-tighter">LOST</div>
                             <div className="text-2xl font-black uppercase tracking-[0.5em] text-white">Visual Identity</div>
                         </div>
                     </motion.div>
@@ -287,7 +287,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onLoginClick }) => {
                         >
                             <div className="h-12 bg-[#262626] border-b border-[#393939] flex items-center px-6 justify-between">
                                 <div className="flex gap-2">
-                                    <div className="w-2 h-2 rounded-full bg-[#da1e28]" />
+                                    <div className="w-2 h-2 rounded-full bg-[#f1c21b]" />
                                     <div className="w-2 h-2 rounded-full bg-[#f1c21b]" />
                                     <div className="w-2 h-2 rounded-full bg-[#24a148]" />
                                 </div>
@@ -348,7 +348,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onLoginClick }) => {
                         {[
                             { name: "Creator", price: "Free", desc: "Build your personal DNA.", color: "white" },
                             { name: "Pro", price: "$49", desc: "For teams who want speed.", color: "#0f62fe" },
-                            { name: "Enterprise", price: "Custom", desc: "Total governance at scale.", color: "#da1e28" }
+                            { name: "Enterprise", price: "Custom", desc: "Total governance at scale.", color: "#f1c21b" }
                         ].map((plan, i) => (
                             <motion.div
                                 key={i}
