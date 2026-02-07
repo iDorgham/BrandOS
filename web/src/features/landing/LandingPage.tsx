@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { motion, AnimatePresence, useScroll, useSpring } from 'framer-motion';
+import { motion, AnimatePresence, useScroll, useSpring, useTransform } from 'framer-motion';
 import {
-    Zap, Shield, Layout, Sparkles, ArrowRight, Github, Twitter,
-    Layers, BarChart3, Globe, Code, ChevronDown, Check, AlertTriangle,
-    Database, Users, Lock, ChevronRight, Activity, Cpu
+    Zap, Shield, ArrowRight, Github, Twitter,
+    Layers, Code, ChevronDown, Activity, Cpu,
+    Target, Command, Globe, Info, Menu, X
 } from 'lucide-react';
 import { Button } from '@/components/ui';
 
@@ -14,16 +14,19 @@ interface LandingPageProps {
 export const LandingPage: React.FC<LandingPageProps> = ({ onLoginClick }) => {
     const [openFaq, setOpenFaq] = useState<number | null>(null);
     const { scrollYProgress } = useScroll();
+
+    // High-speed spring progress
     const scaleX = useSpring(scrollYProgress, {
-        stiffness: 100,
+        stiffness: 150,
         damping: 30,
         restDelta: 0.001
     });
 
     const [auditLogs, setAuditLogs] = useState([
-        { id: '822', status: 'COMPLIANT', score: 98.2, type: 'COLOR_MATCH' },
-        { id: '144', status: 'COMPLIANT', score: 94.7, type: 'SPATIAL_GEN' },
-        { id: '091', status: 'COMPLIANT', score: 99.8, type: 'VIBE_CHECK' },
+        { id: '822', status: 'OK', score: 98.2, task: 'DNA_SYNC' },
+        { id: '144', status: 'OK', score: 94.7, task: 'VISUAL_AUDIT' },
+        { id: '091', status: 'OK', score: 99.8, task: 'PALETTE_LOCK' },
+        { id: '042', status: 'OK', score: 96.5, task: 'RULE_ENFORCE' },
     ]);
 
     useEffect(() => {
@@ -36,477 +39,399 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onLoginClick }) => {
                 next.push(last);
                 return next;
             });
-        }, 3000);
+        }, 1500); // Faster updates for 2026 feel
         return () => clearInterval(interval);
     }, []);
 
-    const fadeIn = {
-        initial: { opacity: 0, y: 30 },
+    const fastFadeIn = {
+        initial: { opacity: 0, y: 20 },
         whileInView: { opacity: 1, y: 0 },
         viewport: { once: true, margin: "-100px" },
-        transition: { duration: 0.8, ease: "easeOut" }
-    };
-
-    const staggerContainer = {
-        hidden: { opacity: 0 },
-        show: {
-            opacity: 1,
-            transition: {
-                staggerChildren: 0.1
-            }
-        }
+        transition: { duration: 0.4, ease: [0.23, 1, 0.32, 1] }
     };
 
     return (
-        <div className="min-h-screen bg-[#161616] text-white selection:bg-[#0f62fe]/30 font-sans relative overflow-x-hidden">
+        <div className="min-h-screen bg-[#000000] text-[#f4f4f4] selection:bg-[#0f62fe]/30 font-sans relative overflow-x-hidden">
             <div className="cinematic-noise" />
 
             {/* Global Progress Bar */}
-            <motion.div className="fixed top-0 left-0 right-0 h-0.5 bg-[#0f62fe] origin-left z-[60]" style={{ scaleX }} />
+            <motion.div className="fixed top-0 left-0 right-0 h-1 bg-[#0f62fe] origin-left z-[70]" style={{ scaleX }} />
 
-            {/* Gradient Mesh Background */}
-            <div className="mesh-gradient opacity-40 pointer-events-none" />
+            {/* Gradient Mesh (Refined for Higher Visibility) */}
+            <div className="mesh-gradient opacity-50 pointer-events-none" />
 
-            {/* Structural Grid Background */}
-            <div className="absolute inset-0 z-0 opacity-[0.03] pointer-events-none"
-                style={{ backgroundImage: 'radial-gradient(#fff 1px, transparent 1px)', backgroundSize: '48px 48px' }} />
+            {/* Technical Grid Overlay */}
+            <div className="fixed inset-0 z-0 opacity-[0.05] pointer-events-none"
+                style={{
+                    backgroundImage: 'linear-gradient(#fff 1px, transparent 1px), linear-gradient(90deg, #fff 1px, transparent 1px)',
+                    backgroundSize: '100px 100px'
+                }} />
 
-            {/* Navigation (Carbon UI Shell) */}
-            <nav className="fixed top-0 w-full z-50 border-b border-[#393939] bg-[#161616]/90 backdrop-blur-xl h-12">
-                <div className="max-w-[1600px] mx-auto px-6 h-full flex items-center justify-between">
-                    <div className="flex items-center gap-6">
-                        <div className="flex items-center gap-3">
-                            <div className="w-8 h-8 bg-[#0f62fe] flex items-center justify-center aura-glow">
-                                <Zap className="text-white" size={16} fill="currentColor" />
+            {/* Top Navigation */}
+            <nav className="fixed top-0 w-full z-50 border-b border-[#1a1a1a] bg-[#000000]/80 backdrop-blur-2xl h-16">
+                <div className="max-w-[1800px] mx-auto px-8 h-full flex items-center justify-between">
+                    <div className="flex items-center gap-12">
+                        <motion.div
+                            whileHover={{ scale: 1.05 }}
+                            className="flex items-center gap-3 cursor-pointer"
+                        >
+                            <div className="w-10 h-10 bg-[#0f62fe] flex items-center justify-center aura-glow">
+                                <Zap className="text-white" size={20} fill="currentColor" />
                             </div>
-                            <span className="text-[14px] font-bold tracking-widest uppercase hidden sm:inline">Brand OS</span>
-                        </div>
-                        <div className="h-4 w-px bg-[#393939] hidden lg:block" />
-                        <div className="hidden lg:flex items-center gap-8 text-[12px] font-medium text-[#c6c6c6] uppercase tracking-wider">
-                            <a href="#problem" className="hover:text-white transition-colors">The Crisis</a>
-                            <a href="#infrastructure" className="hover:text-white transition-colors">Infrastructure</a>
-                            <a href="#governance" className="hover:text-white transition-colors">Governance</a>
-                            <a href="#pricing" className="hover:text-white transition-colors">Economics</a>
+                            <span className="text-[18px] font-black tracking-tighter uppercase mr-4">Brand OS</span>
+                        </motion.div>
+
+                        <div className="hidden lg:flex items-center gap-10 text-[11px] font-bold text-[#6f6f6f] uppercase tracking-[0.2em]">
+                            <a href="#problem" className="hover:text-white transition-colors">Problem</a>
+                            <a href="#solution" className="hover:text-white transition-colors">Protocol</a>
+                            <a href="#control" className="hover:text-white transition-colors">Control</a>
+                            <a href="#pricing" className="hover:text-white transition-colors">Contact</a>
                         </div>
                     </div>
 
-                    <div className="flex items-center h-full">
-                        <div className="hidden sm:flex items-center px-4 text-[10px] font-mono text-[#525252] tracking-widest">
-                            [SYSTEM: OPERATIONAL]
-                        </div>
+                    <div className="flex items-center h-full gap-4">
                         <Button
                             onClick={onLoginClick}
                             variant="ghost"
-                            className="text-[11px] uppercase tracking-widest font-bold px-6 h-12 hover:bg-[#393939] rounded-none border-l border-[#393939] text-white"
+                            className="text-[12px] uppercase tracking-widest font-black px-8 h-12 hover:bg-[#1a1a1a] rounded-none text-white transition-all"
                         >
-                            Log In
+                            Login
                         </Button>
                         <Button
                             onClick={onLoginClick}
-                            className="bg-[#0f62fe] text-white text-[11px] uppercase tracking-widest font-bold rounded-none h-12 px-8 hover:bg-[#0043ce] transition-colors border-l border-[#393939]"
+                            className="bg-[#0f62fe] text-white text-[12px] uppercase tracking-widest font-black rounded-none h-12 px-10 hover:bg-[#0043ce] transition-all aura-glow"
                         >
-                            Request Access
+                            Get Started
                         </Button>
                     </div>
                 </div>
             </nav>
 
-            {/* Hero Section: Mega Typography */}
-            <section className="relative pt-48 pb-64 px-6 z-10 border-b border-[#393939]">
-                <div className="max-w-[1600px] mx-auto">
+            {/* 1. HERO: BOLD & SIMPLE */}
+            <section className="relative min-h-screen flex flex-col justify-center pt-32 px-8 z-10">
+                <div className="max-w-[1800px] mx-auto w-full">
                     <motion.div
-                        initial={{ opacity: 0, x: -20 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
+                        initial={{ opacity: 0, y: 40 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
                     >
-                        <div className="text-[#0f62fe] text-[13px] font-bold uppercase tracking-[0.4em] mb-12 flex items-center gap-4">
-                            <span className="w-12 h-px bg-[#0f62fe]" />
-                            Enterprise Creative Protocol v2.5
+                        <div className="inline-flex items-center gap-3 px-4 py-2 bg-[#0f62fe]/10 border border-[#0f62fe]/20 rounded-full mb-12">
+                            <div className="w-2 h-2 rounded-full bg-[#0f62fe] animate-pulse" />
+                            <span className="text-[10px] font-black uppercase tracking-[0.3em] text-[#0f62fe]">Next Gen AI Protocol Enabled</span>
                         </div>
 
-                        <h1 className="text-[clamp(3.5rem,10vw,10rem)] font-semibold tracking-tighter leading-[0.9] uppercase mb-12 text-glow">
-                            Scale Your <span className="text-transparent bg-clip-text bg-gradient-to-r from-white via-white to-[#525252] italic font-light">Identity</span>. <br />
-                            Not Just Your Output.
+                        <h1 className="text-[clamp(4rem,12vw,14rem)] font-black tracking-[-0.04em] leading-[0.85] uppercase mb-16 text-glow">
+                            AI that <span className="italic font-light text-[#525252]">knows</span> <br />
+                            your brand.
                         </h1>
 
-                        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-end">
-                            <div className="lg:col-span-6">
-                                <p className="text-xl md:text-2xl text-[#c6c6c6] max-w-2xl leading-tight font-light mb-12">
-                                    Stop managing assets. Start orchestrating DNA. <br />
-                                    Brand OS transforms fragmented workflows into a single,
-                                    AI-powered source of truth for the global enterprise.
+                        <div className="grid grid-cols-1 lg:grid-cols-12 gap-20">
+                            <div className="lg:col-span-7">
+                                <p className="text-2xl md:text-4xl text-[#c6c6c6] max-w-3xl leading-[1.1] font-light mb-16">
+                                    Stop writing manuals. Start running code. <br />
+                                    Brand OS is the first system that teaches AI how to look,
+                                    speak, and act exactly like your brand.
                                 </p>
-                                <div className="flex flex-wrap gap-4">
-                                    <Button onClick={onLoginClick} size="lg" className="bg-[#0f62fe] text-white hover:bg-[#0043ce] h-16 px-12 rounded-none text-[14px] font-bold uppercase tracking-widest group aura-glow">
-                                        Initialize Protocol <ArrowRight className="ml-4 group-hover:translate-x-1 transition-transform" size={18} />
+                                <div className="flex flex-wrap gap-6">
+                                    <Button onClick={onLoginClick} className="bg-[#0f62fe] text-white hover:bg-[#0043ce] h-20 px-16 rounded-none text-[16px] font-black uppercase tracking-widest group aura-glow transition-all hover:scale-105">
+                                        Launch System <ArrowRight className="ml-4 group-hover:translate-x-2 transition-transform" size={24} />
                                     </Button>
-                                    <Button
-                                        onClick={onLoginClick}
-                                        variant="secondary"
-                                        className="h-16 px-12 border border-[#393939] text-[#f4f4f4] hover:bg-[#393939] text-[14px] font-bold uppercase tracking-widest transition-colors rounded-none"
-                                    >
-                                        View Architecture
+                                    <Button onClick={onLoginClick} variant="secondary" className="h-20 px-16 border-[#393939] text-white hover:bg-[#1a1a1a] rounded-none text-[16px] font-black uppercase tracking-widest transition-all">
+                                        View Demo
                                     </Button>
                                 </div>
                             </div>
-                            <div className="lg:col-span-6 flex flex-col gap-4">
-                                <div className="flex items-center gap-4 text-[11px] font-mono text-[#525252] uppercase tracking-[0.3em] mb-4">
-                                    <Activity size={12} className="text-[#0f62fe] animate-pulse" /> Live Operational Feed
-                                </div>
-                                <div className="space-y-2">
-                                    <AnimatePresence mode="popLayout">
-                                        {auditLogs.map((log) => (
-                                            <motion.div
-                                                key={log.id}
-                                                initial={{ opacity: 0, x: 20 }}
-                                                animate={{ opacity: 1, x: 0 }}
-                                                exit={{ opacity: 0, x: -20 }}
-                                                className="h-10 border border-[#393939] bg-[#262626]/20 flex items-center justify-between px-6 backdrop-blur-md"
-                                            >
-                                                <div className="flex gap-3 items-center">
-                                                    <div className="w-1.5 h-1.5 bg-[#0f62fe]" />
-                                                    <span className="text-[10px] font-mono text-[#c6c6c6]">{log.type}_{log.id}</span>
-                                                </div>
-                                                <span className="text-[10px] font-mono text-[#0f62fe]">{log.score}% VALIDATED</span>
-                                            </motion.div>
-                                        ))}
-                                    </AnimatePresence>
+                            <div className="lg:col-span-5 flex flex-col justify-end pt-20 lg:pt-0">
+                                <div className="p-8 border-l border-t border-[#393939] bg-[#161616]/40 backdrop-blur-xl">
+                                    <div className="text-[10px] font-black text-[#525252] uppercase tracking-[0.4em] mb-4">Core Statistics</div>
+                                    <div className="grid grid-cols-2 gap-12">
+                                        <div>
+                                            <div className="text-5xl font-black mb-1">99.8%</div>
+                                            <div className="text-[10px] font-bold text-[#0f62fe] uppercase tracking-widest">Accuracy</div>
+                                        </div>
+                                        <div>
+                                            <div className="text-5xl font-black mb-1">3.5s</div>
+                                            <div className="text-[10px] font-bold text-[#0f62fe] uppercase tracking-widest">Turnaround</div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </motion.div>
                 </div>
+
+                {/* Scroll Indicator */}
+                <motion.div
+                    animate={{ y: [0, 10, 0] }}
+                    transition={{ duration: 2, repeat: Infinity }}
+                    className="absolute bottom-12 left-1/2 -translate-x-1/2 text-[#525252]"
+                >
+                    <ChevronDown size={32} strokeWidth={1} />
+                </motion.div>
             </section>
 
-            {/* Section: The Crisis (The Drift) */}
-            <section id="problem" className="py-48 px-6 bg-transparent border-b border-[#393939] relative">
-                <div className="max-w-[1600px] mx-auto grid grid-cols-1 lg:grid-cols-12 gap-24">
-                    <motion.div className="lg:col-span-5" {...fadeIn}>
-                        <div className="sticky top-32">
-                            <h2 className="text-6xl font-semibold tracking-tighter leading-none uppercase mb-12">
-                                YOUR BRAND <br /> GUIDELINES <br /> ARE <span className="italic font-light text-[#525252]">DEAD.</span>
-                            </h2>
-                            <p className="text-xl text-[#c6c6c6] leading-relaxed font-light mb-8">
-                                Traditional manuals are static PDFs that humans ignore and AI can't read.
-                                This leads to **Brand Drift**—the slow, expensive erosion of your visual equity
-                                across thousands of touchpoints.
-                            </p>
-                            <div className="p-8 border border-[#393939] bg-[#262626]/40 backdrop-blur-xl relative overflow-hidden group">
-                                <div className="absolute top-0 left-0 w-1 h-full bg-[#0f62fe]" />
-                                <div className="text-[11px] font-bold text-[#0f62fe] uppercase tracking-widest mb-4">The Impact</div>
-                                <div className="text-5xl font-semibold mb-2">$2,400,000+</div>
-                                <div className="text-[12px] text-[#525252] uppercase font-medium tracking-widest">
-                                    Annual Resource Leak Due to Fragmented Governance
+            {/* 2. THE PROBLEM: SIMPLE & HARD-HITTING */}
+            <section id="problem" className="py-64 px-8 border-t border-[#1a1a1a] relative overflow-hidden">
+                <div className="max-w-[1800px] mx-auto grid grid-cols-1 lg:grid-cols-2 gap-32 items-center">
+                    <motion.div {...fastFadeIn}>
+                        <h2 className="text-[clamp(3.5rem,8vw,8rem)] font-black tracking-tighter leading-[0.9] uppercase mb-12">
+                            The Mess.
+                        </h2>
+                        <div className="space-y-12">
+                            <div className="flex gap-8 group">
+                                <div className="w-1 px-1 bg-[#da1e28] h-full" />
+                                <div>
+                                    <h3 className="text-3xl font-bold uppercase mb-4 text-[#da1e28]">Manual Speed</h3>
+                                    <p className="text-xl text-[#c6c6c6] font-light max-w-lg">
+                                        Humans are too slow for the AI era. Review loops kill momentum.
+                                    </p>
+                                </div>
+                            </div>
+                            <div className="flex gap-8 group">
+                                <div className="w-1 px-1 bg-[#da1e28] h-full" />
+                                <div>
+                                    <h3 className="text-3xl font-bold uppercase mb-4 text-[#da1e28]">AI Drift</h3>
+                                    <p className="text-xl text-[#c6c6c6] font-light max-w-lg">
+                                        Raw AI doesn't know your style. It creates junk that dilutes your brand.
+                                    </p>
                                 </div>
                             </div>
                         </div>
                     </motion.div>
-                    <div className="lg:col-span-7 space-y-32 pt-24">
+
+                    <motion.div
+                        initial={{ opacity: 0, scale: 0.9 }}
+                        whileInView={{ opacity: 1, scale: 1 }}
+                        transition={{ duration: 0.6 }}
+                        className="aspect-square bg-[#161616] border border-[#393939] relative flex items-center justify-center aura-glow"
+                    >
+                        <div className="absolute inset-0 opacity-[0.2]"
+                            style={{ backgroundImage: 'radial-gradient(#da1e28 2px, transparent 2px)', backgroundSize: '24px 24px' }} />
+                        <div className="relative text-center p-12 z-10">
+                            <div className="text-[clamp(10rem,20vw,20rem)] font-black text-[#da1e28] leading-none mb-4 tracking-tighter">LOST</div>
+                            <div className="text-2xl font-black uppercase tracking-[0.5em] text-white">Visual Identity</div>
+                        </div>
+                    </motion.div>
+                </div>
+            </section>
+
+            {/* 3. THE SOLUTION: THE 2026 WAY */}
+            <section id="solution" className="py-64 px-8 bg-[#0f62fe] text-white">
+                <div className="max-w-[1800px] mx-auto">
+                    <motion.div {...fastFadeIn} className="mb-48">
+                        <h2 className="text-[clamp(4rem,10vw,12rem)] font-black tracking-tighter leading-[0.85] uppercase mb-12">
+                            One Protocol. <br /> Total Control.
+                        </h2>
+                        <p className="text-3xl md:text-5xl font-light leading-tight max-w-5xl">
+                            We bridge the gap between human guidelines and AI execution.
+                            Your brand DNA becomes the operating system for everything you create.
+                        </p>
+                    </motion.div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-1px bg-white/20 border border-white/20">
                         {[
                             {
-                                head: "Fragmented Intelligence",
-                                sub: "Your brand lives in Slack threads and sub-folders. It needs to live in an executable engine.",
-                                icon: <Cpu className="text-[#0f62fe]" size={56} strokeWidth={0.5} />
+                                num: "01",
+                                title: "Ingest DNA",
+                                desc: "Upload 5 assets. Our AI learns your colors, patterns, and soul instantly."
                             },
                             {
-                                head: "Generative Chaos",
-                                sub: "95% of AI-generated content fails brand compliance on the first pass. We fix this at the source.",
-                                icon: <AlertTriangle className="text-[#0f62fe]" size={56} strokeWidth={0.5} />
+                                num: "02",
+                                title: "Enforce Rules",
+                                desc: "Define rigid 'Grammar Rules' that AI can never break. Ever."
                             },
                             {
-                                head: "Manual Audit Atrophy",
-                                sub: "Review cycles are the graveyard of velocity. Brand OS automates the audit in milliseconds.",
-                                icon: <Shield className="text-[#0f62fe]" size={56} strokeWidth={0.5} />
+                                num: "03",
+                                title: "Automate Output",
+                                desc: "Generate thousands of perfectly branded assets in milliseconds."
                             }
-                        ].map((item, i) => (
+                        ].map((step, i) => (
                             <motion.div
                                 key={i}
-                                initial={{ opacity: 0, y: 40 }}
+                                initial={{ opacity: 0, y: 20 }}
                                 whileInView={{ opacity: 1, y: 0 }}
-                                viewport={{ once: true }}
-                                transition={{ delay: i * 0.1, duration: 0.8 }}
-                                className="flex gap-16 items-start max-w-2xl group"
+                                transition={{ delay: i * 0.1 }}
+                                className="p-16 bg-[#0f62fe] hover:bg-[#0043ce] transition-colors group cursor-default"
                             >
-                                <div className="shrink-0 pt-2 transition-transform duration-500 group-hover:scale-110 group-hover:rotate-6">{item.icon}</div>
-                                <div>
-                                    <h3 className="text-4xl font-semibold tracking-tight mb-6 uppercase group-hover:text-[#0f62fe] transition-colors">{item.head}</h3>
-                                    <p className="text-lg text-[#c6c6c6] font-light leading-snug">{item.sub}</p>
-                                </div>
+                                <div className="text-xl font-mono font-black mb-12 opacity-50 group-hover:opacity-100 transition-opacity">[{step.num}]</div>
+                                <h3 className="text-5xl font-black uppercase mb-8 leading-none tracking-tighter">{step.title}</h3>
+                                <p className="text-xl font-light leading-snug text-white/80">{step.desc}</p>
                             </motion.div>
                         ))}
                     </div>
                 </div>
             </section>
 
-            {/* Section: Infrastructure (Feature Deep Dives) */}
-            <section id="infrastructure" className="py-48 px-6 bg-[#262626]/50 backdrop-blur-sm relative border-b border-[#393939]">
-                <div className="max-w-[1600px] mx-auto flex flex-col items-center mb-48">
-                    <motion.div className="text-center max-w-4xl" {...fadeIn}>
-                        <div className="text-[#0f62fe] text-[13px] font-bold uppercase tracking-[0.4em] mb-8">System Components</div>
-                        <h2 className="text-6xl md:text-8xl font-semibold tracking-tighter uppercase mb-12">
-                            PRECISION **INFRASTRUCTURE**
-                        </h2>
-                    </motion.div>
-                </div>
+            {/* 4. REAL-TIME DEMO: THE CONTROL CENTER */}
+            <section id="control" className="py-64 px-8 relative border-t border-[#1a1a1a]">
+                <div className="max-w-[1800px] mx-auto">
+                    <div className="grid grid-cols-1 lg:grid-cols-12 gap-32 items-start">
+                        <motion.div className="lg:col-span-4" {...fastFadeIn}>
+                            <h2 className="text-7xl font-black tracking-tighter leading-none uppercase mb-12">
+                                THE CONTROL <br /> CENTER.
+                            </h2>
+                            <p className="text-xl text-[#c6c6c6] font-light leading-relaxed mb-12">
+                                Stop guessing. Watch the system audit every pixel in real-time.
+                                Secure, compliant, and lightning fast.
+                            </p>
+                            <Button onClick={onLoginClick} size="lg" className="bg-white text-[#000] hover:bg-[#f4f4f4] h-16 px-12 rounded-none text-[14px] font-black uppercase tracking-widest transition-all w-full">
+                                Initialize Audit
+                            </Button>
+                        </motion.div>
 
-                <div className="max-w-[1600px] mx-auto grid grid-cols-1 lg:grid-cols-2 gap-px bg-[#393939] border border-[#393939]">
-                    {/* Feature Card: AI Studio */}
-                    <motion.div
-                        initial={{ opacity: 0, x: -50 }}
-                        whileInView={{ opacity: 1, x: 0 }}
-                        viewport={{ once: true }}
-                        transition={{ duration: 0.8 }}
-                        className="p-16 bg-[#161616] group hover:bg-[#1a1a1a] transition-all duration-700"
-                    >
-                        <div className="text-[#0f62fe] mb-16 h-12 flex items-end">
-                            <Cpu size={48} strokeWidth={0.5} className="group-hover:rotate-90 transition-transform duration-1000" />
-                        </div>
-                        <h3 className="text-5xl font-semibold tracking-tight mb-8 uppercase">AI STUDIO</h3>
-                        <p className="text-[#c6c6c6] text-xl font-light leading-relaxed mb-16 max-w-lg">
-                            One interface to orchestrate Gemini, Claude, and DALL-E through
-                            the lens of your Brand DNA. No more trial and error.
-                        </p>
-                        <div className="space-y-8">
-                            {[
-                                { label: "Multi-Model Prompt Routing", value: 100 },
-                                { label: "Semantic Vibe Control", value: 85 },
-                                { label: "Iterative Refinement Logic", value: 92 }
-                            ].map((spec, i) => (
-                                <div key={i} className="space-y-3">
-                                    <div className="flex justify-between text-[11px] font-mono text-[#525252] uppercase tracking-[0.3em]">
-                                        <span>{spec.label}</span>
-                                        <span className="text-[#0f62fe] font-bold">{spec.value}%</span>
-                                    </div>
-                                    <div className="h-1 w-full bg-[#262626] relative overflow-hidden">
-                                        <motion.div
-                                            initial={{ width: 0 }}
-                                            whileInView={{ width: `${spec.value}%` }}
-                                            viewport={{ once: true }}
-                                            transition={{ duration: 1.5, delay: 0.5, ease: "circOut" }}
-                                            className="h-full bg-[#0f62fe] aura-glow"
-                                        />
-                                    </div>
+                        <motion.div
+                            initial={{ opacity: 0, x: 100 }}
+                            whileInView={{ opacity: 1, x: 0 }}
+                            transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
+                            className="lg:col-span-8 bg-[#161616] border border-[#393939] p-2 aura-glow"
+                        >
+                            <div className="h-12 bg-[#262626] border-b border-[#393939] flex items-center px-6 justify-between">
+                                <div className="flex gap-2">
+                                    <div className="w-2 h-2 rounded-full bg-[#da1e28]" />
+                                    <div className="w-2 h-2 rounded-full bg-[#f1c21b]" />
+                                    <div className="w-2 h-2 rounded-full bg-[#24a148]" />
                                 </div>
-                            ))}
-                        </div>
-                    </motion.div>
-
-                    {/* Feature Card: Moodboard */}
-                    <motion.div
-                        initial={{ opacity: 0, x: 50 }}
-                        whileInView={{ opacity: 1, x: 0 }}
-                        viewport={{ once: true }}
-                        transition={{ duration: 0.8 }}
-                        className="p-16 bg-[#161616] group hover:bg-[#1a1a1a] transition-all duration-700"
-                    >
-                        <div className="text-[#0f62fe] mb-16 h-12 flex items-end">
-                            <Layers size={48} strokeWidth={0.5} className="group-hover:translate-x-4 transition-transform duration-1000" />
-                        </div>
-                        <h3 className="text-5xl font-semibold tracking-tight mb-8 uppercase">MOODBOARD CANVAS</h3>
-                        <p className="text-[#c6c6c6] text-xl font-light leading-relaxed mb-16 max-w-lg">
-                            A node-based workflow designer where you assemble visual logic gates.
-                            Connect reference images to style attributes instantly.
-                        </p>
-                        <div className="relative border border-[#393939] aspect-video bg-[#262626]/20 overflow-hidden flex items-center justify-center group/canvas shrink-0">
-                            <div className="absolute inset-0 opacity-10"
-                                style={{ backgroundImage: 'linear-gradient(#393939 1px, transparent 1px), linear-gradient(90deg, #393939 1px, transparent 1px)', backgroundSize: '30px 30px' }} />
-                            <div className="flex gap-8 items-center z-10 scale-125 md:scale-150">
-                                <motion.div
-                                    animate={{
-                                        y: [0, -10, 0],
-                                        rotate: [0, 2, 0]
-                                    }}
-                                    transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-                                    className="w-20 h-28 border border-[#0f62fe] bg-[#161616] flex flex-col p-2 shadow-2xl aura-glow"
-                                >
-                                    <div className="flex-1 bg-[#393939]/30" />
-                                    <div className="h-3 w-full bg-[#0f62fe]/40 mt-2" />
-                                </motion.div>
-                                <motion.div
-                                    animate={{ opacity: [0.2, 0.8, 0.2] }}
-                                    transition={{ duration: 2, repeat: Infinity }}
-                                >
-                                    <ArrowRight className="text-[#0f62fe]" size={32} />
-                                </motion.div>
-                                <motion.div
-                                    animate={{
-                                        y: [0, 10, 0],
-                                        rotate: [0, -2, 0]
-                                    }}
-                                    transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
-                                    className="w-16 h-16 rounded-none border border-[#0f62fe] bg-[#161616] flex items-center justify-center shadow-2xl group-hover/canvas:scale-110 transition-transform duration-700"
-                                >
-                                    <Cpu size={24} className="text-[#0f62fe]" strokeWidth={1} />
-                                </motion.div>
+                                <div className="text-[10px] font-mono font-black text-[#525252] uppercase tracking-[0.4em]">system_active_v2.5</div>
                             </div>
-                        </div>
-                    </motion.div>
-                </div>
-            </section>
-
-            {/* Section: Comparison & Economics */}
-            <section id="pricing" className="py-48 px-6 border-b border-[#393939]">
-                <div className="max-w-[1600px] mx-auto">
-                    <motion.div className="mb-32" {...fadeIn}>
-                        <h2 className="text-6xl md:text-8xl font-semibold tracking-tighter uppercase mb-8">THE **PRECISION** ADVANTAGE.</h2>
-                        <p className="text-2xl text-[#c6c6c6] font-light max-w-3xl leading-snug">Why global enterprises are switching from manual approvals to executable governance.</p>
-                    </motion.div>
-
-                    <motion.div
-                        initial={{ opacity: 0 }}
-                        whileInView={{ opacity: 1 }}
-                        viewport={{ once: true }}
-                        transition={{ duration: 1 }}
-                        className="overflow-x-auto no-scrollbar border border-[#393939]"
-                    >
-                        <table className="w-full text-left border-collapse">
-                            <thead>
-                                <tr className="bg-[#262626] border-b border-[#393939]">
-                                    <th className="p-10 text-[11px] font-bold uppercase tracking-[0.3em] text-[#525252]">METRIC_DEFINITION</th>
-                                    <th className="p-10 text-[11px] font-bold uppercase tracking-[0.3em] text-[#525252]">GENERAL_AI</th>
-                                    <th className="p-10 text-[11px] font-bold uppercase tracking-[0.3em] text-white bg-[#0f62fe]/10 border-x border-[#0f62fe]">BRAND_OS_PROTOCOL</th>
-                                    <th className="p-10 text-[11px] font-bold uppercase tracking-[0.3em] text-[#525252]">CREATIVE_AGENCY</th>
-                                </tr>
-                            </thead>
-                            <tbody className="text-[14px] font-medium uppercase tracking-wider">
-                                {[
-                                    { label: "Compliance Accuracy", ai: "⚠️ ~15%", bos: "💎 99.8%", agency: "✅ 95.0%" },
-                                    { label: "Revision Latency", ai: "⚡ Seconds (Manual)", bos: "⚡ Milliseconds (Auto)", agency: "🐌 Days/Weeks" },
-                                    { label: "Protocol Governance", ai: "❌ None", bos: "🛡️ RLS-Enforced", agency: "✅ Manual Oversight" },
-                                    { label: "Deployment Velocity", ai: "F-Tier", bos: "S-Tier", agency: "B-Tier" }
-                                ].map((row, i) => (
-                                    <tr key={i} className="border-b border-[#393939] group hover:bg-[#262626]/30 transition-colors">
-                                        <td className="p-10 font-bold border-r border-[#393939] text-[#c6c6c6]">{row.label}</td>
-                                        <td className="p-10 text-[#525252]">{row.ai}</td>
-                                        <td className="p-10 text-[#0f62fe] bg-[#0f62fe]/5 border-x border-[#0f62fe]/50 font-bold text-glow">{row.bos}</td>
-                                        <td className="p-10 text-[#525252]">{row.agency}</td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
-                    </motion.div>
-                </div>
-            </section>
-
-            {/* Section: Enterprise FAQ (Accordion) */}
-            <section className="py-48 px-6 bg-[#161616] relative">
-                <div className="max-w-[1200px] mx-auto relative z-10">
-                    <motion.div className="text-center mb-32" {...fadeIn}>
-                        <h2 className="text-5xl md:text-7xl font-semibold tracking-tighter uppercase">TECHNICAL **SPECIFICATIONS**</h2>
-                    </motion.div>
-
-                    <div className="border-t border-[#393939]">
-                        {[
-                            {
-                                q: "How does the system ingest legacy brand guidelines?",
-                                a: "We ingest 5-10 high-resolution reference assets per brand. Our AI extracts color ratios, compositional patterns, and stylistic signatures into a JSON-based Visual Doctrine profile."
-                            },
-                            {
-                                q: "Is our proprietary brand data isolated?",
-                                a: "Yes. Every brand profile is protected by Supabase Row Level Security (RLS) at the infrastructure level. Your models and profiles are never shared between organizations."
-                            },
-                            {
-                                q: "Can we integrate with our existing CMS and Figma?",
-                                a: "Brand OS provides direct webhooks for CMS updates and a dedicated API for pushing brand-aligned assets directly to Figma Team Libraries."
-                            },
-                            {
-                                q: "What is the average ROI of implementation?",
-                                a: "Enterprises typically see a 60% reduction in total creative revision hours and a 3x increase in cross-channel asset velocity within 90 days."
-                            }
-                        ].map((faq, i) => (
-                            <div key={i} className="border-b border-[#393939] overflow-hidden">
-                                <button
-                                    onClick={() => setOpenFaq(openFaq === i ? null : i)}
-                                    className="w-full py-12 flex items-center justify-between text-left group hover:px-4 transition-all duration-500"
-                                >
-                                    <span className="text-2xl font-semibold tracking-tight uppercase group-hover:text-[#0f62fe] transition-colors">{faq.q}</span>
-                                    <div className={`p-2 transition-all duration-500 ${openFaq === i ? 'rotate-180 bg-[#0f62fe] text-white' : 'text-[#525252]'}`}>
-                                        <ChevronDown size={24} />
-                                    </div>
-                                </button>
-                                <AnimatePresence>
-                                    {openFaq === i && (
+                            <div className="p-12 space-y-6 min-h-[500px] flex flex-col justify-end">
+                                <AnimatePresence mode="popLayout">
+                                    {auditLogs.map((log) => (
                                         <motion.div
-                                            initial={{ height: 0, opacity: 0 }}
-                                            animate={{ height: 'auto', opacity: 1 }}
-                                            exit={{ height: 0, opacity: 0 }}
-                                            transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+                                            key={log.id}
+                                            initial={{ opacity: 0, scale: 0.95, y: 10 }}
+                                            animate={{ opacity: 1, scale: 1, y: 0 }}
+                                            exit={{ opacity: 0, scale: 1.05, y: -10 }}
+                                            className="p-6 border border-[#393939] bg-[#000] flex flex-wrap items-center justify-between gap-8 group hover:border-[#0f62fe] transition-colors"
                                         >
-                                            <p className="pb-12 px-4 text-xl text-[#c6c6c6] font-light leading-relaxed max-w-4xl border-l-2 border-[#0f62fe] my-4 ml-2">
-                                                {faq.a}
-                                            </p>
+                                            <div className="flex items-center gap-6">
+                                                <div className="w-10 h-10 border border-[#393939] flex items-center justify-center font-mono text-[10px] text-[#525252]">0{log.id}</div>
+                                                <div>
+                                                    <div className="text-[10px] font-black text-[#0f62fe] uppercase tracking-widest">{log.task}</div>
+                                                    <div className="text-xl font-black uppercase tracking-tighter">PROTOCOL_CHECK</div>
+                                                </div>
+                                            </div>
+                                            <div className="flex items-center gap-12">
+                                                <div className="text-right">
+                                                    <div className="text-[10px] font-black text-[#525252] uppercase tracking-[0.2em]">Match Score</div>
+                                                    <div className="text-3xl font-black text-white">{log.score}%</div>
+                                                </div>
+                                                <div className="px-4 py-2 bg-[#24a148]/10 border border-[#24a148]/20 text-[#24a148] text-[10px] font-black uppercase tracking-[0.2em]">
+                                                    {log.status}
+                                                </div>
+                                            </div>
                                         </motion.div>
-                                    )}
+                                    ))}
                                 </AnimatePresence>
+                                <div className="mt-8 flex justify-between items-center text-[#525252] font-mono text-[10px] uppercase tracking-[0.3em] font-black">
+                                    <span>[SCANNING_ALL_NODES...]</span>
+                                    <span className="animate-pulse">STREAMING_LIVE</span>
+                                </div>
                             </div>
+                        </motion.div>
+                    </div>
+                </div>
+            </section>
+
+            {/* 5. TRUST & PRICING: THE NEW STANDARD */}
+            <section id="pricing" className="py-64 px-8 border-t border-[#1a1a1a]">
+                <div className="max-w-[1800px] mx-auto flex flex-col items-center">
+                    <motion.div {...fastFadeIn} className="text-center mb-32">
+                        <h2 className="text-[clamp(3rem,8vw,10rem)] font-black tracking-tighter uppercase leading-none mb-12">
+                            The New Standard.
+                        </h2>
+                        <p className="text-2xl text-[#c6c6c6] font-light max-w-4xl mx-auto">
+                            Used by forward-thinking teams to eliminate manual overhead and build the future of branding.
+                        </p>
+                    </motion.div>
+
+                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-px bg-[#393939] border border-[#393939] w-full">
+                        {[
+                            { name: "Creator", price: "Free", desc: "Build your personal DNA.", color: "white" },
+                            { name: "Pro", price: "$49", desc: "For teams who want speed.", color: "#0f62fe" },
+                            { name: "Enterprise", price: "Custom", desc: "Total governance at scale.", color: "#da1e28" }
+                        ].map((plan, i) => (
+                            <motion.div
+                                key={i}
+                                whileHover={{ scale: 1.02, zIndex: 10 }}
+                                className="p-20 bg-[#000] flex flex-col h-full relative overflow-hidden group"
+                            >
+                                <div className="text-[10px] font-black uppercase tracking-[0.4em] text-[#525252] mb-12">Protocol_Tier_0{i + 1}</div>
+                                <h3 className="text-5xl font-black uppercase mb-4 tracking-tighter">{plan.name}</h3>
+                                <div className="text-7xl font-black mb-12 tracking-tighter">{plan.price}<span className="text-lg opacity-30">/mo</span></div>
+                                <p className="text-xl font-light text-[#c6c6c6] mb-20 flex-1 leading-tight">{plan.desc}</p>
+                                <Button
+                                    onClick={onLoginClick}
+                                    style={{ backgroundColor: i === 1 ? '#0f62fe' : 'transparent', border: i === 1 ? 'none' : '1px solid #393939' }}
+                                    className="w-full h-16 rounded-none text-sm font-black uppercase tracking-widest"
+                                >
+                                    Select Access
+                                </Button>
+                            </motion.div>
                         ))}
                     </div>
                 </div>
             </section>
 
-            {/* Final CTA */}
-            <section className="relative py-72 px-6 bg-transparent overflow-hidden border-t border-[#393939]">
-                <div className="absolute inset-0 bg-[#0f62fe] opacity-90 z-0" />
-                <div className="mesh-gradient opacity-100 z-0 scale-150 rotate-45" />
+            {/* FINAL CTA */}
+            <section className="py-80 px-8 relative overflow-hidden flex flex-col items-center text-center">
+                <div className="absolute inset-0 bg-[#0f62fe] aura-glow z-0" />
+                <div className="mesh-gradient opacity-100 rotate-12 scale-150 relative z-0" />
 
-                <motion.div
-                    initial={{ opacity: 0, scale: 0.9 }}
-                    whileInView={{ opacity: 1, scale: 1 }}
-                    viewport={{ once: true }}
-                    transition={{ duration: 1 }}
-                    className="max-w-[1600px] mx-auto text-center relative z-10"
-                >
-                    <h2 className="text-[clamp(3rem,8vw,8rem)] font-semibold tracking-tighter uppercase leading-[0.9] mb-12 text-white">
-                        INITIALIZE THE <br /> **FUTURE** PROTOCOL.
-                    </h2>
-                    <p className="text-2xl md:text-3xl font-light mb-20 text-white/90 max-w-3xl mx-auto leading-tight">
-                        Transform your brand management into high-performance executive logic.
-                    </p>
-                    <Button onClick={onLoginClick} size="lg" className="bg-white text-[#0f62fe] hover:bg-white/90 h-24 px-20 rounded-none text-2xl font-bold uppercase tracking-[0.2em] shadow-[0_0_100px_rgba(255,255,255,0.3)] transition-all hover:scale-105 active:scale-95">
-                        Request Access
-                    </Button>
-                </motion.div>
+                <div className="relative z-10 max-w-[1200px]">
+                    <motion.div
+                        initial={{ scale: 0.9, opacity: 0 }}
+                        whileInView={{ scale: 1, opacity: 1 }}
+                        transition={{ duration: 0.8 }}
+                    >
+                        <h2 className="text-[clamp(4rem,12vw,15rem)] font-black tracking-[-0.04em] leading-[0.8] uppercase mb-16 italic">
+                            ACTIVATE <br /> THE DNA.
+                        </h2>
+                        <p className="text-3xl md:text-5xl font-light mb-24 opacity-90 max-w-4xl mx-auto leading-tight">
+                            The future doesn't have PDFs. <br /> It has Brand OS.
+                        </p>
+                        <Button onClick={onLoginClick} size="lg" className="bg-white text-black hover:bg-white/90 h-24 px-24 rounded-none text-2xl font-black uppercase tracking-widest shadow-[0_0_100px_rgba(255,255,255,0.4)] transition-all hover:scale-110 active:scale-95">
+                            Initialize Now
+                        </Button>
+                    </motion.div>
+                </div>
             </section>
 
-            {/* Footer */}
-            <footer className="py-32 px-6 border-t border-[#393939] relative z-10 bg-[#161616]">
-                <div className="max-w-[1600px] mx-auto grid grid-cols-1 md:grid-cols-4 gap-24">
-                    <div className="col-span-1 md:col-span-2">
-                        <div className="flex items-center gap-3 mb-10">
-                            <div className="w-10 h-10 bg-[#0f62fe] flex items-center justify-center aura-glow">
-                                <Zap className="text-white" size={20} fill="currentColor" />
+            {/* FOOTER */}
+            <footer className="py-32 px-8 border-t border-[#1a1a1a] bg-[#000] relative z-20">
+                <div className="max-w-[1800px] mx-auto grid grid-cols-1 md:grid-cols-12 gap-24">
+                    <div className="md:col-span-6">
+                        <div className="flex items-center gap-4 mb-12">
+                            <div className="w-12 h-12 bg-[#0f62fe] flex items-center justify-center aura-glow">
+                                <Zap className="text-white" size={24} fill="currentColor" />
                             </div>
-                            <span className="font-bold tracking-[0.3em] uppercase text-xl">Brand OS</span>
+                            <span className="font-black tracking-tighter uppercase text-3xl">Brand OS</span>
                         </div>
-                        <p className="text-[#525252] text-[12px] max-w-sm leading-loose uppercase tracking-[0.3em] font-medium">
-                            The Operating System for Visual Doctrine. <br />
-                            Engineered for Global Precision. <br />
-                            V2.5.0 STABLE_PRODUCTION_BUILD.
+                        <p className="text-[#525252] text-sm max-w-md leading-loose uppercase tracking-[0.2em] font-black">
+                            Engineered in 2026. <br />
+                            Optimized for Maximum Precision. <br />
+                            V3.0.0_STABLE_BUILD.
                         </p>
                     </div>
 
-                    <div className="grid grid-cols-2 gap-16 col-span-1 md:col-span-2">
+                    <div className="md:col-span-6 grid grid-cols-2 gap-20">
                         <div>
-                            <h4 className="text-[12px] font-bold uppercase tracking-[0.4em] text-[#c6c6c6] mb-12">Protocol</h4>
-                            <div className="flex flex-col gap-6 text-[14px] text-[#525252] font-mono uppercase tracking-widest">
-                                <a href="#" className="hover:text-white transition-colors">Documentation</a>
-                                <a href="#" className="hover:text-white transition-colors">API_Reference</a>
-                                <a href="#" className="hover:text-white transition-colors">Security</a>
+                            <h4 className="text-[10px] font-black uppercase tracking-[0.4em] text-white mb-12">Security</h4>
+                            <div className="flex flex-col gap-6 text-[12px] text-[#525252] font-mono uppercase tracking-[0.2em] font-black">
+                                <a href="#" className="hover:text-white transition-colors">Privacy_Protocol</a>
+                                <a href="#" className="hover:text-white transition-colors">Audit_Logs</a>
+                                <a href="#" className="hover:text-white transition-colors">Compliance</a>
                             </div>
                         </div>
-                        <div>
-                            <h4 className="text-[12px] font-bold uppercase tracking-[0.4em] text-[#c6c6c6] mb-12">Network</h4>
-                            <div className="flex gap-12 text-[#525252]">
-                                <a href="#" className="hover:text-white transition-colors"><Twitter size={24} strokeWidth={1} /></a>
-                                <a href="#" className="hover:text-white transition-colors"><Github size={24} strokeWidth={1} /></a>
-                                <a href="#" className="hover:text-white transition-colors"><Code size={24} strokeWidth={1} /></a>
+                        <div className="flex flex-col items-end justify-between">
+                            <div className="flex gap-10 text-[#525252]">
+                                <a href="#" className="hover:text-white transition-all"><Twitter size={28} strokeWidth={1} /></a>
+                                <a href="#" className="hover:text-white transition-all"><Github size={28} strokeWidth={1} /></a>
+                            </div>
+                            <div className="text-[10px] font-mono text-[#333] font-black letter-spacing-[0.5em] text-right">
+                                © 2026 DNA_SYSTEMS_GLOBAL
                             </div>
                         </div>
                     </div>
-                </div>
-                <div className="max-w-[1600px] mx-auto mt-64 pt-12 border-t border-[#262626] flex flex-col md:flex-row justify-between items-center gap-6 text-[10px] font-mono text-[#393939] uppercase tracking-[0.5em]">
-                    <div>© 2026 BRAND_DNA_ORCHESTRATOR — ALL_RIGHTS_RESERVED</div>
-                    <div className="text-[#525252]">INTELLIGENT_CREATIVE_GOVERNANCE</div>
                 </div>
             </footer>
         </div>
