@@ -58,11 +58,48 @@ html {
     height: 200%;
     background: transparent url('http://assets.iceable.com/img/noise-transparent.png') repeat 0 0;
     background-repeat: repeat;
-    animation: noise 0.2s infinite;
-    opacity: 0.05;
+    animation: shift 0.2s infinite;
+    opacity: 0.04;
     visibility: visible;
-    z-index: 1;
     pointer-events: none;
+    z-index: 100;
+  }
+
+  /* Gradient Mesh Background */
+  .mesh-gradient {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+    background: radial-gradient(at 0% 0%, hsla(220, 100%, 10%, 1) 0, transparent 50%),
+      radial-gradient(at 100% 0%, hsla(230, 100%, 15%, 1) 0, transparent 50%),
+      radial-gradient(at 100% 100%, hsla(240, 100%, 10%, 1) 0, transparent 50%),
+      radial-gradient(at 0% 100%, hsla(225, 100%, 15%, 1) 0, transparent 50%);
+    filter: blur(100px);
+    opacity: 0.6;
+  }
+
+  /* Glow Utilities */
+  .aura-glow {
+    position: relative;
+  }
+
+  .aura-glow::after {
+    content: '';
+    position: absolute;
+    inset: -20px;
+    background: var(--cds-link-01);
+    filter: blur(60px);
+    opacity: 0.15;
+    z-index: -1;
+    border-radius: 50%;
+    pointer-events: none;
+  }
+
+  .text-glow {
+    text-shadow: 0 0 30px rgba(15, 98, 254, 0.4);
   }
 
   .no-scrollbar::-webkit-scrollbar {
@@ -75,7 +112,7 @@ html {
   }
 }
 
-@keyframes noise {
+@keyframes shift {
   0% {
     transform: translate(0, 0)
   }
