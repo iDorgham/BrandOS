@@ -27,6 +27,17 @@ html {
     --carbon-spacing-08: 2.5rem;
     --carbon-spacing-09: 3rem;
     --carbon-spacing-10: 4rem;
+
+    /* Mega Typography */
+    --mega-title-sm: 3.5rem;
+    --mega-title-md: 6rem;
+    --mega-title-lg: 10rem;
+    --mega-title-weight: 600;
+
+    /* Carbon Table & UI Shell */
+    --carbon-table-header: #262626;
+    --carbon-table-border: #393939;
+    --carbon-table-row-hover: #353535;
   }
 
   body {

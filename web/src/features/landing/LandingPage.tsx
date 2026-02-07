@@ -1,194 +1,347 @@
-import React from 'react';
-import { motion } from 'framer-motion';
-import { Zap, Shield, Layout, Sparkles, ArrowRight, Github, Twitter, Layers, BarChart3, Globe, Code } from 'lucide-react';
+import React, { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import {
+    Zap, Shield, Layout, Sparkles, ArrowRight, Github, Twitter,
+    Layers, BarChart3, Globe, Code, ChevronDown, Check, AlertTriangle,
+    Database, Users, Lock, ChevronRight, Activity, Cpu
+} from 'lucide-react';
 import { Button } from '@/components/ui';
-import { useAuth } from '@/contexts/AuthContext';
 
 interface LandingPageProps {
     onLoginClick: () => void;
 }
 
 export const LandingPage: React.FC<LandingPageProps> = ({ onLoginClick }) => {
+    const [openFaq, setOpenFaq] = useState<number | null>(null);
+
+    const fadeIn = {
+        initial: { opacity: 0, y: 20 },
+        whileInView: { opacity: 1, y: 0 },
+        viewport: { once: true },
+        transition: { duration: 0.6, ease: [0.16, 1, 0.3, 1] }
+    };
+
     return (
         <div className="min-h-screen bg-[#161616] text-white selection:bg-[#0f62fe]/30 font-sans relative overflow-x-hidden">
             <div className="cinematic-noise" />
 
-            {/* Minimalist Grid Pattern */}
-            <div className="absolute inset-0 z-0 opacity-[0.03] pointer-events-none"
-                style={{ backgroundImage: 'radial-gradient(#fff 1px, transparent 1px)', backgroundSize: '32px 32px' }} />
+            {/* Structural Grid Background */}
+            <div className="absolute inset-0 z-0 opacity-[0.05] pointer-events-none"
+                style={{ backgroundImage: 'radial-gradient(#fff 1px, transparent 1px)', backgroundSize: '48px 48px' }} />
 
-            {/* Navigation */}
-            <nav className="fixed top-0 w-full z-50 border-b border-[#393939] bg-[#161616]/80 backdrop-blur-md">
-                <div className="max-w-[1600px] mx-auto px-6 h-12 flex items-center justify-between">
-                    <div className="flex items-center gap-4">
-                        <div className="w-8 h-8 bg-[#0f62fe] flex items-center justify-center">
-                            <Zap className="text-white" size={16} fill="currentColor" />
+            {/* Navigation (Carbon UI Shell) */}
+            <nav className="fixed top-0 w-full z-50 border-b border-[#393939] bg-[#161616]/90 backdrop-blur-xl h-12">
+                <div className="max-w-[1600px] mx-auto px-6 h-full flex items-center justify-between">
+                    <div className="flex items-center gap-6">
+                        <div className="flex items-center gap-3">
+                            <div className="w-8 h-8 bg-[#0f62fe] flex items-center justify-center">
+                                <Zap className="text-white" size={16} fill="currentColor" />
+                            </div>
+                            <span className="text-[14px] font-bold tracking-widest uppercase hidden sm:inline">Brand OS</span>
                         </div>
-                        <span className="text-sm font-semibold tracking-wider uppercase">Brand OS</span>
+                        <div className="h-4 w-px bg-[#393939] hidden lg:block" />
+                        <div className="hidden lg:flex items-center gap-8 text-[12px] font-medium text-[#c6c6c6] uppercase tracking-wider">
+                            <a href="#problem" className="hover:text-white transition-colors">The Crisis</a>
+                            <a href="#infrastructure" className="hover:text-white transition-colors">Infrastructure</a>
+                            <a href="#governance" className="hover:text-white transition-colors">Governance</a>
+                            <a href="#pricing" className="hover:text-white transition-colors">Economics</a>
+                        </div>
                     </div>
 
-                    <div className="hidden lg:flex items-center gap-10 text-[13px] font-medium text-[#c6c6c6]">
-                        <a href="#governance" className="hover:text-white transition-colors">Governance</a>
-                        <a href="#intelligence" className="hover:text-white transition-colors">Intelligence</a>
-                        <a href="#scale" className="hover:text-white transition-colors">Scale</a>
-                    </div>
-
-                    <div className="flex items-center">
-                        <Button onClick={onLoginClick} variant="ghost" className="text-[12px] uppercase tracking-widest font-bold px-6 h-12 hover:bg-[#393939] rounded-none border-l border-[#393939]">
+                    <div className="flex items-center h-full">
+                        <div className="hidden sm:flex items-center px-4 text-[10px] font-mono text-[#525252] tracking-widest">
+                            [SYSTEM: OPERATIONAL]
+                        </div>
+                        <Button onClick={onLoginClick} variant="ghost" className="text-[11px] uppercase tracking-widest font-bold px-6 h-12 hover:bg-[#393939] rounded-none border-l border-[#393939]">
                             Log In
                         </Button>
-                        <Button onClick={onLoginClick} className="bg-[#0f62fe] text-white text-[12px] uppercase tracking-widest font-bold rounded-none h-12 px-8 hover:bg-[#0043ce] transition-colors">
+                        <Button onClick={onLoginClick} className="bg-[#0f62fe] text-white text-[11px] uppercase tracking-widest font-bold rounded-none h-12 px-8 hover:bg-[#0043ce] transition-colors border-l border-[#393939]">
                             Request Access
                         </Button>
                     </div>
                 </div>
             </nav>
 
-            {/* Hero Section */}
-            <section className="relative pt-32 pb-40 px-6 z-10 border-b border-[#393939]">
-                <div className="max-w-[1600px] mx-auto grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
-                    <div className="lg:col-span-7">
-                        <motion.div
-                            initial={{ opacity: 0, x: -20 }}
-                            animate={{ opacity: 1, x: 0 }}
-                            transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-                        >
-                            <div className="text-[#0f62fe] text-[12px] font-bold uppercase tracking-[0.3em] mb-6">
-                                Enterprise Creative Protocol v2.4
-                            </div>
-                            <h1 className="text-5xl md:text-8xl font-light tracking-tight leading-[1.05] mb-8">
-                                Scalable <span className="font-semibold italic">Identity</span> <br />
-                                Infrastructure.
-                            </h1>
-                            <p className="text-lg md:text-xl text-[#c6c6c6] max-w-xl mb-12 leading-relaxed font-light">
-                                Stop managing assets. Start orchestrating DNA.
-                                Brand OS transforms fragmented creative workflows into a single,
-                                AI-powered source of truth for global enterprises.
-                            </p>
-
-                            <div className="flex flex-wrap gap-4">
-                                <Button onClick={onLoginClick} size="lg" className="bg-[#0f62fe] text-white hover:bg-[#0043ce] h-14 px-10 rounded-none text-[13px] font-bold uppercase tracking-widest group">
-                                    Initialize Protocol <ArrowRight className="ml-3 group-hover:translate-x-1 transition-transform" size={16} />
-                                </Button>
-                                <Button variant="secondary" size="lg" className="border-[#393939] text-[#f4f4f4] hover:bg-[#393939] h-14 px-10 rounded-none text-[13px] font-bold uppercase tracking-widest">
-                                    Technical Specs
-                                </Button>
-                            </div>
-                        </motion.div>
-                    </div>
-
-                    <div className="lg:col-span-5 relative">
-                        <motion.div
-                            initial={{ opacity: 0, scale: 0.95 }}
-                            animate={{ opacity: 1, scale: 1 }}
-                            transition={{ duration: 0.8, delay: 0.2 }}
-                            className="relative border border-[#393939] bg-[#262626] aspect-square lg:aspect-[4/5] flex flex-col p-px"
-                        >
-                            <div className="flex-1 bg-[#161616] p-8 flex flex-col justify-between overflow-hidden">
-                                <div className="space-y-6">
-                                    <div className="h-px w-full bg-[#393939]" />
-                                    <div className="flex justify-between items-center text-[10px] font-mono text-[#525252] uppercase tracking-[0.2em]">
-                                        <span>Status: Operational</span>
-                                        <span>Sync: 99.8%</span>
-                                    </div>
-                                    <div className="grid grid-cols-2 gap-4">
-                                        <div className="h-24 border border-[#393939] bg-[#262626]/20" />
-                                        <div className="h-24 border border-[#393939] bg-[#262626]/20" />
-                                    </div>
-                                    <div className="space-y-2">
-                                        <div className="h-2 w-full bg-[#393939]" />
-                                        <div className="h-2 w-2/3 bg-[#393939]" />
-                                    </div>
-                                </div>
-                                <div className="mt-8 flex items-center justify-center">
-                                    <div className="relative">
-                                        <div className="w-24 h-24 border-2 border-[#0f62fe] animate-ping absolute inset-0 opacity-20" />
-                                        <div className="w-24 h-24 border border-[#0f62fe] flex items-center justify-center">
-                                            <Sparkles className="text-[#0f62fe]" size={32} />
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div className="h-12 bg-[#262626] border-t border-[#393939] flex items-center px-4 justify-between">
-                                <div className="text-[10px] font-mono text-[#c6c6c6]">BRAND_DNA_MODEL_LOADED</div>
-                                <div className="flex gap-1">
-                                    <div className="w-1.5 h-1.5 bg-[#0f62fe]" />
-                                    <div className="w-1.5 h-1.5 bg-[#0f62fe]" />
-                                    <div className="w-1.5 h-1.5 bg-[#0f62fe]" />
-                                </div>
-                            </div>
-                        </motion.div>
-                    </div>
-                </div>
-            </section>
-
-            {/* Value Propositions */}
-            <section id="governance" className="py-32 px-6 border-b border-[#393939]">
-                <div className="max-w-[1600px] mx-auto grid grid-cols-1 md:grid-cols-3 gap-0 border-l border-t border-[#393939]">
-                    {[
-                        {
-                            icon: <Shield size={24} />,
-                            label: "Governance",
-                            title: "Bulletproof Compliance",
-                            desc: "Automated brand audit systems that enforce DNA consistency across thousands of AI-generated assets in real-time."
-                        },
-                        {
-                            icon: <BarChart3 size={24} />,
-                            label: "Intelligence",
-                            title: "Predictive Analytics",
-                            desc: "Measure creative velocity and brand sentiment before deployment. Data-driven insights for artistic decisions."
-                        },
-                        {
-                            icon: <Globe size={24} />,
-                            label: "Scale",
-                            title: "Global Distribution",
-                            desc: "One-click deployment to multiple channels. Decentralized orchestration for high-performance localized variants."
-                        }
-                    ].map((item, i) => (
-                        <div key={i} className="p-12 border-r border-b border-[#393939] group hover:bg-[#262626] transition-colors">
-                            <div className="text-[#0f62fe] mb-8 group-hover:scale-110 transition-transform">{item.icon}</div>
-                            <div className="text-[11px] font-bold text-[#525252] uppercase tracking-[0.2em] mb-4">{item.label}</div>
-                            <h3 className="text-xl font-medium mb-4">{item.title}</h3>
-                            <p className="text-[#c6c6c6] text-sm leading-relaxed font-light">
-                                {item.desc}
-                            </p>
+            {/* Hero Section: Mega Typography */}
+            <section className="relative pt-48 pb-64 px-6 z-10 border-b border-[#393939]">
+                <div className="max-w-[1600px] mx-auto">
+                    <motion.div
+                        initial={{ opacity: 0, scale: 0.98 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
+                    >
+                        <div className="text-[#0f62fe] text-[13px] font-bold uppercase tracking-[0.4em] mb-12 flex items-center gap-4">
+                            <span className="w-12 h-px bg-[#0f62fe]" />
+                            Enterprise Creative Protocol v2.5
                         </div>
-                    ))}
+
+                        <h1 className="text-[clamp(3.5rem,10vw,10rem)] font-semibold tracking-tighter leading-[0.9] uppercase mb-12">
+                            Scale Your <span className="text-transparent bg-clip-text bg-gradient-to-r from-white via-white to-[#525252] italic font-light">Identity</span>. <br />
+                            Not Just Your Output.
+                        </h1>
+
+                        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-end">
+                            <div className="lg:col-span-6">
+                                <p className="text-xl md:text-2xl text-[#c6c6c6] max-w-2xl leading-tight font-light mb-12">
+                                    Stop managing assets. Start orchestrating DNA. <br />
+                                    Brand OS transforms fragmented workflows into a single,
+                                    AI-powered source of truth for the global enterprise.
+                                </p>
+                                <div className="flex flex-wrap gap-4">
+                                    <Button onClick={onLoginClick} size="lg" className="bg-[#0f62fe] text-white hover:bg-[#0043ce] h-16 px-12 rounded-none text-[14px] font-bold uppercase tracking-widest group">
+                                        Initialize Protocol <ArrowRight className="ml-4 group-hover:translate-x-1 transition-transform" size={18} />
+                                    </Button>
+                                    <button className="h-16 px-12 border border-[#393939] text-[#f4f4f4] hover:bg-[#393939] text-[14px] font-bold uppercase tracking-widest transition-colors">
+                                        View Architecture
+                                    </button>
+                                </div>
+                            </div>
+                            <div className="lg:col-span-6 flex flex-col gap-4">
+                                <div className="flex items-center gap-4 text-[11px] font-mono text-[#525252] uppercase tracking-[0.3em] mb-4">
+                                    <Activity size={12} className="text-[#0f62fe]" /> Real-time Compliance Feed
+                                </div>
+                                <div className="space-y-2">
+                                    {[98.2, 94.7, 99.8].map((score, i) => (
+                                        <div key={i} className="h-8 border border-[#393939] bg-[#262626]/20 flex items-center justify-between px-4">
+                                            <div className="flex gap-2 items-center">
+                                                <div className="w-1.5 h-1.5 bg-[#0f62fe]" />
+                                                <span className="text-[10px] font-mono text-[#c6c6c6]">ASSET_DNA_AUDIT_{i}</span>
+                                            </div>
+                                            <span className="text-[10px] font-mono text-[#0f62fe]">{score}% COMPLIANT</span>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        </div>
+                    </motion.div>
                 </div>
             </section>
 
-            {/* Content Section - The "Sales" bit */}
-            <section className="py-40 px-6 bg-[#262626]">
-                <div className="max-w-[1600px] mx-auto flex flex-col items-center text-center">
-                    <div className="max-w-3xl mb-24">
-                        <h2 className="text-4xl md:text-6xl font-light tracking-tight mb-8">Creative work at the <br />speed of <span className="font-semibold text-white italic">Logic</span>.</h2>
-                        <p className="text-[#c6c6c6] text-lg leading-relaxed font-light">
-                            Brand OS isn't just a design tool. It's an enterprise infrastructure
-                            that ensures every pixel generated is 100% aligned with your strategic
-                            visual doctrine. Reduce creative overhead by 60% while maintaining
-                            perfect brand governance.
+            {/* Section: The Crisis (The Drift) */}
+            <section id="problem" className="py-48 px-6 bg-[#161616] border-b border-[#393939]">
+                <div className="max-w-[1600px] mx-auto grid grid-cols-1 lg:grid-cols-12 gap-24">
+                    <div className="lg:col-span-5">
+                        <div className="sticky top-32">
+                            <h2 className="text-6xl font-semibold tracking-tighter leading-none uppercase mb-12">
+                                YOUR BRAND <br /> GUIDELINES <br /> ARE <span className="italic font-light text-[#525252]">DEAD.</span>
+                            </h2>
+                            <p className="text-xl text-[#c6c6c6] leading-relaxed font-light mb-8">
+                                Traditional manuals are static PDFs that humans ignore and AI can't read.
+                                This leads to **Brand Drift**—the slow, expensive erosion of your visual equity
+                                across thousands of touchpoints.
+                            </p>
+                            <div className="p-8 border border-[#393939] bg-[#262626]/30">
+                                <div className="text-[11px] font-bold text-[#0f62fe] uppercase tracking-widest mb-4">The Impact</div>
+                                <div className="text-4xl font-semibold mb-2">$2.4M</div>
+                                <div className="text-[12px] text-[#525252] uppercase font-medium">Avg. Annual Loss Due to Inconsistent Creative Execution</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div className="lg:col-span-7 space-y-32">
+                        {[
+                            {
+                                head: "Fragmented Intelligence",
+                                sub: "Your brand lives in Slack threads and sub-folders. It needs to live in an executable engine.",
+                                icon: <Cpu className="text-[#0f62fe]" size={48} strokeWidth={1} />
+                            },
+                            {
+                                head: "Generative Chaos",
+                                sub: "95% of AI-generated content fails brand compliance on the first pass. We fix this at the source.",
+                                icon: <AlertTriangle className="text-[#0f62fe]" size={48} strokeWidth={1} />
+                            },
+                            {
+                                head: "Manual Audit Atrophy",
+                                sub: "Review cycles are the graveyard of velocity. Brand OS automates the audit in milliseconds.",
+                                icon: <Shield className="text-[#0f62fe]" size={48} strokeWidth={1} />
+                            }
+                        ].map((item, i) => (
+                            <motion.div key={i} {...fadeIn} className="flex gap-12 items-start max-w-2xl">
+                                <div className="shrink-0 pt-4">{item.icon}</div>
+                                <div>
+                                    <h3 className="text-4xl font-semibold tracking-tight mb-6 uppercase">{item.head}</h3>
+                                    <p className="text-lg text-[#c6c6c6] font-light leading-snug">{item.sub}</p>
+                                </div>
+                            </motion.div>
+                        ))}
+                    </div>
+                </div>
+            </section>
+
+            {/* Section: Infrastructure (Feature Deep Dives) */}
+            <section id="infrastructure" className="py-48 px-6 bg-[#262626]">
+                <div className="max-w-[1600px] mx-auto flex flex-col items-center mb-32">
+                    <div className="text-center max-w-4xl">
+                        <div className="text-[#0f62fe] text-[13px] font-bold uppercase tracking-[0.4em] mb-8">System Components</div>
+                        <h2 className="text-6xl md:text-8xl font-semibold tracking-tighter uppercase mb-12">
+                            PRECISION **INFRASTRUCTURE**
+                        </h2>
+                    </div>
+                </div>
+
+                <div className="max-w-[1600px] mx-auto grid grid-cols-1 lg:grid-cols-2 gap-4">
+                    {/* Feature Card: AI Studio */}
+                    <div className="p-16 border border-[#393939] bg-[#161616] group hover:border-[#0f62fe] transition-colors">
+                        <div className="text-[#0f62fe] mb-12"><Cpu size={40} /></div>
+                        <h3 className="text-5xl font-semibold tracking-tight mb-8 uppercase">AI STUDIO</h3>
+                        <p className="text-[#c6c6c6] text-xl font-light leading-relaxed mb-12">
+                            One interface to orchestrate Gemini, Claude, and DALL-E through
+                            the lens of your Brand DNA. No more trial and error.
+                            Just brand-aligned assets on the first try.
                         </p>
+                        <div className="space-y-6">
+                            {[
+                                { label: "Multi-Model Prompt Routing", value: 100 },
+                                { label: "Semantic Vibe Control", value: 85 },
+                                { label: "Iterative Refinement Logic", value: 92 }
+                            ].map((spec, i) => (
+                                <div key={i} className="space-y-2">
+                                    <div className="flex justify-between text-[11px] font-mono text-[#525252] uppercase tracking-widest">
+                                        <span>{spec.label}</span>
+                                        <span>{spec.value}% Capability</span>
+                                    </div>
+                                    <div className="h-1 w-full bg-[#393939]">
+                                        <div className="h-full bg-[#0f62fe]" style={{ width: `${spec.value}%` }} />
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 w-full">
+                    {/* Feature Card: Moodboard */}
+                    <div className="p-16 border border-[#393939] bg-[#161616] group hover:border-[#0f62fe] transition-colors">
+                        <div className="text-[#0f62fe] mb-12"><Layers size={40} /></div>
+                        <h3 className="text-5xl font-semibold tracking-tight mb-8 uppercase">MOODBOARD CANVAS</h3>
+                        <p className="text-[#c6c6c6] text-xl font-light leading-relaxed mb-12">
+                            A node-based workflow designer where you assemble visual logic gates.
+                            Connect reference images to style attributes and let the engine
+                            calculate your creative trajectory.
+                        </p>
+                        <div className="relative border border-[#393939] aspect-video bg-[#262626]/20 overflow-hidden flex items-center justify-center">
+                            <div className="absolute inset-0 opacity-10"
+                                style={{ backgroundImage: 'linear-gradient(#393939 1px, transparent 1px), linear-gradient(90deg, #393939 1px, transparent 1px)', backgroundSize: '20px 20px' }} />
+                            <div className="flex gap-4 items-center z-10">
+                                <div className="w-24 h-32 border border-[#0f62fe] bg-[#161616] flex flex-col p-2">
+                                    <div className="flex-1 bg-[#393939]/30" />
+                                    <div className="h-4 w-full bg-primary/20 mt-2" />
+                                </div>
+                                <ArrowRight className="text-[#525252]" />
+                                <div className="w-12 h-12 rounded-full border border-[#0f62fe] flex items-center justify-center animate-pulse">
+                                    <Cpu size={16} className="text-[#0f62fe]" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            {/* Section: Comparison & Economics */}
+            <section id="pricing" className="py-48 px-6 border-b border-[#393939]">
+                <div className="max-w-[1600px] mx-auto">
+                    <div className="mb-32">
+                        <h2 className="text-6xl md:text-8xl font-semibold tracking-tighter uppercase mb-8">THE **PRECISION** ADVANTAGE.</h2>
+                        <p className="text-2xl text-[#c6c6c6] font-light max-w-3xl">Why global enterprises are switching from manual approvals to executable governance.</p>
+                    </div>
+
+                    <div className="overflow-x-auto">
+                        <table className="w-full text-left border-collapse border border-[#393939]">
+                            <thead>
+                                <tr className="bg-[#262626] border-b border-[#393939]">
+                                    <th className="p-8 text-[11px] font-bold uppercase tracking-widest text-[#525252]">METRIC_DEFINITION</th>
+                                    <th className="p-8 text-[11px] font-bold uppercase tracking-widest text-[#525252]">GENERAL_AI</th>
+                                    <th className="p-8 text-[11px] font-bold uppercase tracking-widest text-white border-x border-[#0f62fe]">BRAND_OS_PROTOCOL</th>
+                                    <th className="p-8 text-[11px] font-bold uppercase tracking-widest text-[#525252]">CREATIVE_AGENCY</th>
+                                </tr>
+                            </thead>
+                            <tbody className="text-[13px] font-medium uppercase tracking-wider">
+                                {[
+                                    { label: "Compliance Accuracy", ai: "⚠️ ~15%", bos: "💎 99.8%", agency: "✅ 95.0%" },
+                                    { label: "Revision Latency", ai: "⚡ Seconds (Manual)", bos: "⚡ Milliseconds (Auto)", agency: "🐌 Days/Weeks" },
+                                    { label: "Protocol Governance", ai: "❌ None", bos: "🛡️ RLS-Enforced", agency: "✅ Manual Oversight" },
+                                    { label: "Deployment Velocity", ai: "Fast", bos: "Instant", agency: "Variable" }
+                                ].map((row, i) => (
+                                    <tr key={i} className="border-b border-[#393939] hover:bg-[#262626]/50">
+                                        <td className="p-8 font-semibold">{row.label}</td>
+                                        <td className="p-8 text-[#525252]">{row.ai}</td>
+                                        <td className="p-8 text-[#0f62fe] bg-[#0f62fe]/5 border-x border-[#0f62fe]/50">{row.bos}</td>
+                                        <td className="p-8 text-[#525252]">{row.agency}</td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            {/* Section: Enterprise FAQ (Accordion) */}
+            <section className="py-48 px-6 bg-[#161616]">
+                <div className="max-w-[1200px] mx-auto">
+                    <h2 className="text-5xl font-semibold tracking-tight uppercase mb-24 text-center">TECHNICAL **SPECIFICATIONS**</h2>
+                    <div className="border-t border-[#393939]">
                         {[
-                            { stat: "80%", label: "Faster Deployment" },
-                            { stat: "0%", label: "Brand Drift" },
-                            { stat: "10x", label: "Creative Output" },
-                            { stat: "$2.4M", label: "Avg. ROI / Year" }
-                        ].map((stat, i) => (
-                            <div key={i} className="p-10 border border-[#393939] bg-[#161616] flex flex-col items-center">
-                                <div className="text-3xl font-semibold text-[#0f62fe] mb-2">{stat.stat}</div>
-                                <div className="text-[11px] font-bold text-[#525252] uppercase tracking-widest">{stat.label}</div>
+                            {
+                                q: "How does the system ingest legacy brand guidelines?",
+                                a: "We ingest 5-10 high-resolution reference assets per brand. Our AI extracts color ratios, compositional patterns, and stylistic signatures into a JSON-based Visual Doctrine profile."
+                            },
+                            {
+                                q: "Is our proprietary brand data isolated?",
+                                a: "Yes. Every brand profile is protected by Supabase Row Level Security (RLS) at the infrastructure level. Your models and profiles are never shared between organizations."
+                            },
+                            {
+                                q: "Can we integrate with our existing CMS and Figma?",
+                                a: "Brand OS provides direct webhooks for CMS updates and a dedicated API for pushing brand-aligned assets directly to Figma Team Libraries."
+                            },
+                            {
+                                q: "What is the average ROI of implementation?",
+                                a: "Enterprises typically see a 60% reduction in total creative revision hours and a 3x increase in cross-channel asset velocity within 90 days."
+                            }
+                        ].map((faq, i) => (
+                            <div key={i} className="border-b border-[#393939]">
+                                <button
+                                    onClick={() => setOpenFaq(openFaq === i ? null : i)}
+                                    className="w-full py-10 flex items-center justify-between text-left group"
+                                >
+                                    <span className="text-xl font-medium tracking-tight uppercase">{faq.q}</span>
+                                    <ChevronDown className={`text-[#525252] group-hover:text-white transition-all ${openFaq === i ? 'rotate-180 text-white' : ''}`} />
+                                </button>
+                                <AnimatePresence>
+                                    {openFaq === i && (
+                                        <motion.div
+                                            initial={{ height: 0, opacity: 0 }}
+                                            animate={{ height: 'auto', opacity: 1 }}
+                                            exit={{ height: 0, opacity: 0 }}
+                                            transition={{ duration: 0.3 }}
+                                            className="overflow-hidden"
+                                        >
+                                            <p className="pb-10 text-lg text-[#c6c6c6] font-light leading-relaxed max-w-3xl">
+                                                {faq.a}
+                                            </p>
+                                        </motion.div>
+                                    )}
+                                </AnimatePresence>
                             </div>
                         ))}
                     </div>
                 </div>
             </section>
 
+            {/* Final CTA */}
+            <section className="py-64 px-6 bg-[#0f62fe] text-white text-center">
+                <div className="max-w-[1600px] mx-auto">
+                    <h2 className="text-[clamp(2.5rem,8vw,8rem)] font-semibold tracking-tighter uppercase leading-[0.9] mb-12">
+                        READY TO **DECODE** <br /> YOUR IDENTITY?
+                    </h2>
+                    <p className="text-2xl font-light mb-16 opacity-90 max-w-2xl mx-auto">
+                        Join the world's most innovative brands and transform your creative workflow into a high-performance protocol.
+                    </p>
+                    <Button onClick={onLoginClick} size="lg" className="bg-white text-[#0f62fe] hover:bg-white/90 h-20 px-16 rounded-none text-lg font-bold uppercase tracking-widest shadow-2xl">
+                        Request Protocol Access
+                    </Button>
+                </div>
+            </section>
+
             {/* Footer */}
             <footer className="py-20 px-6 border-t border-[#393939]">
-                <div className="max-w-[1600px] mx-auto grid grid-cols-1 md:grid-cols-4 gap-12">
+                <div className="max-w-[1600px] mx-auto grid grid-cols-1 md:grid-cols-4 gap-24">
                     <div className="col-span-1 md:col-span-2">
                         <div className="flex items-center gap-3 mb-8">
                             <div className="w-8 h-8 bg-[#0f62fe] flex items-center justify-center">
@@ -196,37 +349,35 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onLoginClick }) => {
                             </div>
                             <span className="font-bold tracking-wider uppercase text-sm">Brand OS</span>
                         </div>
-                        <p className="text-[#525252] text-xs max-w-xs leading-relaxed uppercase tracking-tighter">
+                        <p className="text-[#525252] text-[10px] max-w-xs leading-loose uppercase tracking-[0.2em]">
                             Carbon-Ready Creative Infrastructure <br />
-                            Built for the next generation of visual production.
+                            Engineered for Precision Governance. <br />
+                            V2.5 Stable Release.
                         </p>
                     </div>
 
-                    <div>
-                        <h4 className="text-[11px] font-bold uppercase tracking-widest text-[#c6c6c6] mb-6">Network</h4>
-                        <div className="flex flex-col gap-3 text-[12px] text-[#525252] font-medium">
-                            <a href="#" className="hover:text-white transition-colors">Documentation</a>
-                            <a href="#" className="hover:text-white transition-colors">Enterprise API</a>
-                            <a href="#" className="hover:text-white transition-colors">System Status</a>
+                    <div className="grid grid-cols-2 gap-12 col-span-1 md:col-span-2">
+                        <div>
+                            <h4 className="text-[11px] font-bold uppercase tracking-widest text-[#c6c6c6] mb-8">Protocol</h4>
+                            <div className="flex flex-col gap-4 text-[13px] text-[#525252] font-medium font-mono uppercase">
+                                <a href="#" className="hover:text-white transition-colors">Documentation_v2</a>
+                                <a href="#" className="hover:text-white transition-colors">Infrastructure_API</a>
+                                <a href="#" className="hover:text-white transition-colors">Security_Whitepaper</a>
+                            </div>
                         </div>
-                    </div>
-
-                    <div>
-                        <h4 className="text-[11px] font-bold uppercase tracking-widest text-[#c6c6c6] mb-6">Connect</h4>
-                        <div className="flex gap-6 text-[#525252]">
-                            <a href="#" className="hover:text-white transition-colors"><Twitter size={18} /></a>
-                            <a href="#" className="hover:text-white transition-colors"><Github size={18} /></a>
-                            <a href="#" className="hover:text-white transition-colors"><Code size={18} /></a>
+                        <div>
+                            <h4 className="text-[11px] font-bold uppercase tracking-widest text-[#c6c6c6] mb-8">Network</h4>
+                            <div className="flex gap-8 text-[#525252]">
+                                <a href="#" className="hover:text-white transition-colors"><Twitter size={20} /></a>
+                                <a href="#" className="hover:text-white transition-colors"><Github size={20} /></a>
+                                <a href="#" className="hover:text-white transition-colors"><Code size={20} /></a>
+                            </div>
                         </div>
                     </div>
                 </div>
-                <div className="max-w-[1600px] mx-auto mt-32 pt-8 border-t border-[#262626] flex flex-col md:flex-row justify-between items-center gap-4">
-                    <div className="text-[10px] font-mono text-[#393939] uppercase tracking-[0.3em]">
-                        © 2026 Brand OS Protocol
-                    </div>
-                    <div className="text-[10px] font-mono text-[#393939] uppercase tracking-[0.3em]">
-                        Precision in Creative Governance
-                    </div>
+                <div className="max-w-[1600px] mx-auto mt-48 pt-8 border-t border-[#262626] flex flex-col md:flex-row justify-between items-center gap-4 text-[9px] font-mono text-[#393939] uppercase tracking-[0.4em]">
+                    <div>© 2026 Brand OS — All Protocols Enforced</div>
+                    <div>Precision in Creative Governance</div>
                 </div>
             </footer>
         </div>
