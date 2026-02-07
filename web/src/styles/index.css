@@ -159,13 +159,26 @@ html {
 }
 
 @keyframes scan {
-  0% {
-    transform: translateY(0);
+  from {
+    transform: translateY(-100%);
   }
 
-  100% {
+  to {
     transform: translateY(100%);
   }
+}
+
+.scanline-effect {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(to bottom,
+      transparent 0%,
+      rgba(15, 98, 254, 0.05) 50%,
+      transparent 100%);
+  background-size: 100% 4px;
+  animation: scan 8s linear infinite;
+  z-index: 10;
 }
 
 /* Custom Range Slider Styling */

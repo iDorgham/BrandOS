@@ -265,17 +265,25 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onLoginClick }) => {
             {/* 4. REAL-TIME DEMO: THE CONTROL CENTER */}
             <section id="control" className="py-64 px-8 relative border-t border-[#1a1a1a]">
                 <div className="max-w-[1800px] mx-auto">
-                    <div className="grid grid-cols-1 lg:grid-cols-12 gap-32 items-start">
+                    <div className="grid grid-cols-1 lg:grid-cols-12 gap-32 items-center">
                         <motion.div className="lg:col-span-4" {...fastFadeIn}>
-                            <h2 className="text-7xl font-black tracking-tighter leading-none uppercase mb-12">
+                            <div className="text-[10px] font-black text-[#f1c21b] uppercase tracking-[0.4em] mb-6 font-mono">[ MODULE_TRX_04 ]</div>
+                            <h2 className="text-[clamp(4rem,7vw,9rem)] font-black tracking-tighter leading-[0.85] uppercase mb-12">
                                 THE CONTROL <br /> CENTER.
                             </h2>
-                            <p className="text-xl text-[#c6c6c6] font-light leading-relaxed mb-12">
+                            <p className="text-xl text-[#c6c6c6] font-light leading-relaxed mb-12 max-w-md">
                                 Stop guessing. Watch the system audit every pixel in real-time.
                                 Secure, compliant, and lightning fast.
                             </p>
-                            <Button onClick={onLoginClick} size="lg" className="bg-white text-[#000] hover:bg-[#f4f4f4] h-16 px-12 rounded-none text-[14px] font-black uppercase tracking-widest transition-all w-full">
-                                Initialize Audit
+                            <Button
+                                onClick={onLoginClick}
+                                size="lg"
+                                className="bg-transparent border border-white/20 text-white hover:bg-white hover:text-black h-20 px-12 rounded-none text-[16px] font-black uppercase tracking-[0.2em] transition-all w-full relative group overflow-hidden"
+                            >
+                                <span className="relative z-10 flex items-center justify-center gap-4">
+                                    Initialize Audit <ArrowRight className="group-hover:translate-x-2 transition-transform" size={20} />
+                                </span>
+                                <div className="absolute inset-0 bg-white translate-x-[-101%] group-hover:translate-x-0 transition-transform duration-500 ease-[0.16,1,0.3,1]" />
                             </Button>
                         </motion.div>
 
@@ -283,48 +291,79 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onLoginClick }) => {
                             initial={{ opacity: 0, x: 100 }}
                             whileInView={{ opacity: 1, x: 0 }}
                             transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
-                            className="lg:col-span-8 bg-[#161616] border border-[#393939] p-2 aura-glow"
+                            className="lg:col-span-8 bg-[#0a0a0a] border border-[#393939] p-2 aura-glow relative group overflow-hidden"
                         >
-                            <div className="h-12 bg-[#262626] border-b border-[#393939] flex items-center px-6 justify-between">
-                                <div className="flex gap-2">
-                                    <div className="w-2 h-2 rounded-full bg-[#f1c21b]" />
-                                    <div className="w-2 h-2 rounded-full bg-[#f1c21b]" />
-                                    <div className="w-2 h-2 rounded-full bg-[#24a148]" />
+                            {/* Technical Overlays */}
+                            <div className="scanline-effect opacity-20 pointer-events-none" />
+                            <div className="absolute inset-0 border border-[#f1c21b]/10 pointer-events-none z-10 opacity-0 group-hover:opacity-100 transition-opacity" />
+
+                            <div className="h-14 bg-[#161616] border-b border-[#393939] flex items-center px-6 justify-between relative z-20">
+                                <div className="flex gap-3">
+                                    <div className="w-2.5 h-2.5 rounded-none bg-[#f1c21b] scale-75" />
+                                    <div className="w-2.5 h-2.5 rounded-none bg-[#f1c21b] scale-75 rotate-45" />
+                                    <div className="w-2.5 h-2.5 rounded-none bg-[#24a148] scale-75" />
                                 </div>
-                                <div className="text-[10px] font-mono font-black text-[#525252] uppercase tracking-[0.4em]">system_active_v2.5</div>
+                                <div className="flex items-center gap-8">
+                                    <div className="text-[10px] font-mono font-black text-[#525252] uppercase tracking-[0.4em]">system_active_v3.0.0</div>
+                                    <div className="h-4 w-[1px] bg-[#393939]" />
+                                    <div className="text-[10px] font-mono font-black text-[#f1c21b] animate-pulse uppercase tracking-[0.2em]">Live Stream</div>
+                                </div>
                             </div>
-                            <div className="p-12 space-y-6 min-h-[500px] flex flex-col justify-end">
+
+                            <div className="p-12 space-y-6 min-h-[600px] flex flex-col justify-end relative z-20">
                                 <AnimatePresence mode="popLayout">
                                     {auditLogs.map((log) => (
                                         <motion.div
                                             key={log.id}
-                                            initial={{ opacity: 0, scale: 0.95, y: 10 }}
+                                            initial={{ opacity: 0, scale: 0.98, y: 15 }}
                                             animate={{ opacity: 1, scale: 1, y: 0 }}
-                                            exit={{ opacity: 0, scale: 1.05, y: -10 }}
-                                            className="p-6 border border-[#393939] bg-[#000] flex flex-wrap items-center justify-between gap-8 group hover:border-[#0f62fe] transition-colors"
+                                            exit={{ opacity: 0, scale: 1.02, y: -15 }}
+                                            className="p-8 border border-[#393939] bg-[#000]/80 backdrop-blur-md flex flex-wrap items-center justify-between gap-8 group/item hover:border-[#f1c21b] transition-all relative overflow-hidden"
                                         >
-                                            <div className="flex items-center gap-6">
-                                                <div className="w-10 h-10 border border-[#393939] flex items-center justify-center font-mono text-[10px] text-[#525252]">0{log.id}</div>
+                                            <div className="absolute top-0 left-0 w-[2px] h-0 bg-[#f1c21b] group-hover/item:h-full transition-all duration-300" />
+
+                                            <div className="flex items-center gap-8">
+                                                <div className="w-12 h-12 border border-[#393939] flex items-center justify-center font-mono text-[10px] text-[#525252] group-hover/item:border-[#f1c21b]/50 group-hover/item:text-[#f1c21b]">
+                                                    ID_{log.id}
+                                                </div>
                                                 <div>
-                                                    <div className="text-[10px] font-black text-[#0f62fe] uppercase tracking-widest">{log.task}</div>
-                                                    <div className="text-xl font-black uppercase tracking-tighter">PROTOCOL_CHECK</div>
+                                                    <div className="flex items-center gap-2 mb-1">
+                                                        <div className="w-1.5 h-1.5 bg-[#f1c21b]" />
+                                                        <div className="text-[10px] font-black text-[#f1c21b] uppercase tracking-[0.3em] font-mono">{log.task}</div>
+                                                    </div>
+                                                    <div className="text-2xl font-black uppercase tracking-tighter">PROTOCOL_ENFORCEMENT</div>
                                                 </div>
                                             </div>
-                                            <div className="flex items-center gap-12">
-                                                <div className="text-right">
-                                                    <div className="text-[10px] font-black text-[#525252] uppercase tracking-[0.2em]">Match Score</div>
-                                                    <div className="text-3xl font-black text-white">{log.score}%</div>
+
+                                            <div className="flex items-center gap-16">
+                                                <div className="text-right hidden sm:block">
+                                                    <div className="text-[10px] font-black text-[#525252] uppercase tracking-[0.4em] mb-1">Hash_Key</div>
+                                                    <div className="text-[10px] font-mono text-[#333]">SHA_256: 8C4B...77D0</div>
                                                 </div>
-                                                <div className="px-4 py-2 bg-[#24a148]/10 border border-[#24a148]/20 text-[#24a148] text-[10px] font-black uppercase tracking-[0.2em]">
-                                                    {log.status}
+
+                                                <div className="text-right">
+                                                    <div className="text-[10px] font-black text-[#525252] uppercase tracking-[0.4em] mb-1">Match</div>
+                                                    <div className="text-4xl font-black text-white tracking-tighter tabular-nums">{log.score}%</div>
+                                                </div>
+
+                                                <div className="px-6 py-2 bg-[#24a148]/10 border border-[#24a148]/30 text-[#24a148] text-[10px] font-black uppercase tracking-[0.3em] font-mono shadow-[0_0_15px_rgba(36,161,72,0.1)]">
+                                                    {log.status}_OK
                                                 </div>
                                             </div>
                                         </motion.div>
                                     ))}
                                 </AnimatePresence>
-                                <div className="mt-8 flex justify-between items-center text-[#525252] font-mono text-[10px] uppercase tracking-[0.3em] font-black">
-                                    <span>[SCANNING_ALL_NODES...]</span>
-                                    <span className="animate-pulse">STREAMING_LIVE</span>
+                                <div className="mt-12 flex justify-between items-center text-[#525252] font-mono text-[10px] uppercase tracking-[0.4em] font-black border-t border-[#1a1a1a] pt-8">
+                                    <div className="flex items-center gap-4">
+                                        <div className="flex gap-1">
+                                            {[1, 2, 3, 4].map(i => <div key={i} className="w-1 px-1 h-3 bg-[#1a1a1a] group-hover:bg-[#f1c21b] transition-colors" style={{ transitionDelay: `${i * 100}ms` }} />)}
+                                        </div>
+                                        <span>[ ENCRYPTED_CHANNEL_OPEN ]</span>
+                                    </div>
+                                    <span className="flex items-center gap-3">
+                                        <span className="w-2 h-2 rounded-full bg-[#24a148] animate-ping" />
+                                        RE-SYNCING_ALL_NODES... [ v3.0.0 ]
+                                    </span>
                                 </div>
                             </div>
                         </motion.div>
