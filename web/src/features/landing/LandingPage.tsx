@@ -385,25 +385,33 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onLoginClick }) => {
 
                     <div className="grid grid-cols-1 lg:grid-cols-3 gap-px bg-[#393939] border border-[#393939] w-full">
                         {[
-                            { name: "Creator", price: "Free", desc: "Build your personal DNA.", color: "white" },
+                            { name: "Creator", price: "Free", desc: "Build your personal DNA.", color: "#ffffff" },
                             { name: "Pro", price: "$49", desc: "For teams who want speed.", color: "#0f62fe" },
                             { name: "Enterprise", price: "Custom", desc: "Total governance at scale.", color: "#f1c21b" }
                         ].map((plan, i) => (
                             <motion.div
                                 key={i}
-                                whileHover={{ scale: 1.02, zIndex: 10 }}
-                                className="p-12 bg-[#000] flex flex-col h-full relative overflow-hidden group"
+                                whileHover={{ y: -10, zIndex: 10 }}
+                                className="p-12 bg-[#000] flex flex-col h-full relative overflow-hidden group transition-all duration-500 hover:bg-[#0a0a0a]"
                             >
-                                <div className="text-[10px] font-black uppercase tracking-[0.4em] text-[#525252] mb-8">Protocol_Tier_0{i + 1}</div>
-                                <h3 className="text-4xl font-black uppercase mb-2 tracking-tighter">{plan.name}</h3>
-                                <div className="text-6xl font-black mb-10 tracking-tighter">{plan.price}<span className="text-sm opacity-30 tracking-normal font-normal">/mo</span></div>
-                                <p className="text-lg font-light text-[#c6c6c6] mb-12 flex-1 leading-tight">{plan.desc}</p>
+                                <div className="absolute top-0 left-0 w-full h-[1px] bg-[#393939] group-hover:bg-[#f1c21b] transition-colors duration-500" style={{ backgroundColor: plan.color + '40' }} />
+                                <div className="absolute top-0 left-0 w-0 h-[1px] group-hover:w-full transition-all duration-700 ease-[0.16,1,0.3,1]" style={{ backgroundColor: plan.color }} />
+
+                                <div className="text-[10px] font-black uppercase tracking-[0.4em] text-[#525252] mb-8 group-hover:text-white transition-colors duration-500">Protocol_Tier_0{i + 1}</div>
+                                <h3 className="text-4xl font-black uppercase mb-2 tracking-tighter group-hover:translate-x-1 transition-transform duration-500">{plan.name}</h3>
+                                <div className="text-6xl font-black mb-10 tracking-tighter tabular-nums">{plan.price}<span className="text-sm opacity-30 tracking-normal font-normal">/mo</span></div>
+                                <p className="text-lg font-light text-[#c6c6c6] mb-12 flex-1 leading-tight group-hover:text-white transition-colors duration-500">{plan.desc}</p>
                                 <Button
                                     onClick={onLoginClick}
-                                    style={{ backgroundColor: i === 1 ? '#0f62fe' : 'transparent', border: i === 1 ? 'none' : '1px solid #393939' }}
-                                    className="w-full h-14 rounded-none text-xs font-black uppercase tracking-widest"
+                                    style={{
+                                        backgroundColor: i === 1 ? '#0f62fe' : 'transparent',
+                                        border: i === 1 ? 'none' : '1px solid #393939',
+                                        borderColor: plan.color + '40'
+                                    }}
+                                    className="w-full h-14 rounded-none text-xs font-black uppercase tracking-widest relative group/btn overflow-hidden"
                                 >
-                                    Select Access
+                                    <span className="relative z-10 transition-colors duration-500 group-hover/btn:text-white">Select Access</span>
+                                    <div className="absolute inset-0 bg-white translate-x-[-101%] group-hover/btn:translate-x-0 transition-transform duration-500 ease-[0.16,1,0.3,1] mix-blend-difference" />
                                 </Button>
                             </motion.div>
                         ))}
