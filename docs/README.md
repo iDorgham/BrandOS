@@ -4,6 +4,13 @@ Welcome to the Brand OS documentation hub. This project is a generative AI creat
 
 ## 📁 Documentation Structure
 
+### 📚 [Core Documentation](.)
+- **[API Documentation](./API.md)** - Complete API reference with endpoints, authentication, and WebSocket events
+- **[User Guide](./USER_GUIDE.md)** - Step-by-step guide for using all features
+- **[Deployment Guide](./DEPLOYMENT.md)** - Local development, environment setup, and production deployment
+- **[Technical Architecture](./TECHNICAL_ARCHITECTURE.md)** - System design, database schema, and technical deep-dive
+- **[Project Documentation](./PROJECT_DOCUMENTATION.md)** - Complete project overview and implementation status
+
 ### 🚀 [Setup](./setup/)
 - **[Data Persistence Setup](./setup/DATA_PERSISTENCE.md)** - Supabase cloud storage configuration and migration guide
 
@@ -32,11 +39,12 @@ Welcome to the Brand OS documentation hub. This project is a generative AI creat
 
 ## 🎯 Quick Links
 
-- **New to Brand OS?** Start with the [Product Requirements Document](./product/prd.md)
-- **Setting up development?** Follow the [Data Persistence Setup](./setup/DATA_PERSISTENCE.md)
+- **New to Brand OS?** Start with the [Product Requirements Document](./product/prd.md) or [User Guide](./USER_GUIDE.md)
+- **Setting up development?** Follow the [Deployment Guide](./DEPLOYMENT.md) and [Data Persistence Setup](./setup/DATA_PERSISTENCE.md)
+- **API integration?** Check the [API Documentation](./API.md)
+- **Understanding the architecture?** Review the [Technical Architecture](./TECHNICAL_ARCHITECTURE.md)
 - **Looking for file locations?** Check the [Quick Reference](./architecture/QUICK_REFERENCE.md)
-- **Understanding the codebase?** Review the [Project Structure](./architecture/STRUCTURE.md)
-- **Project management?** See the [Tasks](./project/TASKS.md) and [Implementation Status](./project/IMPLEMENTATION_STATUS.md)
+- **Project overview?** See the [Project Documentation](./PROJECT_DOCUMENTATION.md)
 
 ---
 
