@@ -657,25 +657,49 @@ export const organizationService = {
 export const userService = {
   async getProfile(): Promise<UserProfile> {
     const user = await getCurrentUser();
+    if (!user) throw new Error('Not authenticated');
+
     const { data, error } = await supabase
       .from('profiles')
       .select('*')
-      .eq('user_id', user.id)
-      .single();
+      .eq('id', user.id)
+      .maybeSingle();
 
     if (error) throw error;
+
+    if (!data) {
+      return {
+        id: user.id,
+        name: '',
+        email: user.email || '',
+        avatarUrl: '',
+        bio: '',
+        role: 'art_director',
+        preferences: {
+          notifications: true,
+          theme: 'dark',
+          compactMode: false
+        }
+      };
+    }
+
     return this.mapDbProfileToApp(data, user.email);
   },
 
   async updateProfile(profile: Partial<UserProfile>): Promise<UserProfile> {
     const user = await getCurrentUser();
+    if (!user) throw new Error('Not authenticated');
+
     const { data, error } = await supabase
       .from('profiles')
-      .update({
+      .upsert({
+        id: user.id,
+        user_id: user.id,
         full_name: profile.name,
         avatar_url: profile.avatarUrl,
+        bio: profile.bio,
+        updated_at: new Date().toISOString(),
       })
-      .eq('user_id', user.id)
       .select()
       .single();
 
@@ -689,6 +713,7 @@ export const userService = {
       name: dbProfile.full_name || '',
       email: email || '',
       avatarUrl: dbProfile.avatar_url || '',
+      bio: dbProfile.bio || '',
       role: 'art_director', // Default role for demo
       preferences: {
         notifications: true,

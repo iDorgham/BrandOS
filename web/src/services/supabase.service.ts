@@ -22,18 +22,21 @@ export interface Database {
           avatar_url: string | null;
           created_at: string;
           updated_at: string;
+          bio: string | null;
         };
         Insert: {
           id?: string;
           user_id: string;
           full_name?: string | null;
           avatar_url?: string | null;
+          bio?: string | null;
         };
         Update: {
           id?: string;
           user_id?: string;
           full_name?: string | null;
           avatar_url?: string | null;
+          bio?: string | null;
           created_at?: string;
           updated_at?: string;
         };
