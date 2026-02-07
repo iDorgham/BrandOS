@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Zap, Shield, Layout, Sparkles, ArrowRight, Github, Twitter, Layers } from 'lucide-react';
+import { Zap, Shield, Layout, Sparkles, ArrowRight, Github, Twitter, Layers, BarChart3, Globe, Code } from 'lucide-react';
 import { Button } from '@/components/ui';
 import { useAuth } from '@/contexts/AuthContext';
 
@@ -8,177 +8,223 @@ export const LandingPage: React.FC = () => {
     const { signIn } = useAuth();
 
     return (
-        <div className="min-h-screen bg-background text-foreground selection:bg-primary/30 font-sans relative overflow-x-hidden">
+        <div className="min-h-screen bg-[#161616] text-white selection:bg-[#0f62fe]/30 font-sans relative overflow-x-hidden">
             <div className="cinematic-noise" />
 
-            {/* Background elements */}
-            <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none z-0">
-                <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-primary/10 blur-[120px] rounded-full animate-pulse" />
-                <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-blue-500/10 blur-[120px] rounded-full animate-pulse delay-700" />
-            </div>
+            {/* Minimalist Grid Pattern */}
+            <div className="absolute inset-0 z-0 opacity-[0.03] pointer-events-none"
+                style={{ backgroundImage: 'radial-gradient(#fff 1px, transparent 1px)', backgroundSize: '32px 32px' }} />
 
             {/* Navigation */}
-            <nav className="fixed top-0 w-full z-50 border-b border-border/40 bg-background/60 backdrop-blur-xl">
-                <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 bg-primary flex items-center justify-center rounded-sm">
-                            <Zap className="text-primary-foreground" size={20} />
-                        </div>
-                        <span className="text-xl font-bold tracking-tight">Brand OS</span>
-                    </div>
-
-                    <div className="hidden md:flex items-center gap-8 text-sm font-medium text-muted-foreground">
-                        <a href="#features" className="hover:text-primary transition-colors">Features</a>
-                        <a href="#studio" className="hover:text-primary transition-colors">Studio</a>
-                        <a href="#security" className="hover:text-primary transition-colors">Security</a>
-                    </div>
-
+            <nav className="fixed top-0 w-full z-50 border-b border-[#393939] bg-[#161616]/80 backdrop-blur-md">
+                <div className="max-w-[1600px] mx-auto px-6 h-12 flex items-center justify-between">
                     <div className="flex items-center gap-4">
-                        <Button onClick={signIn} variant="ghost" className="hidden sm:inline-flex text-xs uppercase tracking-widest font-bold">
-                            Login
+                        <div className="w-8 h-8 bg-[#0f62fe] flex items-center justify-center">
+                            <Zap className="text-white" size={16} fill="currentColor" />
+                        </div>
+                        <span className="text-sm font-semibold tracking-wider uppercase">Brand OS</span>
+                    </div>
+
+                    <div className="hidden lg:flex items-center gap-10 text-[13px] font-medium text-[#c6c6c6]">
+                        <a href="#governance" className="hover:text-white transition-colors">Governance</a>
+                        <a href="#intelligence" className="hover:text-white transition-colors">Intelligence</a>
+                        <a href="#scale" className="hover:text-white transition-colors">Scale</a>
+                    </div>
+
+                    <div className="flex items-center">
+                        <Button onClick={signIn} variant="ghost" className="text-[12px] uppercase tracking-widest font-bold px-6 h-12 hover:bg-[#393939] rounded-none border-l border-[#393939]">
+                            Log In
                         </Button>
-                        <Button onClick={signIn} className="text-xs uppercase tracking-widest font-bold rounded-none h-11 px-6">
-                            Get Started
+                        <Button onClick={signIn} className="bg-[#0f62fe] text-white text-[12px] uppercase tracking-widest font-bold rounded-none h-12 px-8 hover:bg-[#0043ce] transition-colors">
+                            Request Access
                         </Button>
                     </div>
                 </div>
             </nav>
 
             {/* Hero Section */}
-            <section className="relative pt-40 pb-20 px-6 z-10">
-                <div className="max-w-7xl mx-auto text-center">
-                    <motion.div
-                        initial={{ opacity: 0, y: 30 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-                    >
-                        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/5 border border-primary/20 text-primary text-[10px] font-bold uppercase tracking-[0.2em] mb-8">
-                            <Sparkles size={12} />
-                            AI-Powered Creative Protocol
-                        </div>
-                        <h1 className="text-5xl md:text-8xl font-light tracking-tighter leading-[0.95] mb-8">
-                            The Identity <br />
-                            <span className="font-bold italic text-primary">Orchestration</span> OS
-                        </h1>
-                        <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto mb-12 leading-relaxed">
-                            Transform static brand guidelines into an executable DNA.
-                            Orchestrate high-fidelity creative at scale with multi-model AI logic.
-                        </p>
-
-                        <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-                            <Button onClick={signIn} size="lg" className="h-14 px-10 rounded-none text-sm font-bold uppercase tracking-widest group">
-                                Initialize Workflow <ArrowRight className="ml-2 group-hover:translate-x-1 transition-transform" />
-                            </Button>
-                            <Button variant="secondary" size="lg" className="h-14 px-10 rounded-none text-sm font-bold uppercase tracking-widest border-border/60 hover:bg-muted">
-                                View Documentation
-                            </Button>
-                        </div>
-                    </motion.div>
-
-                    {/* Dashboard Preview */}
-                    <motion.div
-                        initial={{ opacity: 0, y: 100 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 1, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
-                        className="mt-24 relative"
-                    >
-                        <div className="absolute inset-0 bg-primary/20 blur-[100px] -z-10 rounded-full scale-90" />
-                        <div className="border border-border/40 bg-card rounded-xl overflow-hidden shadow-2xl skew-x-[-1deg] skew-y-[1deg]">
-                            <div className="h-10 border-b border-border/40 bg-muted/30 flex items-center px-4 gap-2">
-                                <div className="w-2.5 h-2.5 rounded-full bg-red-500/20" />
-                                <div className="w-2.5 h-2.5 rounded-full bg-yellow-500/20" />
-                                <div className="w-2.5 h-2.5 rounded-full bg-green-500/20" />
-                                <div className="ml-4 h-4 w-40 bg-muted/40 rounded-full" />
+            <section className="relative pt-32 pb-40 px-6 z-10 border-b border-[#393939]">
+                <div className="max-w-[1600px] mx-auto grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+                    <div className="lg:col-span-7">
+                        <motion.div
+                            initial={{ opacity: 0, x: -20 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+                        >
+                            <div className="text-[#0f62fe] text-[12px] font-bold uppercase tracking-[0.3em] mb-6">
+                                Enterprise Creative Protocol v2.4
                             </div>
-                            <div className="aspect-video bg-background/50 flex items-center justify-center">
-                                <div className="flex flex-col items-center gap-4 opacity-40">
-                                    <Layout size={48} className="text-primary" />
-                                    <span className="text-[10px] font-mono tracking-[0.3em] uppercase">Visual DNA Loaded</span>
+                            <h1 className="text-5xl md:text-8xl font-light tracking-tight leading-[1.05] mb-8">
+                                Scalable <span className="font-semibold italic">Identity</span> <br />
+                                Infrastructure.
+                            </h1>
+                            <p className="text-lg md:text-xl text-[#c6c6c6] max-w-xl mb-12 leading-relaxed font-light">
+                                Stop managing assets. Start orchestrating DNA.
+                                Brand OS transforms fragmented creative workflows into a single,
+                                AI-powered source of truth for global enterprises.
+                            </p>
+
+                            <div className="flex flex-wrap gap-4">
+                                <Button onClick={signIn} size="lg" className="bg-[#0f62fe] text-white hover:bg-[#0043ce] h-14 px-10 rounded-none text-[13px] font-bold uppercase tracking-widest group">
+                                    Initialize Protocol <ArrowRight className="ml-3 group-hover:translate-x-1 transition-transform" size={16} />
+                                </Button>
+                                <Button variant="secondary" size="lg" className="border-[#393939] text-[#f4f4f4] hover:bg-[#393939] h-14 px-10 rounded-none text-[13px] font-bold uppercase tracking-widest">
+                                    Technical Specs
+                                </Button>
+                            </div>
+                        </motion.div>
+                    </div>
+
+                    <div className="lg:col-span-5 relative">
+                        <motion.div
+                            initial={{ opacity: 0, scale: 0.95 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            transition={{ duration: 0.8, delay: 0.2 }}
+                            className="relative border border-[#393939] bg-[#262626] aspect-square lg:aspect-[4/5] flex flex-col p-px"
+                        >
+                            <div className="flex-1 bg-[#161616] p-8 flex flex-col justify-between overflow-hidden">
+                                <div className="space-y-6">
+                                    <div className="h-px w-full bg-[#393939]" />
+                                    <div className="flex justify-between items-center text-[10px] font-mono text-[#525252] uppercase tracking-[0.2em]">
+                                        <span>Status: Operational</span>
+                                        <span>Sync: 99.8%</span>
+                                    </div>
+                                    <div className="grid grid-cols-2 gap-4">
+                                        <div className="h-24 border border-[#393939] bg-[#262626]/20" />
+                                        <div className="h-24 border border-[#393939] bg-[#262626]/20" />
+                                    </div>
+                                    <div className="space-y-2">
+                                        <div className="h-2 w-full bg-[#393939]" />
+                                        <div className="h-2 w-2/3 bg-[#393939]" />
+                                    </div>
+                                </div>
+                                <div className="mt-8 flex items-center justify-center">
+                                    <div className="relative">
+                                        <div className="w-24 h-24 border-2 border-[#0f62fe] animate-ping absolute inset-0 opacity-20" />
+                                        <div className="w-24 h-24 border border-[#0f62fe] flex items-center justify-center">
+                                            <Sparkles className="text-[#0f62fe]" size={32} />
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                    </motion.div>
+                            <div className="h-12 bg-[#262626] border-t border-[#393939] flex items-center px-4 justify-between">
+                                <div className="text-[10px] font-mono text-[#c6c6c6]">BRAND_DNA_MODEL_LOADED</div>
+                                <div className="flex gap-1">
+                                    <div className="w-1.5 h-1.5 bg-[#0f62fe]" />
+                                    <div className="w-1.5 h-1.5 bg-[#0f62fe]" />
+                                    <div className="w-1.5 h-1.5 bg-[#0f62fe]" />
+                                </div>
+                            </div>
+                        </motion.div>
+                    </div>
                 </div>
             </section>
 
-            {/* Features Grid */}
-            <section id="features" className="py-32 px-6 bg-muted/30 relative">
-                <div className="max-w-7xl mx-auto">
-                    <div className="mb-20">
-                        <h2 className="text-3xl md:text-5xl font-light tracking-tight mb-4">Core Infrastructure</h2>
-                        <div className="w-20 h-1 bg-primary" />
+            {/* Value Propositions */}
+            <section id="governance" className="py-32 px-6 border-b border-[#393939]">
+                <div className="max-w-[1600px] mx-auto grid grid-cols-1 md:grid-cols-3 gap-0 border-l border-t border-[#393939]">
+                    {[
+                        {
+                            icon: <Shield size={24} />,
+                            label: "Governance",
+                            title: "Bulletproof Compliance",
+                            desc: "Automated brand audit systems that enforce DNA consistency across thousands of AI-generated assets in real-time."
+                        },
+                        {
+                            icon: <BarChart3 size={24} />,
+                            label: "Intelligence",
+                            title: "Predictive Analytics",
+                            desc: "Measure creative velocity and brand sentiment before deployment. Data-driven insights for artistic decisions."
+                        },
+                        {
+                            icon: <Globe size={24} />,
+                            label: "Scale",
+                            title: "Global Distribution",
+                            desc: "One-click deployment to multiple channels. Decentralized orchestration for high-performance localized variants."
+                        }
+                    ].map((item, i) => (
+                        <div key={i} className="p-12 border-r border-b border-[#393939] group hover:bg-[#262626] transition-colors">
+                            <div className="text-[#0f62fe] mb-8 group-hover:scale-110 transition-transform">{item.icon}</div>
+                            <div className="text-[11px] font-bold text-[#525252] uppercase tracking-[0.2em] mb-4">{item.label}</div>
+                            <h3 className="text-xl font-medium mb-4">{item.title}</h3>
+                            <p className="text-[#c6c6c6] text-sm leading-relaxed font-light">
+                                {item.desc}
+                            </p>
+                        </div>
+                    ))}
+                </div>
+            </section>
+
+            {/* Content Section - The "Sales" bit */}
+            <section className="py-40 px-6 bg-[#262626]">
+                <div className="max-w-[1600px] mx-auto flex flex-col items-center text-center">
+                    <div className="max-w-3xl mb-24">
+                        <h2 className="text-4xl md:text-6xl font-light tracking-tight mb-8">Creative work at the <br />speed of <span className="font-semibold text-white italic">Logic</span>.</h2>
+                        <p className="text-[#c6c6c6] text-lg leading-relaxed font-light">
+                            Brand OS isn't just a design tool. It's an enterprise infrastructure
+                            that ensures every pixel generated is 100% aligned with your strategic
+                            visual doctrine. Reduce creative overhead by 60% while maintaining
+                            perfect brand governance.
+                        </p>
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 w-full">
                         {[
-                            {
-                                icon: <Zap size={24} />,
-                                title: "Creative Studio",
-                                description: "Multi-model orchestration engine. Generate brand-aligned assets with precise DNA injection."
-                            },
-                            {
-                                icon: <Layers size={24} />,
-                                title: "Visual Moodboard",
-                                description: "Node-based canvas for mapping visual relationships and creating creative briefs."
-                            },
-                            {
-                                icon: <Shield size={24} />,
-                                title: "Compliance Hub",
-                                description: "AI-powered brand adherence analysis. Instant feedback on color, spatial rules, and vibe."
-                            }
-                        ].map((feature, i) => (
-                            <div key={i} className="group p-8 border border-border/40 bg-background hover:border-primary/40 transition-all">
-                                <div className="w-12 h-12 bg-primary/10 text-primary flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
-                                    {feature.icon}
-                                </div>
-                                <h3 className="text-lg font-bold uppercase tracking-wider mb-4">{feature.title}</h3>
-                                <p className="text-muted-foreground text-sm leading-relaxed">
-                                    {feature.description}
-                                </p>
+                            { stat: "80%", label: "Faster Deployment" },
+                            { stat: "0%", label: "Brand Drift" },
+                            { stat: "10x", label: "Creative Output" },
+                            { stat: "$2.4M", label: "Avg. ROI / Year" }
+                        ].map((stat, i) => (
+                            <div key={i} className="p-10 border border-[#393939] bg-[#161616] flex flex-col items-center">
+                                <div className="text-3xl font-semibold text-[#0f62fe] mb-2">{stat.stat}</div>
+                                <div className="text-[11px] font-bold text-[#525252] uppercase tracking-widest">{stat.label}</div>
                             </div>
                         ))}
                     </div>
                 </div>
             </section>
 
-            {/* CTA Section */}
-            <section className="py-32 px-6 text-center overflow-hidden">
-                <div className="max-w-3xl mx-auto relative">
-                    <div className="absolute inset-0 bg-primary/10 blur-[100px] -z-10 rounded-full" />
-                    <h2 className="text-4xl md:text-6xl font-light tracking-tight mb-8">Ready to evolve your <br /><span className="font-bold italic">Brand DNA</span>?</h2>
-                    <p className="text-muted-foreground mb-12 leading-relaxed">
-                        Join elite creative teams orchestrating the future of brand identity.
-                        Free for individuals. Enterprise security for teams.
-                    </p>
-                    <Button onClick={signIn} size="lg" className="h-16 px-12 rounded-none text-sm font-bold uppercase tracking-widest shadow-2xl shadow-primary/20">
-                        Initial Protocol Registration
-                    </Button>
-                </div>
-            </section>
-
             {/* Footer */}
-            <footer className="py-20 px-6 border-t border-border/40 bg-muted/10">
-                <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-10">
-                    <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 bg-primary/20 flex items-center justify-center text-primary rounded-sm">
-                            <Zap size={16} />
+            <footer className="py-20 px-6 border-t border-[#393939]">
+                <div className="max-w-[1600px] mx-auto grid grid-cols-1 md:grid-cols-4 gap-12">
+                    <div className="col-span-1 md:col-span-2">
+                        <div className="flex items-center gap-3 mb-8">
+                            <div className="w-8 h-8 bg-[#0f62fe] flex items-center justify-center">
+                                <Zap className="text-white" size={16} fill="currentColor" />
+                            </div>
+                            <span className="font-bold tracking-wider uppercase text-sm">Brand OS</span>
                         </div>
-                        <span className="font-bold tracking-tight">Brand OS</span>
+                        <p className="text-[#525252] text-xs max-w-xs leading-relaxed uppercase tracking-tighter">
+                            Carbon-Ready Creative Infrastructure <br />
+                            Built for the next generation of visual production.
+                        </p>
                     </div>
 
-                    <div className="flex items-center gap-8 text-xs font-bold uppercase tracking-widest text-muted-foreground">
-                        <a href="#" className="hover:text-primary transition-colors">Privacy</a>
-                        <a href="#" className="hover:text-primary transition-colors">Terms</a>
-                        <a href="#" className="hover:text-primary transition-colors">Contact</a>
+                    <div>
+                        <h4 className="text-[11px] font-bold uppercase tracking-widest text-[#c6c6c6] mb-6">Network</h4>
+                        <div className="flex flex-col gap-3 text-[12px] text-[#525252] font-medium">
+                            <a href="#" className="hover:text-white transition-colors">Documentation</a>
+                            <a href="#" className="hover:text-white transition-colors">Enterprise API</a>
+                            <a href="#" className="hover:text-white transition-colors">System Status</a>
+                        </div>
                     </div>
 
-                    <div className="flex items-center gap-6">
-                        <a href="#" className="text-muted-foreground hover:text-primary transition-colors"><Twitter size={18} /></a>
-                        <a href="#" className="text-muted-foreground hover:text-primary transition-colors"><Github size={18} /></a>
+                    <div>
+                        <h4 className="text-[11px] font-bold uppercase tracking-widest text-[#c6c6c6] mb-6">Connect</h4>
+                        <div className="flex gap-6 text-[#525252]">
+                            <a href="#" className="hover:text-white transition-colors"><Twitter size={18} /></a>
+                            <a href="#" className="hover:text-white transition-colors"><Github size={18} /></a>
+                            <a href="#" className="hover:text-white transition-colors"><Code size={18} /></a>
+                        </div>
                     </div>
                 </div>
-                <div className="max-w-7xl mx-auto text-center mt-20 text-[10px] font-mono tracking-[0.2em] uppercase text-muted-foreground/40">
-                    © 2026 Brand OS Protocol • Designed for Creativity
+                <div className="max-w-[1600px] mx-auto mt-32 pt-8 border-t border-[#262626] flex flex-col md:flex-row justify-between items-center gap-4">
+                    <div className="text-[10px] font-mono text-[#393939] uppercase tracking-[0.3em]">
+                        © 2026 Brand OS Protocol
+                    </div>
+                    <div className="text-[10px] font-mono text-[#393939] uppercase tracking-[0.3em]">
+                        Precision in Creative Governance
+                    </div>
                 </div>
             </footer>
         </div>
