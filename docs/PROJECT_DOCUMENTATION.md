@@ -109,20 +109,15 @@ Brand DNA/
 - **Reference Analysis**: AI extracts colors, patterns, and stylistic signatures
 
 ```typescript
-interface BrandProfile {
+interface UserProfile {
   id: string;
+  user_id: string;
   name: string;
-  doctrine: string;
-  palette: BrandColor[];
-  background: string;
-  negativeSpace: number;
-  emotionalTags: EmotionalIntent[];
-  grammarRules: GrammarRule[];
-  // Advanced DNA features
-  typography?: TypographyDNA;
-  lighting?: LightingDNA;
-  grid?: GridDNA;
-  versionHistory?: VersionControlData;
+  email: string;
+  avatarUrl?: string;
+  bio?: string;
+  role: UserRole;
+  preferences: UserPreferences;
 }
 ```
 
@@ -278,10 +273,10 @@ deployments      → Deployment request tracking
 
 ### **Security Features**
 
-- **Row Level Security**: Users access only their data
-- **OAuth Integration**: Google authentication
-- **Automatic Profile Creation**: Seamless user onboarding
-- **Audit Logging**: Complete activity tracking
+- **Row Level Security**: Corrected policies using `user_id` for profile isolation.
+- **Recursion Prevention**: `SECURITY DEFINER` functions (`is_workspace_member`, etc.) to break circular RLS loops.
+- **OAuth Integration**: Google authentication for secure onboarding.
+- **Automatic Profile Creation**: Seamless user initialization via triggers.
 
 ---
 

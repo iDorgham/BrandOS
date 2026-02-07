@@ -317,10 +317,12 @@ erDiagram
     
     profiles {
         uuid id PK
-        string email
+        uuid user_id FK
         string full_name
         string avatar_url
+        string bio
         timestamp created_at
+        timestamp updated_at
     }
     
     workspaces {
@@ -429,32 +431,51 @@ CREATE INDEX idx_assets_compliance_score ON assets(compliance_score);
 
 ### Row Level Security (RLS) Policies
 
+Brand OS uses advanced RLS patterns to ensure data isolation while preventing infinite recursion errors.
+
+#### RLS Recursion Prevention Pattern
+
+To avoid circular dependencies (e.g., `workspace_members` querying `workspaces` which queries `workspace_members`), we use **SECURITY DEFINER** functions that bypass RLS checks for internal privilege validation.
+
 ```sql
--- Users can only see brands in their workspaces
+-- Secure membership check
+CREATE OR REPLACE FUNCTION is_workspace_member(_workspace_id UUID)
+RETURNS BOOLEAN SECURITY DEFINER AS $$
+BEGIN
+    RETURN EXISTS (
+        SELECT 1 FROM workspace_members
+        WHERE workspace_id = _workspace_id AND user_id = auth.uid()
+    );
+END;
+$$ LANGUAGE plpgsql;
+
+-- Policy using the secure function
+CREATE POLICY "Users see members of their workspaces"
+ON workspace_members FOR SELECT
+USING (is_workspace_member(workspace_id));
+```
+
+#### Profile Access Control
+
+Profiles use the `user_id` column as the primary identifier for RLS to maintain alignment with `auth.users`.
+
+```sql
+-- Profile RLS (Corrected)
+CREATE POLICY "Users can manage own profile"
+ON profiles FOR ALL
+USING (user_id = (SELECT auth.uid()));
+```
+
+#### Workspace-Based Isolation
+
+Users can only access resources (brands, assets, prompt history) within workspaces where they have an active membership.
+
+```sql
 CREATE POLICY "Users see own workspace brands"
 ON brands FOR SELECT
-TO authenticated
 USING (
-  workspace_id IN (
-    SELECT workspace_id 
-    FROM workspace_members 
-    WHERE user_id = auth.uid()
-  )
+  workspace_id = ANY(get_my_workspace_ids())
 );
-
--- Users can only create brands in their workspaces
-CREATE POLICY "Users create in own workspaces"
-ON brands FOR INSERT
-TO authenticated
-WITH CHECK (
-  workspace_id IN (
-    SELECT workspace_id 
-    FROM workspace_members 
-    WHERE user_id = auth.uid()
-  )
-);
-
--- Similar policies for assets, deployments, etc.
 ```
 
 ---

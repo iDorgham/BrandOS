@@ -48,8 +48,10 @@ Brand OS is a **generative AI creativity platform** that transforms static brand
 - **Prompt Synthesis**: Translates mood board elements into detailed creative briefs
 
 ### 📚 Asset Management Vault
-- **Smart Library**: Complete asset storage with metadata and compliance tracking
-- **Advanced Filtering**: Search by brand, type, compliance score, tags
+- **Moodboard Workflow**: Interactive canvas for visual storytelling and spatial planning.
+- **Unified Library**: Secure vault for all brand assets, reference images, and kampaign history.
+- **Smart Profiles**: Personalized user profiles with customizable bios and preferences.
+- **Enterprise-Grade Security**: Hardened RLS policies with infinite recursion prevention and role-based access.
 - **Audit System**: AI-powered brand adherence analysis with actionable suggestions
 - **Bulk Operations**: Download, tag, and deploy multiple assets
 

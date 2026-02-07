@@ -5,9 +5,11 @@ Welcome to the Brand OS documentation hub. This project is a generative AI creat
 ## 📁 Documentation Structure
 
 ### 📚 [Core Documentation](.)
-- **[API Documentation](./API.md)** - Complete API reference with endpoints, authentication, and WebSocket events
+- [API Reference](API.md): Detailed API documentation, including the new User Profile API.
+- [Database Schema](TECHNICAL_ARCHITECTURE.md#database-schema): Detailed ERD and table definitions.
+- [Security Architecture](TECHNICAL_ARCHITECTURE.md#authentication--security): RLS policies and recursion prevention.
+- [Deployment Guide](DEPLOYMENT.md): Step-by-step instructions for production setup.
 - **[User Guide](./USER_GUIDE.md)** - Step-by-step guide for using all features
-- **[Deployment Guide](./DEPLOYMENT.md)** - Local development, environment setup, and production deployment
 - **[Technical Architecture](./TECHNICAL_ARCHITECTURE.md)** - System design, database schema, and technical deep-dive
 - **[Project Documentation](./PROJECT_DOCUMENTATION.md)** - Complete project overview and implementation status
 

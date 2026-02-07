@@ -167,6 +167,11 @@ VITE_ENABLE_DEPLOYMENT_HUB=true
 3. Copy contents from `database/schema.sql`
 4. Click **"Run"**
 
+> [!IMPORTANT]
+> **Essential Post-Migration Fixes**: After running the initial schema, you **MUST** run the latest security and architecture migrations located in `supabase/migrations/`:
+> - `20240208_fix_profiles_rls_final.sql`: Re-aligns RLS to `user_id` and adds `bio`.
+> - `20240208_fix_recursion_final_v2.sql`: Critical fix for infinite recursion in workspaces.
+
 #### Option B: Using Supabase CLI
 
 ```bash
@@ -612,8 +617,15 @@ server {
 }
 ```
 
-### Environment Variable Security
+### Security Hardening
 
+#### RLS Recursion Prevention
+The system implements a `SECURITY DEFINER` pattern to prevent "infinite recursion detected" errors in complex junction tables. If you create new policies that query related tables, use the provided helper functions:
+- `is_workspace_member(uuid)`
+- `is_workspace_owner(uuid)`
+- `get_my_workspace_ids()`
+
+#### Environment Variable Security
 Never commit `.env` files. Use platform-specific secret management:
 
 **Vercel:**

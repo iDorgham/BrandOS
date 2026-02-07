@@ -18,6 +18,7 @@
 8. [WebSocket Events](#websocket-events)
 9. [Error Handling](#error-handling)
 10. [Rate Limiting](#rate-limiting)
+11. [User Profile API](#user-profile-api)
 
 ---
 
@@ -683,6 +684,65 @@ job = client.assets.create(
     brand_id=brand.id,
     model_id='gemini-3-pro-preview'
 )
+```
+
+---
+
+## User Profile API
+
+### Get Profile
+
+Retrieve the authenticated user's profile information.
+
+```http
+GET /api/profile
+```
+
+**Response:**
+```json
+{
+  "id": "user_uuid",
+  "name": "Jane Doe",
+  "email": "jane@example.com",
+  "avatarUrl": "https://...",
+  "bio": "Brand strategist and creative director.",
+  "role": "art_director",
+  "preferences": {
+    "notifications": true,
+    "theme": "dark",
+    "compactMode": false
+  }
+}
+```
+
+### Update Profile
+
+Update the authenticated user's profile. This endpoint uses an `upsert` mechanism to ensure the profile exists.
+
+```http
+PATCH /api/profile
+```
+
+**Request Body:**
+```json
+{
+  "name": "Jane Smith",
+  "bio": "Lead creative specializing in brand identity.",
+  "avatarUrl": "https://...",
+  "preferences": {
+    "theme": "light"
+  }
+}
+```
+
+**Response:**
+```json
+{
+  "id": "user_uuid",
+  "name": "Jane Smith",
+  "bio": "Lead creative specializing in brand identity.",
+  "status": "updated"
+}
 ```
 
 ---
