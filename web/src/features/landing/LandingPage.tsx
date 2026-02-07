@@ -94,10 +94,17 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onLoginClick }) => {
                         <div className="hidden sm:flex items-center px-4 text-[10px] font-mono text-[#525252] tracking-widest">
                             [SYSTEM: OPERATIONAL]
                         </div>
-                        <Button onClick={onLoginClick} variant="ghost" className="text-[11px] uppercase tracking-widest font-bold px-6 h-12 hover:bg-[#393939] rounded-none border-l border-[#393939]">
+                        <Button
+                            onClick={onLoginClick}
+                            variant="ghost"
+                            className="text-[11px] uppercase tracking-widest font-bold px-6 h-12 hover:bg-[#393939] rounded-none border-l border-[#393939] text-white"
+                        >
                             Log In
                         </Button>
-                        <Button onClick={onLoginClick} className="bg-[#0f62fe] text-white text-[11px] uppercase tracking-widest font-bold rounded-none h-12 px-8 hover:bg-[#0043ce] transition-colors border-l border-[#393939]">
+                        <Button
+                            onClick={onLoginClick}
+                            className="bg-[#0f62fe] text-white text-[11px] uppercase tracking-widest font-bold rounded-none h-12 px-8 hover:bg-[#0043ce] transition-colors border-l border-[#393939]"
+                        >
                             Request Access
                         </Button>
                     </div>
@@ -133,9 +140,13 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onLoginClick }) => {
                                     <Button onClick={onLoginClick} size="lg" className="bg-[#0f62fe] text-white hover:bg-[#0043ce] h-16 px-12 rounded-none text-[14px] font-bold uppercase tracking-widest group aura-glow">
                                         Initialize Protocol <ArrowRight className="ml-4 group-hover:translate-x-1 transition-transform" size={18} />
                                     </Button>
-                                    <button className="h-16 px-12 border border-[#393939] text-[#f4f4f4] hover:bg-[#393939] text-[14px] font-bold uppercase tracking-widest transition-colors">
+                                    <Button
+                                        onClick={onLoginClick}
+                                        variant="secondary"
+                                        className="h-16 px-12 border border-[#393939] text-[#f4f4f4] hover:bg-[#393939] text-[14px] font-bold uppercase tracking-widest transition-colors rounded-none"
+                                    >
                                         View Architecture
-                                    </button>
+                                    </Button>
                                 </div>
                             </div>
                             <div className="lg:col-span-6 flex flex-col gap-4">

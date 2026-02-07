@@ -140,6 +140,11 @@ const AppContent: React.FC = () => {
         setActiveTab('creative');
     };
 
+    // Reset showAuth when user becomes present
+    useEffect(() => {
+        if (user) setShowAuth(false);
+    }, [user]);
+
     if (!user) {
         return (
             <React.Suspense fallback={<ViewLoader />}>
