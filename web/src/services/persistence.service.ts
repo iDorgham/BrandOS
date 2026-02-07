@@ -662,7 +662,7 @@ export const userService = {
     const { data, error } = await supabase
       .from('profiles')
       .select('*')
-      .eq('id', user.id)
+      .eq('user_id', user.id)
       .maybeSingle();
 
     if (error) throw error;
@@ -693,13 +693,12 @@ export const userService = {
     const { data, error } = await supabase
       .from('profiles')
       .upsert({
-        id: user.id,
         user_id: user.id,
         full_name: profile.name,
         avatar_url: profile.avatarUrl,
         bio: profile.bio,
         updated_at: new Date().toISOString(),
-      })
+      }, { onConflict: 'user_id' })
       .select()
       .single();
 
