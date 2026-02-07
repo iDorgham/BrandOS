@@ -4,9 +4,11 @@ import { Zap, Shield, Layout, Sparkles, ArrowRight, Github, Twitter, Layers, Bar
 import { Button } from '@/components/ui';
 import { useAuth } from '@/contexts/AuthContext';
 
-export const LandingPage: React.FC = () => {
-    const { signIn } = useAuth();
+interface LandingPageProps {
+    onLoginClick: () => void;
+}
 
+export const LandingPage: React.FC<LandingPageProps> = ({ onLoginClick }) => {
     return (
         <div className="min-h-screen bg-[#161616] text-white selection:bg-[#0f62fe]/30 font-sans relative overflow-x-hidden">
             <div className="cinematic-noise" />
@@ -32,10 +34,10 @@ export const LandingPage: React.FC = () => {
                     </div>
 
                     <div className="flex items-center">
-                        <Button onClick={signIn} variant="ghost" className="text-[12px] uppercase tracking-widest font-bold px-6 h-12 hover:bg-[#393939] rounded-none border-l border-[#393939]">
+                        <Button onClick={onLoginClick} variant="ghost" className="text-[12px] uppercase tracking-widest font-bold px-6 h-12 hover:bg-[#393939] rounded-none border-l border-[#393939]">
                             Log In
                         </Button>
-                        <Button onClick={signIn} className="bg-[#0f62fe] text-white text-[12px] uppercase tracking-widest font-bold rounded-none h-12 px-8 hover:bg-[#0043ce] transition-colors">
+                        <Button onClick={onLoginClick} className="bg-[#0f62fe] text-white text-[12px] uppercase tracking-widest font-bold rounded-none h-12 px-8 hover:bg-[#0043ce] transition-colors">
                             Request Access
                         </Button>
                     </div>
@@ -65,7 +67,7 @@ export const LandingPage: React.FC = () => {
                             </p>
 
                             <div className="flex flex-wrap gap-4">
-                                <Button onClick={signIn} size="lg" className="bg-[#0f62fe] text-white hover:bg-[#0043ce] h-14 px-10 rounded-none text-[13px] font-bold uppercase tracking-widest group">
+                                <Button onClick={onLoginClick} size="lg" className="bg-[#0f62fe] text-white hover:bg-[#0043ce] h-14 px-10 rounded-none text-[13px] font-bold uppercase tracking-widest group">
                                     Initialize Protocol <ArrowRight className="ml-3 group-hover:translate-x-1 transition-transform" size={16} />
                                 </Button>
                                 <Button variant="secondary" size="lg" className="border-[#393939] text-[#f4f4f4] hover:bg-[#393939] h-14 px-10 rounded-none text-[13px] font-bold uppercase tracking-widest">

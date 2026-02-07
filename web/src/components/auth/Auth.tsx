@@ -3,7 +3,11 @@ import { User, Loader2, Shield, LogIn, LogOut, RotateCcw, Database } from 'lucid
 import { useAuth } from '../../contexts/AuthContext';
 import { Button, Card } from '@/components/ui';
 
-export const AuthGuard: React.FC = () => {
+interface AuthGuardProps {
+  onBack?: () => void;
+}
+
+export const AuthGuard: React.FC<AuthGuardProps> = ({ onBack }) => {
   const { user, loading, signIn, signInEmail, signOut, migrateData } = useAuth();
   const [showEmailLogin, setShowEmailLogin] = React.useState(false);
   const [email, setEmail] = React.useState('');
@@ -74,12 +78,22 @@ export const AuthGuard: React.FC = () => {
                 <LogIn size={20} />
                 Continue with Google
               </Button>
-              <button
-                onClick={() => setShowEmailLogin(true)}
-                className="text-xs text-muted-foreground hover:text-primary transition-colors hover:underline underline-offset-4 font-medium"
-              >
-                Authenticate via Email credentials
-              </button>
+              <div className="flex flex-col gap-3">
+                <button
+                  onClick={() => setShowEmailLogin(true)}
+                  className="text-xs text-muted-foreground hover:text-primary transition-colors hover:underline underline-offset-4 font-medium"
+                >
+                  Authenticate via Email credentials
+                </button>
+                {onBack && (
+                  <button
+                    onClick={onBack}
+                    className="text-xs text-muted-foreground hover:text-primary transition-colors hover:underline underline-offset-4 font-medium"
+                  >
+                    Return to Landing Page
+                  </button>
+                )}
+              </div>
             </div>
           ) : (
             <form onSubmit={handleEmailLogin} className="space-y-6 text-left animate-in fade-in slide-in-from-bottom-4 duration-500">
@@ -112,6 +126,15 @@ export const AuthGuard: React.FC = () => {
                 <Button type="submit" size="lg" className="w-full rounded-none h-14 gap-3 font-bold uppercase tracking-wide text-xs">
                   <LogIn size={20} /> Authenticate
                 </Button>
+                {onBack && (
+                  <button
+                    type="button"
+                    onClick={onBack}
+                    className="w-full text-center text-xs text-muted-foreground hover:text-primary transition-colors hover:underline underline-offset-4"
+                  >
+                    Return to Mission Protocol
+                  </button>
+                )}
                 <button
                   type="button"
                   onClick={() => setShowEmailLogin(false)}
@@ -145,7 +168,7 @@ export const AuthStatus: React.FC = () => {
 
   if (!user) {
     return (
-      <Button onClick={signIn} variant="outline" size="sm" className="gap-2">
+      <Button onClick={signIn} variant="secondary" size="sm" className="gap-2">
         <LogIn size={14} /> Sign In
       </Button>
     );

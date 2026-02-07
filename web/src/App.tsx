@@ -46,6 +46,7 @@ const AppContent: React.FC = () => {
     const [activeTab, setActiveTab] = useState('dashboard');
     const [headerActions, setHeaderActions] = useState<React.ReactNode>(null);
     const [apiKeyReady, setApiKeyReady] = useState<boolean | null>(null);
+    const [showAuth, setShowAuth] = useState(false);
 
     // Reset header actions when tab changes
     useEffect(() => {
@@ -142,7 +143,11 @@ const AppContent: React.FC = () => {
     if (!user) {
         return (
             <React.Suspense fallback={<ViewLoader />}>
-                <LandingPage />
+                {showAuth ? (
+                    <AuthGuard onBack={() => setShowAuth(false)} />
+                ) : (
+                    <LandingPage onLoginClick={() => setShowAuth(true)} />
+                )}
             </React.Suspense>
         );
     }
