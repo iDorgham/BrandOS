@@ -257,9 +257,6 @@ const AppContent: React.FC = () => {
     }
 
     if (!user) {
-        // Determine if we need dark mode header (for dark pages like Industries)
-        const isDarkPage = industriesView || caseStudiesView || pricingView;
-
         return (
             <React.Suspense fallback={<ViewLoader />}>
                 {!showAuth && (
@@ -271,7 +268,6 @@ const AppContent: React.FC = () => {
                         onIndustriesClick={() => handleNavigate('industries')}
                         onCaseStudiesClick={() => handleNavigate('results')}
                         onPricingClick={() => handleNavigate('pricing')}
-                        dark={isDarkPage}
                     />
                 )}
 

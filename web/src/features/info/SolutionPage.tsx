@@ -113,22 +113,22 @@ export const SolutionPage: React.FC<SolutionPageProps> = ({ initialTab = 'dna', 
     const activeContent = tabs[activeTab];
 
     return (
-        <div className="min-h-screen bg-[#000000] text-white pt-24 pb-24 px-8 relative overflow-hidden">
+        <div className="min-h-screen bg-[var(--cds-ui-background)] text-[var(--cds-text-primary)] pt-24 pb-24 px-8 relative overflow-hidden transition-colors duration-300">
             <div className="cinematic-noise" />
 
             <div className="max-w-[1600px] mx-auto relative z-10">
                 <Button
                     onClick={onBack}
                     variant="ghost"
-                    className="mb-12 hover:bg-white/5 text-[#525252] hover:text-white uppercase tracking-[0.3em] font-black text-[10px] gap-3"
+                    className="mb-12 hover:bg-[var(--cds-layer-hover)] text-[var(--cds-text-secondary)] hover:text-[var(--cds-text-primary)] uppercase tracking-[0.3em] font-black text-[10px] gap-3"
                 >
                     <ArrowLeft size={16} /> [ Back_to_Interface ]
                 </Button>
 
                 <div className="text-center mb-24">
-                    <div className="inline-flex items-center gap-4 bg-[#161616] border border-[#393939] px-6 py-2 mb-8">
-                        <div className="w-2 h-2 rounded-full bg-white animate-pulse" />
-                        <span className="text-[10px] font-black uppercase tracking-[0.3em] text-[#c6c6c6]">System_Overview // V3.0</span>
+                    <div className="inline-flex items-center gap-4 bg-[var(--cds-layer-01)] border border-[var(--cds-layer-02)] px-6 py-2 mb-8 shadow-sm">
+                        <div className="w-2 h-2 rounded-full bg-[var(--cds-interactive-01)] animate-pulse" />
+                        <span className="text-[10px] font-black uppercase tracking-[0.3em] text-[var(--cds-text-secondary)]">System_Overview // V3.0</span>
                     </div>
                     <h1 className="text-[clamp(3.5rem,7vw,9rem)] font-black tracking-tighter uppercase leading-[0.9] mb-8">
                         The End of <br /> Inconsistent Branding.
@@ -146,24 +146,24 @@ export const SolutionPage: React.FC<SolutionPageProps> = ({ initialTab = 'dna', 
                                 <div
                                     key={key}
                                     onClick={() => setActiveTab(key)}
-                                    className={`p-8 border cursor-pointer transition-all duration-300 relative group overflow-hidden ${isActive ? `border-white bg-[#1a1a1a]` : 'border-[#333] bg-transparent hover:border-[#666]'}`}
+                                    className={`p-8 border cursor-pointer transition-all duration-300 relative group overflow-hidden ${isActive ? `border-[var(--cds-text-primary)] bg-[var(--cds-layer-01)] shadow-lg` : 'border-[var(--cds-layer-03)] bg-transparent hover:border-[var(--cds-text-secondary)]'}`}
                                 >
                                     <div className={`absolute top-0 left-0 w-1 h-full transition-all duration-300 ${isActive ? tab.bg : 'bg-transparent'}`} />
                                     <div className="flex items-center justify-between mb-4">
-                                        <div className={`${isActive ? tab.color : 'text-[#666]'} transition-colors`}>{tab.icon}</div>
-                                        {isActive && <ArrowRight size={16} className="text-white" />}
+                                        <div className={`${isActive ? tab.color : 'text-[var(--cds-text-secondary)]'} transition-colors`}>{tab.icon}</div>
+                                        {isActive && <ArrowRight size={16} className="text-[var(--cds-text-primary)]" />}
                                     </div>
-                                    <h3 className={`text-xl font-black uppercase tracking-tighter mb-2 ${isActive ? 'text-white' : 'text-[#666]'}`}>
+                                    <h3 className={`text-xl font-black uppercase tracking-tighter mb-2 ${isActive ? 'text-[var(--cds-text-primary)]' : 'text-[var(--cds-text-secondary)]'}`}>
                                         {tab.title}
                                     </h3>
                                     {isActive && (
                                         <motion.div
                                             initial={{ opacity: 0, height: 0 }}
                                             animate={{ opacity: 1, height: 'auto' }}
-                                            className="text-sm text-[#c6c6c6] mt-4"
+                                            className="text-sm text-[var(--cds-text-secondary)] mt-4"
                                         >
-                                            <div className="mb-2"><span className="text-[#6f6f6f] uppercase text-[10px] tracking-widest">Problem:</span> <br /> {tab.problem}</div>
-                                            <div className="mb-4"><span className="text-[#6f6f6f] uppercase text-[10px] tracking-widest">Solution:</span> <br /> {tab.solution}</div>
+                                            <div className="mb-2"><span className="text-[var(--cds-text-secondary)] opacity-50 uppercase text-[10px] tracking-widest">Problem:</span> <br /> {tab.problem}</div>
+                                            <div className="mb-4"><span className="text-[var(--cds-text-secondary)] opacity-50 uppercase text-[10px] tracking-widest">Solution:</span> <br /> {tab.solution}</div>
                                             <div className={`text-xs font-bold uppercase tracking-wider ${tab.color}`}>ROI: {tab.roi}</div>
                                         </motion.div>
                                     )}
@@ -181,9 +181,9 @@ export const SolutionPage: React.FC<SolutionPageProps> = ({ initialTab = 'dna', 
                                 animate={{ opacity: 1, x: 0 }}
                                 exit={{ opacity: 0, x: -20 }}
                                 transition={{ duration: 0.3 }}
-                                className="h-full border border-[#393939] bg-[#0c0c0c] p-12 relative overflow-hidden"
+                                className="h-full border border-[var(--cds-layer-02)] bg-[var(--cds-layer-01)] p-12 relative overflow-hidden shadow-2xl"
                             >
-                                <div className="absolute top-0 right-0 p-8 opacity-5 pointer-events-none">
+                                <div className="absolute top-0 right-0 p-8 opacity-[0.03] pointer-events-none">
                                     <div className={`text-[200px] leading-none font-black ${activeContent.color}`}>
                                         {activeTab === 'dna' ? '01' : activeTab === 'generate' ? '02' : '03'}
                                     </div>
@@ -197,7 +197,11 @@ export const SolutionPage: React.FC<SolutionPageProps> = ({ initialTab = 'dna', 
                                         <h3 className="text-4xl font-black uppercase mb-8 tracking-tighter">
                                             {activeContent.demoTitle}
                                         </h3>
-                                        <Button onClick={onLoginClick} variant="ghost" className="w-fit border border-white text-white hover:bg-white hover:text-black uppercase tracking-widest text-xs font-black px-8 py-6">
+                                        <Button
+                                            onClick={onLoginClick}
+                                            variant="ghost"
+                                            className="w-fit border border-[var(--cds-text-primary)] text-[var(--cds-text-primary)] hover:bg-[var(--cds-text-primary)] hover:text-[var(--cds-ui-background)] uppercase tracking-widest text-xs font-black px-8 py-6 rounded-none transition-all"
+                                        >
                                             Try It Live
                                         </Button>
                                     </div>
@@ -211,44 +215,44 @@ export const SolutionPage: React.FC<SolutionPageProps> = ({ initialTab = 'dna', 
                 </div>
 
                 {/* BATTLE CARD (Simplified from Home) */}
-                <div className="mb-48 border-t border-[#1a1a1a] pt-24">
+                <div className="mb-48 border-t border-[var(--cds-layer-02)] pt-24">
                     <h2 className="text-[clamp(2.5rem,5vw,4rem)] font-black tracking-tighter uppercase leading-none mb-16 text-center">
                         Total Market Superiority.
                     </h2>
                     <div className="overflow-x-auto">
-                        <table className="w-full text-left border-collapse">
+                        <table className="w-full text-left border-collapse border border-[var(--cds-layer-03)]">
                             <thead>
-                                <tr className="border-b-2 border-[#333]">
-                                    <th className="p-6 text-[#6f6f6f] font-mono text-xs uppercase tracking-widest w-1/4">Metric</th>
-                                    <th className="p-6 text-white font-black text-xl uppercase tracking-tighter w-1/4 bg-[#1a1a1a] border-t-4 border-[#0f62fe]">Brand OS</th>
-                                    <th className="p-6 text-[#6f6f6f] font-bold w-1/4 opacity-50">Manual PDF</th>
-                                    <th className="p-6 text-[#6f6f6f] font-bold w-1/4 opacity-50">Agencies</th>
+                                <tr className="border-b-2 border-[var(--cds-layer-03)]">
+                                    <th className="p-6 text-[var(--cds-text-secondary)] font-mono text-xs uppercase tracking-widest w-1/4">Metric</th>
+                                    <th className="p-6 text-[var(--cds-text-primary)] font-black text-xl uppercase tracking-tighter w-1/4 bg-[var(--cds-layer-01)] border-t-4 border-[var(--cds-interactive-01)] shadow-inner">Brand OS</th>
+                                    <th className="p-6 text-[var(--cds-text-secondary)] font-bold w-1/4 opacity-30">Manual PDF</th>
+                                    <th className="p-6 text-[var(--cds-text-secondary)] font-bold w-1/4 opacity-30">Agencies</th>
                                 </tr>
                             </thead>
-                            <tbody className="divide-y divide-[#1a1a1a]">
+                            <tbody className="divide-y divide-[var(--cds-layer-03)]">
                                 <tr>
-                                    <td className="p-6 font-bold text-[#c6c6c6]">Setup Time</td>
-                                    <td className="p-6 font-black text-[#0f62fe] bg-[#161616]">60 Seconds</td>
-                                    <td className="p-6 text-[#666]">2-4 Weeks</td>
-                                    <td className="p-6 text-[#666]">2+ Weeks</td>
+                                    <td className="p-6 font-bold text-[var(--cds-text-secondary)]">Setup Time</td>
+                                    <td className="p-6 font-black text-[var(--cds-interactive-01)] bg-[var(--cds-layer-01)]">60 Seconds</td>
+                                    <td className="p-6 text-[var(--cds-text-secondary)] opacity-50">2-4 Weeks</td>
+                                    <td className="p-6 text-[var(--cds-text-secondary)] opacity-50">2+ Weeks</td>
                                 </tr>
                                 <tr>
-                                    <td className="p-6 font-bold text-[#c6c6c6]">Cost</td>
-                                    <td className="p-6 font-black text-[#0f62fe] bg-[#161616]">$49/mo</td>
-                                    <td className="p-6 text-[#666]">$0 (Hidden labor)</td>
-                                    <td className="p-6 text-[#666]">$5K+/mo</td>
+                                    <td className="p-6 font-bold text-[var(--cds-text-secondary)]">Cost</td>
+                                    <td className="p-6 font-black text-[var(--cds-interactive-01)] bg-[var(--cds-layer-01)]">$49/mo</td>
+                                    <td className="p-6 text-[var(--cds-text-secondary)] opacity-50">$0 (Hidden labor)</td>
+                                    <td className="p-6 text-[var(--cds-text-secondary)] opacity-50">$5K+/mo</td>
                                 </tr>
                                 <tr>
-                                    <td className="p-6 font-bold text-[#c6c6c6]">Consistency</td>
-                                    <td className="p-6 font-black text-[#0f62fe] bg-[#161616]">92%+ Guaranteed</td>
-                                    <td className="p-6 text-[#666]">40-60%</td>
-                                    <td className="p-6 text-[#666]">60-80%</td>
+                                    <td className="p-6 font-bold text-[var(--cds-text-secondary)]">Consistency</td>
+                                    <td className="p-6 font-black text-[var(--cds-interactive-01)] bg-[var(--cds-layer-01)]">92%+ Guaranteed</td>
+                                    <td className="p-6 text-[var(--cds-text-secondary)] opacity-50">40-60%</td>
+                                    <td className="p-6 text-[var(--cds-text-secondary)] opacity-50">60-80%</td>
                                 </tr>
                                 <tr>
-                                    <td className="p-6 font-bold text-[#c6c6c6]">Speed</td>
-                                    <td className="p-6 font-black text-[#0f62fe] bg-[#161616]">10 Seconds</td>
-                                    <td className="p-6 text-[#666]">N/A</td>
-                                    <td className="p-6 text-[#666]">2-3 Days</td>
+                                    <td className="p-6 font-bold text-[var(--cds-text-secondary)]">Speed</td>
+                                    <td className="p-6 font-black text-[var(--cds-interactive-01)] bg-[var(--cds-layer-01)]">10 Seconds</td>
+                                    <td className="p-6 text-[var(--cds-text-secondary)] opacity-50">N/A</td>
+                                    <td className="p-6 text-[var(--cds-text-secondary)] opacity-50">2-3 Days</td>
                                 </tr>
                             </tbody>
                         </table>
@@ -260,7 +264,10 @@ export const SolutionPage: React.FC<SolutionPageProps> = ({ initialTab = 'dna', 
                     <h2 className="text-[clamp(3rem,6vw,6rem)] font-black tracking-tighter uppercase leading-none mb-12">
                         Build Your <br /> Operating System.
                     </h2>
-                    <Button onClick={onLoginClick} className="bg-[#0f62fe] text-white hover:bg-[#0f62fe]/90 h-20 px-16 rounded-none text-xl font-black uppercase tracking-[0.2em] shadow-[0_0_50px_rgba(15,98,254,0.4)]">
+                    <Button
+                        onClick={onLoginClick}
+                        className="bg-[var(--cds-interactive-01)] text-[var(--cds-text-on-color)] hover:bg-[var(--cds-interactive-01)]/90 h-20 px-16 rounded-none text-xl font-black uppercase tracking-[0.2em] shadow-[0_10px_50px_rgba(15,98,254,0.4)] transition-all hover:-translate-y-2 hover:shadow-[0_20px_60px_rgba(15,98,254,0.5)]"
+                    >
                         Start Free Trial
                     </Button>
                 </div>
