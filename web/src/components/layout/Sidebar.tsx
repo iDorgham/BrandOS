@@ -87,15 +87,15 @@ export const Sidebar: React.FC<SidebarProps> = ({ activeTab, onTabChange, isColl
                                     aria-label={`Navigate to ${tab.label}`}
                                     aria-current={activeTab === tab.id ? 'page' : undefined}
                                     title={isCollapsed ? tab.label : undefined}
-                                    className={`w-full flex items-center gap-3 h-10 px-0 relative group transition-colors ${activeTab === tab.id
+                                    className={`w-full flex items-center gap-4 h-[48px] px-0 relative group transition-colors ${activeTab === tab.id
                                         ? 'bg-muted/80 text-foreground font-medium'
                                         : 'text-muted-foreground hover:bg-muted/40 hover:text-foreground'
                                         } ${isCollapsed ? 'justify-center' : 'pl-4'}`}
                                 >
                                     {activeTab === tab.id && (
-                                        <div className="absolute left-0 top-0 bottom-0 w-[3px] bg-primary" />
+                                        <div className="absolute left-0 top-0 bottom-0 w-[4px] bg-primary" />
                                     )}
-                                    <tab.icon size={18} className={`shrink-0 ${activeTab === tab.id ? 'text-primary' : 'group-hover:text-primary transition-colors'}`} />
+                                    <tab.icon size={20} className={`shrink-0 ${activeTab === tab.id ? 'text-primary' : 'group-hover:text-primary transition-colors'}`} />
                                     {!isCollapsed && (
                                         <span className="hidden md:block text-[14px] leading-none whitespace-nowrap overflow-hidden">{tab.label}</span>
                                     )}
@@ -109,26 +109,26 @@ export const Sidebar: React.FC<SidebarProps> = ({ activeTab, onTabChange, isColl
             <div className="mt-auto border-t border-border bg-muted/10">
                 <button
                     onClick={() => onTabChange('settings')}
-                    className={`w-full flex items-center gap-3 h-[45px] relative group transition-colors ${activeTab === 'settings'
+                    className={`w-full flex items-center gap-4 h-[48px] relative group transition-colors ${activeTab === 'settings'
                         ? 'bg-muted text-foreground font-semibold'
                         : 'text-muted-foreground hover:bg-muted/50 hover:text-foreground'
                         } ${isCollapsed ? 'justify-center px-0' : 'px-4'}`}
                     title={isCollapsed ? 'Settings' : undefined}
                 >
                     {activeTab === 'settings' && (
-                        <div className="absolute left-0 top-0 bottom-0 w-[3px] bg-primary" />
+                        <div className="absolute left-0 top-0 bottom-0 w-[4px] bg-primary" />
                     )}
-                    <Settings size={18} className={activeTab === 'settings' ? 'text-primary' : 'group-hover:text-primary transition-colors'} />
+                    <Settings size={20} className={activeTab === 'settings' ? 'text-primary' : 'group-hover:text-primary transition-colors'} />
                     {!isCollapsed && (
-                        <span className="hidden md:block text-[12px]">Settings</span>
+                        <span className="hidden md:block text-[14px]">Settings</span>
                     )}
                 </button>
 
                 <button
                     onClick={onToggle}
-                    className="w-full h-[45px] flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors border-t border-border"
+                    className="w-full h-[48px] flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors border-t border-border"
                 >
-                    {isCollapsed ? <ChevronRight size={16} /> : <ChevronLeft size={16} />}
+                    {isCollapsed ? <ChevronRight size={20} /> : <ChevronLeft size={20} />}
                 </button>
             </div>
         </aside>

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { ExitIntentPopup } from './ExitIntentPopup';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
     Zap, Shield, ArrowRight, Github, Twitter,
@@ -9,17 +10,23 @@ import {
 import { Button, ThemeToggle } from '@/components/ui';
 import { useTheme } from '@/contexts/ThemeContext';
 
+
+
 interface LandingPageProps {
     onLoginClick: () => void;
     onInfoClick: (topic: 'terms' | 'privacy' | 'faq' | 'help' | 'cookies' | 'licenses') => void;
     onProductClick: (slug: 'identity' | 'doctrine' | 'studio' | 'audit') => void;
     onCompanyClick: (slug: 'manifesto' | 'careers' | 'contact' | 'press') => void;
     onResourcesClick: (slug: 'documentation' | 'api' | 'status' | 'security') => void;
+    onCalculatorClick: () => void;
+    onIndustriesClick: () => void;
+    onCaseStudiesClick: () => void;
+    onPricingClick: () => void;
 }
 
-export const LandingPage: React.FC<LandingPageProps> = ({ onLoginClick, onInfoClick, onProductClick, onCompanyClick, onResourcesClick }) => {
-    const { resolvedTheme } = useTheme();
-    const [hoveredNav, setHoveredNav] = useState<string | null>(null);
+export const LandingPage: React.FC<LandingPageProps> = ({ onLoginClick, onInfoClick, onProductClick, onCompanyClick, onResourcesClick, onCalculatorClick, onIndustriesClick, onCaseStudiesClick, onPricingClick }) => {
+
+
 
     const [auditLogs, setAuditLogs] = useState([
         { id: '822', status: 'OK', score: 98.2, task: 'HEX_VALIDATION' },
@@ -52,6 +59,10 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onLoginClick, onInfoCl
 
     return (
         <div className="min-h-screen selection:bg-[var(--cds-interactive-01)]/30 font-sans relative overflow-x-hidden">
+            <ExitIntentPopup
+                onStay={onCalculatorClick}
+                onLeave={() => { }}
+            />
             <div className="cinematic-noise" />
 
 
@@ -62,301 +73,60 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onLoginClick, onInfoCl
             <div className="fixed inset-0 z-0 opacity-[0.05] pointer-events-none"
                 style={{
                     backgroundImage: 'linear-gradient(var(--cds-text-primary) 1px, transparent 1px), linear-gradient(90deg, var(--cds-text-primary) 1px, transparent 1px)',
-                    backgroundSize: '100px 100px'
+                    backgroundSize: '128px 128px'
                 }} />
 
-            {/* Top Navigation */}
-            <nav className="fixed top-0 w-full z-50 border-b border-[var(--cds-layer-02)] bg-background/80 backdrop-blur-2xl h-16 transition-colors">
-                <div className="max-w-[1800px] mx-auto px-8 h-full flex items-center justify-between">
-                    <div className="flex items-center gap-12">
-                        <motion.div
-                            whileHover={{ scale: 1.05 }}
-                            onClick={() => window.scrollTo(0, 0)}
-                            className="flex items-center gap-3 cursor-pointer"
-                        >
-                            <div className="w-10 h-10 bg-[var(--cds-interactive-01)] flex items-center justify-center aura-glow">
-                                <Zap className="text-white" size={20} fill="currentColor" />
-                            </div>
-                            <span className="text-[18px] font-black tracking-tighter uppercase mr-4">Brand OS</span>
-                        </motion.div>
 
-                        <div className="hidden lg:flex items-center gap-8 text-[11px] font-bold text-[var(--cds-text-secondary)] uppercase tracking-[0.2em] h-full">
 
-                            {/* Product Dropdown */}
-                            <div
-                                className="relative h-full flex items-center"
-                                onMouseEnter={() => setHoveredNav('product')}
-                                onMouseLeave={() => setHoveredNav(null)}
-                            >
-                                <button className={`transition-colors flex items-center gap-1 ${hoveredNav === 'product' ? 'text-[var(--cds-interactive-01)]' : 'hover:text-foreground'}`}>
-                                    Product <ChevronDown size={12} className={`transition-transform duration-300 ${hoveredNav === 'product' ? 'rotate-180' : ''}`} />
-                                </button>
-                                <AnimatePresence>
-                                    {hoveredNav === 'product' && (
-                                        <motion.div
-                                            initial={{ opacity: 0, y: 8, filter: 'blur(10px)' }}
-                                            animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
-                                            exit={{ opacity: 0, y: 8, filter: 'blur(10px)' }}
-                                            transition={{ duration: 0.2 }}
-                                            className="absolute top-full left-1/2 -translate-x-1/2 pt-4"
-                                        >
-                                            <div className="w-64 bg-[var(--cds-ui-background)]/90 backdrop-blur-md border border-[var(--cds-layer-02)] shadow-2xl p-2 grid gap-1 relative z-50">
-                                                <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-2 border-l-[8px] border-r-[8px] border-b-[8px] border-l-transparent border-r-transparent border-b-[var(--cds-layer-02)]" />
-                                                {[
-                                                    { id: 'identity', label: 'Identity Core', icon: <Shield size={14} /> },
-                                                    { id: 'doctrine', label: 'Doctrine Engine', icon: <Cpu size={14} /> },
-                                                    { id: 'studio', label: 'Creative Studio', icon: <Layers size={14} /> },
-                                                    { id: 'audit', label: 'Audit Protocol', icon: <Activity size={14} /> }
-                                                ].map(item => (
-                                                    <button
-                                                        key={item.id}
-                                                        onClick={() => {
-                                                            onProductClick(item.id as any);
-                                                            setHoveredNav(null);
-                                                        }}
-                                                        className="flex items-center gap-3 w-full p-4 hover:bg-[var(--cds-layer-01)] text-left group/item transition-colors relative overflow-hidden rounded-sm"
-                                                    >
-                                                        <div className="text-[var(--cds-interactive-01)]">{item.icon}</div>
-                                                        <span className="text-[var(--cds-text-primary)] group-hover/item:text-[var(--cds-interactive-01)] transition-colors font-black tracking-wider text-[10px]">
-                                                            {item.label}
-                                                        </span>
-                                                    </button>
-                                                ))}
-                                            </div>
-                                        </motion.div>
-                                    )}
-                                </AnimatePresence>
-                            </div>
-
-                            {/* Resources Dropdown */}
-                            <div
-                                className="relative h-full flex items-center"
-                                onMouseEnter={() => setHoveredNav('resources')}
-                                onMouseLeave={() => setHoveredNav(null)}
-                            >
-                                <button className={`transition-colors flex items-center gap-1 ${hoveredNav === 'resources' ? 'text-[var(--cds-interactive-01)]' : 'hover:text-foreground'}`}>
-                                    Resources <ChevronDown size={12} className={`transition-transform duration-300 ${hoveredNav === 'resources' ? 'rotate-180' : ''}`} />
-                                </button>
-                                <AnimatePresence>
-                                    {hoveredNav === 'resources' && (
-                                        <motion.div
-                                            initial={{ opacity: 0, y: 8, filter: 'blur(10px)' }}
-                                            animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
-                                            exit={{ opacity: 0, y: 8, filter: 'blur(10px)' }}
-                                            transition={{ duration: 0.2 }}
-                                            className="absolute top-full left-1/2 -translate-x-1/2 pt-4"
-                                        >
-                                            <div className="w-64 bg-[var(--cds-ui-background)]/90 backdrop-blur-md border border-[var(--cds-layer-02)] shadow-2xl p-2 grid gap-1 relative z-50">
-                                                <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-2 border-l-[8px] border-r-[8px] border-b-[8px] border-l-transparent border-r-transparent border-b-[var(--cds-layer-02)]" />
-                                                {[
-                                                    { id: 'documentation', label: 'Documentation', icon: <Book size={14} /> },
-                                                    { id: 'api', label: 'API Reference', icon: <Terminal size={14} /> },
-                                                    { id: 'status', label: 'System Status', icon: <Server size={14} /> },
-                                                    { id: 'security', label: 'Security', icon: <Lock size={14} /> }
-                                                ].map(item => (
-                                                    <button
-                                                        key={item.id}
-                                                        onClick={() => {
-                                                            onResourcesClick(item.id as any);
-                                                            setHoveredNav(null);
-                                                        }}
-                                                        className="flex items-center gap-3 w-full p-4 hover:bg-[var(--cds-layer-01)] text-left group/item transition-colors relative overflow-hidden rounded-sm"
-                                                    >
-                                                        <div className="text-[var(--cds-interactive-01)]">{item.icon}</div>
-                                                        <span className="text-[var(--cds-text-primary)] group-hover/item:text-[var(--cds-interactive-01)] transition-colors font-black tracking-wider text-[10px]">
-                                                            {item.label}
-                                                        </span>
-                                                    </button>
-                                                ))}
-                                            </div>
-                                        </motion.div>
-                                    )}
-                                </AnimatePresence>
-                            </div>
-
-                            {/* Company Dropdown */}
-                            <div
-                                className="relative h-full flex items-center"
-                                onMouseEnter={() => setHoveredNav('company')}
-                                onMouseLeave={() => setHoveredNav(null)}
-                            >
-                                <button className={`transition-colors flex items-center gap-1 ${hoveredNav === 'company' ? 'text-[var(--cds-interactive-01)]' : 'hover:text-foreground'}`}>
-                                    Company <ChevronDown size={12} className={`transition-transform duration-300 ${hoveredNav === 'company' ? 'rotate-180' : ''}`} />
-                                </button>
-                                <AnimatePresence>
-                                    {hoveredNav === 'company' && (
-                                        <motion.div
-                                            initial={{ opacity: 0, y: 8, filter: 'blur(10px)' }}
-                                            animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
-                                            exit={{ opacity: 0, y: 8, filter: 'blur(10px)' }}
-                                            transition={{ duration: 0.2 }}
-                                            className="absolute top-full left-1/2 -translate-x-1/2 pt-4"
-                                        >
-                                            <div className="w-64 bg-[var(--cds-ui-background)]/90 backdrop-blur-md border border-[var(--cds-layer-02)] shadow-2xl p-2 grid gap-1 relative z-50">
-                                                <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-2 border-l-[8px] border-r-[8px] border-b-[8px] border-l-transparent border-r-transparent border-b-[var(--cds-layer-02)]" />
-                                                {[
-                                                    { id: 'manifesto', label: 'Manifesto', icon: <Target size={14} /> },
-                                                    { id: 'careers', label: 'Careers', icon: <Users size={14} /> },
-                                                    { id: 'contact', label: 'Contact', icon: <Mail size={14} /> },
-                                                    { id: 'press', label: 'Press', icon: <Globe size={14} /> }
-                                                ].map(item => (
-                                                    <button
-                                                        key={item.id}
-                                                        onClick={() => {
-                                                            onCompanyClick(item.id as any);
-                                                            setHoveredNav(null);
-                                                        }}
-                                                        className="flex items-center gap-3 w-full p-4 hover:bg-[var(--cds-layer-01)] text-left group/item transition-colors relative overflow-hidden rounded-sm"
-                                                    >
-                                                        <div className="text-[var(--cds-interactive-01)]">{item.icon}</div>
-                                                        <span className="text-[var(--cds-text-primary)] group-hover/item:text-[var(--cds-interactive-01)] transition-colors font-black tracking-wider text-[10px]">
-                                                            {item.label}
-                                                        </span>
-                                                    </button>
-                                                ))}
-                                            </div>
-                                        </motion.div>
-                                    )}
-                                </AnimatePresence>
-                            </div>
-
-                            <a href="#pricing" className="hover:text-foreground transition-colors">Pricing</a>
-                            <button onClick={() => onCompanyClick('contact')} className="hover:text-foreground transition-colors">Contact</button>
-                        </div>
-                    </div>
-
-                    <div className="flex items-center h-full gap-8">
-                        <ThemeToggle />
-                        <Button
-                            onClick={onLoginClick}
-                            variant="ghost"
-                            className="hidden lg:flex text-[12px] uppercase tracking-widest font-black px-8 h-12 hover:bg-foreground/5 rounded-none text-foreground transition-all border border-foreground/10 items-center"
-                        >
-                            Login
-                        </Button>
-
-                        {/* Mobile Menu Toggle */}
-                        <button
-                            className="lg:hidden text-foreground"
-                            onClick={() => setHoveredNav(hoveredNav === 'mobile' ? null : 'mobile')}
-                        >
-                            {hoveredNav === 'mobile' ? <X /> : <Menu />}
-                        </button>
-                    </div>
-                </div>
-            </nav>
-
-            {/* Mobile Menu Overlay */}
-            <AnimatePresence>
-                {hoveredNav === 'mobile' && (
-                    <motion.div
-                        initial={{ opacity: 0, y: -20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: -20 }}
-                        className="fixed inset-0 z-40 bg-[var(--cds-ui-background)] pt-24 px-8 overflow-y-auto lg:hidden"
-                    >
-                        <div className="flex flex-col gap-8">
-                            {[
-                                {
-                                    title: 'Product',
-                                    items: [
-                                        { id: 'identity', label: 'Identity Core' },
-                                        { id: 'doctrine', label: 'Doctrine Engine' },
-                                        { id: 'studio', label: 'Creative Studio' },
-                                        { id: 'audit', label: 'Audit Protocol' }
-                                    ],
-                                    action: onProductClick
-                                },
-                                {
-                                    title: 'Resources',
-                                    items: [
-                                        { id: 'documentation', label: 'Documentation' },
-                                        { id: 'api', label: 'API Reference' },
-                                        { id: 'status', label: 'System Status' },
-                                        { id: 'security', label: 'Security' }
-                                    ],
-                                    action: onResourcesClick
-                                },
-                                {
-                                    title: 'Company',
-                                    items: [
-                                        { id: 'manifesto', label: 'Manifesto' },
-                                        { id: 'careers', label: 'Careers' },
-                                        { id: 'contact', label: 'Contact' },
-                                        { id: 'press', label: 'Press' }
-                                    ],
-                                    action: onCompanyClick
-                                }
-                            ].map((section, i) => (
-                                <div key={i} className="border-b border-[var(--cds-layer-02)] pb-8">
-                                    <h3 className="text-[12px] font-black uppercase tracking-[0.2em] text-[var(--cds-text-secondary)] mb-6">{section.title}</h3>
-                                    <div className="grid gap-4">
-                                        {section.items.map(item => (
-                                            <button
-                                                key={item.id}
-                                                onClick={() => {
-                                                    (section.action as any)(item.id);
-                                                    setHoveredNav(null);
-                                                }}
-                                                className="text-2xl font-black uppercase tracking-tighter text-left text-[var(--cds-text-primary)] hover:text-[var(--cds-interactive-01)] transition-colors"
-                                            >
-                                                {item.label}
-                                            </button>
-                                        ))}
-                                    </div>
-                                </div>
-                            ))}
-                            <div className="flex flex-col gap-4 pb-12">
-                                <a
-                                    href="#pricing"
-                                    onClick={() => setHoveredNav(null)}
-                                    className="text-2xl font-black uppercase tracking-tighter text-left text-[var(--cds-text-primary)] hover:text-[var(--cds-interactive-01)] transition-colors"
-                                >
-                                    Pricing
-                                </a>
-                                <button
-                                    onClick={() => {
-                                        onLoginClick();
-                                        setHoveredNav(null);
-                                    }}
-                                    className="w-full h-16 bg-[var(--cds-interactive-01)] text-white text-[14px] font-black uppercase tracking-widest mt-4"
-                                >
-                                    Login
-                                </button>
-                            </div>
-                        </div>
-                    </motion.div>
-                )}
-            </AnimatePresence>
-
-            {/* 1. HERO: BOLD & SIMPLE */}
-            <section className="min-h-screen flex flex-col justify-center px-8 relative overflow-hidden pt-48">
+            {/* 1. HERO: SALES-FOCUSED & URGENT */}
+            <section className="min-h-screen flex flex-col justify-center px-8 relative overflow-hidden pt-32">
                 <motion.div
                     {...fastFadeIn}
                     className="max-w-[1800px] mx-auto w-full relative z-10 will-change-transform"
                 >
-                    <div className="inline-flex items-center gap-4 bg-[var(--cds-interactive-01)]/10 border border-[var(--cds-interactive-01)]/20 px-6 py-2 mb-16">
-                        <div className="w-2 h-2 rounded-full bg-[var(--cds-interactive-01)] animate-pulse" />
-                        <span className="text-[10px] font-black uppercase tracking-[0.4em] text-[var(--cds-interactive-01)]">Brand_OS // Protocol_V3</span>
+                    <div className="inline-flex items-center gap-4 bg-[var(--cds-support-warning)]/10 border border-[var(--cds-support-warning)]/20 px-6 py-2 mb-12">
+                        <div className="w-2 h-2 rounded-full bg-[var(--cds-support-warning)] animate-pulse" />
+                        <span className="text-[10px] font-black uppercase tracking-[0.4em] text-[var(--cds-support-warning)]">SYSTEM_UPDATE: BRAND_EQUITY_OPTIMIZATION_ACTIVE</span>
                     </div>
 
-                    <h1 className="text-[clamp(4rem,11vw,14rem)] font-black tracking-tighter leading-[0.85] uppercase mb-16 italic">
-                        The Operating <br />
-                        <span className="text-[var(--cds-interactive-01)] aura-glow">System.</span>
+                    <h1 className="text-[clamp(3.5rem,8vw,9rem)] font-black tracking-tighter leading-[0.9] uppercase mb-12">
+                        Your Brand Looks <br />
+                        <span className="text-transparent bg-clip-text bg-gradient-to-r from-[var(--cds-support-warning)] to-[var(--cds-interactive-01)]">Different Every Time.</span> <br />
+                        You're Losing Velocity.
                     </h1>
 
-                    <div className="flex flex-col md:flex-row items-start md:items-center gap-12">
-                        <Button
-                            onClick={onLoginClick}
-                            variant="primary"
-                            className="h-24 px-16 rounded-none text-2xl font-black uppercase tracking-[0.2em] shadow-[0_0_50px_rgba(15,98,254,0.3)] transition-all hover:scale-[1.02]"
-                        >
-                            Initialize Protocol
+                    <p className="text-xl md:text-3xl font-light text-[var(--cds-text-secondary)] max-w-4xl leading-tight mb-16">
+                        Brand OS guarantees <span className="text-foreground font-bold">92%+ visual consistency</span> across every asset—automatically.
+                        Stop confusing customers. Start building trust that converts.
+                    </p>
+
+                    <div className="flex flex-col md:flex-row items-start md:items-center gap-8 mb-24">
+                        <Button onClick={onCalculatorClick} variant="primary" size="lg" className="bg-[var(--cds-interactive-01)] hover:bg-[var(--cds-interactive-01)]/90 text-[var(--cds-text-on-color)] h-16 px-8 rounded-none text-sm font-black uppercase tracking-widest shadow-[0_0_30px_rgba(15,98,254,0.4)] transition-all hover:scale-105 active:scale-95">
+                            Calculate Your Brand Velocity <ArrowRight className="ml-2" />
                         </Button>
-                        <p className="text-xl md:text-2xl font-light text-[var(--cds-text-secondary)] max-w-xl leading-tight italic">
-                            Stop brand drift. Start orchestrating DNA. <br />
-                            <span className="text-foreground font-black uppercase not-italic">Brand OS</span> is the enterprise-grade AI platform for visual doctrine and asset generation.
-                        </p>
+                        <Button
+                            onClick={() => window.location.href = '/demo'}
+                            variant="ghost"
+                            className="h-20 px-12 rounded-none text-xl font-black uppercase tracking-widest border border-[var(--cds-text-primary)]/20 hover:bg-[var(--cds-text-primary)] hover:text-[var(--cds-ui-background)] transition-all"
+                        >
+                            Watch 60-Second Demo
+                        </Button>
+                    </div>
+
+                    {/* Trust Bar */}
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-8 border-t border-[var(--cds-layer-02)] pt-12">
+                        {[
+                            { label: "Growth", value: "30% Faster", sub: "For 1,247 brands" },
+                            { label: "Efficiency", value: "8 Hours/Wk", sub: "Saved on reviews" },
+                            { label: "Accuracy", value: "92% Guaranteed", sub: "Visual consistency" },
+                            { label: "Output", value: "$50K/Month", sub: "Assets generated" }
+                        ].map((stat, i) => (
+                            <div key={i} className="flex flex-col">
+                                <span className="text-[10px] font-black uppercase tracking-[0.2em] text-[var(--cds-text-secondary)] mb-2">{stat.label}</span>
+                                <span className="text-3xl font-black uppercase tracking-tighter text-foreground overflow-visible whitespace-nowrap">{stat.value}</span>
+                                <span className="text-sm text-[var(--cds-text-secondary)] mt-1">{stat.sub}</span>
+                            </div>
+                        ))}
                     </div>
                 </motion.div>
 
@@ -364,7 +134,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onLoginClick, onInfoCl
                 <motion.div
                     animate={{ y: [0, 10, 0] }}
                     transition={{ duration: 2, repeat: Infinity }}
-                    className="absolute bottom-12 left-1/2 -translate-x-1/2 text-[#525252]"
+                    className="absolute bottom-12 left-1/2 -translate-x-1/2 text-[var(--cds-text-secondary)]"
                 >
                     <ChevronDown size={32} strokeWidth={1} />
                 </motion.div>
@@ -385,257 +155,267 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onLoginClick, onInfoCl
                 </div>
             </section>
 
-            {/* 2. THE PROBLEM: SIMPLE & HARD-HITTING */}
-            <section id="problem" className="py-64 px-8 border-t border-[var(--cds-layer-02)] relative overflow-hidden transition-colors">
-                <div className="max-w-[1800px] mx-auto grid grid-cols-1 lg:grid-cols-2 gap-32 items-center">
-                    <motion.div {...fastFadeIn}>
-                        <h2 className="text-[clamp(3.5rem,6vw,7rem)] font-black tracking-tighter leading-[0.9] uppercase mb-16">
-                            Brand Drift <br /> Costs You <br /> Millions.
-                        </h2>
-                        <div className="space-y-12">
-                            {[
-                                { title: "The PDF Dead End", desc: "Static guidelines are ignored by designers and unreadable by AI. They are obsolete." },
-                                { title: "Visual Entropy", desc: "Without governance, your brand equity erodes with every off-brand asset created." }
-                            ].map((item, i) => (
-                                <div key={i} className="flex gap-8 group">
-                                    <div className="w-1 px-1 bg-[var(--cds-support-warning)] h-full" />
-                                    <div>
-                                        <h3 className="text-3xl font-bold uppercase mb-4 text-[var(--cds-support-warning)]">{item.title}</h3>
-                                        <p className="text-xl text-[var(--cds-text-secondary)] font-light max-w-lg transition-colors group-hover:text-foreground">
-                                            {item.desc}
-                                        </p>
-                                    </div>
-                                </div>
-                            ))}
-                            <div className="mt-8 p-6 border border-[var(--cds-support-error)]/20 bg-[var(--cds-support-error)]/5 max-w-xl">
-                                <div className="text-[10px] font-black uppercase tracking-widest text-[var(--cds-support-error)] mb-2">Market Impact</div>
-                                <div className="text-2xl font-mono text-[var(--cds-support-error)]">"Global brands lose up to $2.4M annually due to inconsistent execution."</div>
-                            </div>
-                        </div>
-                    </motion.div>
-
-                    <motion.div
-                        initial={{ opacity: 0, scale: 0.9 }}
-                        whileInView={{ opacity: 1, scale: 1 }}
-                        transition={{ duration: 0.6 }}
-                        className="aspect-square bg-[var(--cds-ui-background)] border border-[var(--cds-layer-03)] relative flex items-center justify-center aura-glow hardware-accelerated"
-                    >
-                        <div className="absolute inset-0 opacity-[0.2]"
-                            style={{ backgroundImage: 'radial-gradient(var(--cds-support-warning) 2px, transparent 2px)', backgroundSize: '24px 24px' }} />
-                        <div className="relative text-center p-12 z-10">
-                            <div className="text-[clamp(10rem,20vw,20rem)] font-black text-[var(--cds-support-warning)] leading-none mb-4 tracking-tighter">LOST</div>
-                            <div className="text-2xl font-black uppercase tracking-[0.5em] text-foreground">Visual Identity</div>
-                        </div>
-                    </motion.div>
-                </div>
-            </section>
-
-            {/* 3. THE SOLUTION: THE PLATFORM HUB */}
-            <section id="solution" className="py-64 px-8 bg-[var(--cds-interactive-01)] text-white hardware-accelerated">
+            {/* 2. PAIN POINTS: QUANTIFIED LOSS */}
+            <section id="problem" className="py-24 px-8 border-t border-[var(--cds-layer-02)] bg-[var(--cds-layer-01)] relative overflow-hidden">
                 <div className="max-w-[1800px] mx-auto">
-                    <motion.div {...fastFadeIn} className="mb-48">
-                        <div className="inline-flex items-center gap-4 bg-white/10 border border-white/20 px-6 py-2 mb-12">
-                            <div className="w-2 h-2 rounded-full bg-white animate-pulse" />
-                            <span className="text-[10px] font-black uppercase tracking-[0.3em]">System_Architecture // V3.0</span>
-                        </div>
-                        <h2 className="text-[clamp(4rem,10vw,12rem)] font-black tracking-tighter leading-[0.85] uppercase mb-16">
-                            The Only <br /> Source of Truth.
+                    <motion.div {...fastFadeIn} className="mb-20 text-center">
+                        <h2 className="text-[clamp(2.5rem,5vw,5rem)] font-black tracking-tighter uppercase leading-none mb-6">
+                            Inconsistent Branding <br />
+                            <span className="text-[var(--cds-interactive-01)]">Is Diluting Your Market Impact.</span>
                         </h2>
-                        <p className="text-2xl md:text-3xl font-light leading-tight max-w-5xl italic opacity-90">
-                            Brand OS ingests your fonts, colors, spatial rules, and 'vibe' to create a living digital twin of your brand identity. It governs every pixel, everywhere.
-                        </p>
                     </motion.div>
 
-                    <div
-                        className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-px bg-white/20 border border-white/20"
-                    >
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
                         {[
                             {
-                                id: "identity",
-                                num: "01",
-                                title: "Visual Doctrine",
-                                desc: "Spatial logic gates for perfect composition, every time.",
-                                icon: <Shield size={24} />
+                                icon: <Activity size={32} className="text-[var(--cds-interactive-01)]" />,
+                                title: "Revenue Loss",
+                                stat: "-23%",
+                                desc: "Revenue when customers don't recognize your brand (Forbes)."
                             },
                             {
-                                id: "doctrine",
-                                num: "02",
-                                title: "Brand Grammar",
-                                desc: "IF/THEN rules that AI follows religiously to prevent drift.",
-                                icon: <Cpu size={24} />
+                                icon: <Layers size={32} className="text-[var(--cds-interactive-01)]" />,
+                                title: "Wasted Budget",
+                                stat: "$48K/Yr",
+                                desc: "Lost on endless design debates and subjective reviews."
                             },
                             {
-                                id: "studio",
-                                num: "03",
-                                title: "Emotional Mapping",
-                                desc: "Precise semantic control over brand 'energy' and 'sophistication'.",
-                                icon: <Layers size={24} />
+                                icon: <Users size={32} className="text-[var(--cds-interactive-01)]" />,
+                                title: "Operational Drag",
+                                stat: "15 Hrs/Wk",
+                                desc: " wasted on manual enforcement. Your team is drowning."
                             },
                             {
-                                id: "audit",
-                                num: "04",
-                                title: "Audit Protocol",
-                                desc: "Automated pixels-to-policy enforcement for total brand safety.",
-                                icon: <Activity size={24} />
+                                icon: <Target size={32} className="text-[var(--cds-interactive-01)]" />,
+                                title: "Competitive Disadvantage",
+                                stat: "-40% CTR",
+                                desc: "Compared to consistent brands that build trust instantly."
                             }
-                        ].map((product, i) => (
-                            <motion.button
+                        ].map((item, i) => (
+                            <motion.div
                                 key={i}
-                                {...fastFadeIn}
-                                onClick={() => onProductClick(product.id as any)}
-                                whileHover={{ backgroundColor: 'rgba(255,255,255,0.1)' }}
-                                className="p-12 flex flex-col items-start bg-transparent text-left group relative overflow-hidden will-change-transform hardware-accelerated"
+                                initial={{ opacity: 0, y: 20 }}
+                                whileInView={{ opacity: 1, y: 0 }}
+                                transition={{ delay: i * 0.1 }}
+                                className="p-8 border border-[var(--cds-layer-02)] bg-[var(--cds-ui-background)] hover:border-[var(--cds-interactive-01)] transition-colors group"
                             >
-                                <div className="text-[10px] font-black text-white/40 uppercase tracking-[0.3em] mb-12 group-hover:text-white">NODE_{product.num}</div>
-                                <div className="w-12 h-12 border border-white/20 flex items-center justify-center mb-10 group-hover:border-white transform group-hover:rotate-90">
-                                    {product.icon}
+                                <div className="mb-6 p-4 bg-[var(--cds-interactive-01)]/10 w-fit rounded-full group-hover:bg-[var(--cds-interactive-01)]/20 transition-colors">
+                                    {item.icon}
                                 </div>
-                                <h3 className="text-3xl font-black uppercase mb-6 tracking-tighter group-hover:translate-x-2">{product.title}</h3>
-                                <p className="text-xl font-light leading-tight opacity-70 group-hover:opacity-100 mb-12">{product.desc}</p>
-                                <div className="mt-auto flex items-center gap-4 text-[10px] font-black uppercase tracking-widest opacity-0 group-hover:opacity-100 translate-y-4 group-hover:translate-y-0 text-[#f1c21b]">
-                                    Initialize_Deep_Dive <ChevronRight size={14} />
-                                </div>
-                            </motion.button>
+                                <h3 className="text-xl font-bold uppercase tracking-wider mb-2">{item.title}</h3>
+                                <div className="text-4xl font-black text-[var(--cds-interactive-01)] mb-4 tracking-tighter">{item.stat}</div>
+                                <p className="text-[var(--cds-text-secondary)] leading-relaxed">
+                                    {item.desc}
+                                </p>
+                            </motion.div>
                         ))}
                     </div>
                 </div>
             </section>
 
-            {/* NEW: PROCESS SECTION */}
-            <section className="py-64 px-8 bg-[var(--cds-ui-background)] border-t border-[var(--cds-layer-02)]">
+            {/* 3. SOLUTION: ACCORDION DEMOS */}
+            <section id="solution" className="py-24 px-8 bg-[var(--cds-ui-background)]">
                 <div className="max-w-[1800px] mx-auto">
-                    <div className="flex flex-col lg:flex-row gap-32">
-                        <div className="lg:w-1/3">
-                            <h2 className="text-[clamp(3rem,5vw,6rem)] font-black tracking-tighter uppercase leading-none mb-16 text-white">
-                                How It Works.
-                            </h2>
-                            <p className="text-xl text-[#c6c6c6]">
-                                From static PDF to autonomous creative infrastructure in four steps.
-                            </p>
-                        </div>
-                        <div className="lg:w-2/3 grid grid-cols-1 md:grid-cols-2 gap-12">
+                    <motion.div {...fastFadeIn} className="mb-20">
+                        <h2 className="text-[clamp(3rem,6vw,7rem)] font-black tracking-tighter uppercase leading-none mb-4">
+                            How Brand OS Solves <br /> Your #1 Marketing Problem.
+                        </h2>
+                    </motion.div>
+
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-start">
+                        <div className="space-y-4">
                             {[
-                                { step: "01", title: "Ingest", desc: "Upload your guidelines. AI extracts rules, styles, and distinct tokens." },
-                                { step: "02", title: "Orchestrate", desc: "Design node-based 'Creative Logic' flows for recurring asset types." },
-                                { step: "03", title: "Generate", desc: "Produce thousands of on-brand assets via Gemini 3 & DALL-E 4." },
-                                { step: "04", title: "Audit", desc: "Every pixel is scored against your Visual Doctrine before export." }
+                                {
+                                    id: 'dna',
+                                    title: "Lock Your Brand DNA",
+                                    benefit: "Eliminate design debates forever.",
+                                    roi: "Saves 15 hours/week ($3,200/mo)",
+                                    proof: "\"Reduced approval time from 3 days to 20 minutes\" - Sarah, Acme SaaS"
+                                },
+                                {
+                                    id: 'generate',
+                                    title: "Generate Perfect Assets",
+                                    benefit: "Launch campaigns 10x faster.",
+                                    roi: "$50K/month in assets generated",
+                                    proof: "\"300% engagement increase\" - Mike, StartupXYZ"
+                                },
+                                {
+                                    id: 'audit',
+                                    title: "Audit & Prevent Drift",
+                                    benefit: "Catch violations before they cost you.",
+                                    roi: "Prevents $10K+/year in rebranding",
+                                    proof: "\"Caught 47 issues before $15K ad spend\" - Jessica, E-commerce"
+                                }
                             ].map((item, i) => (
-                                <div key={i} className="border-l-2 border-[var(--cds-layer-02)] pl-8 py-2">
-                                    <div className="text-[10px] font-black text-[var(--cds-interactive-01)] mb-2">STEP_{item.step}</div>
-                                    <h3 className="text-3xl font-black text-[var(--cds-text-primary)] uppercase mb-4">{item.title}</h3>
-                                    <p className="text-[var(--cds-text-secondary)]">{item.desc}</p>
+                                <div key={i} className="group border border-[var(--cds-layer-02)] p-8 hover:border-[var(--cds-interactive-01)] transition-colors cursor-pointer bg-[var(--cds-layer-01)]">
+                                    <div className="flex justify-between items-center mb-4">
+                                        <h3 className="text-2xl font-black uppercase tracking-tighter">{item.title}</h3>
+                                        <ChevronDown className="group-hover:rotate-180 transition-transform text-[var(--cds-interactive-01)]" />
+                                    </div>
+                                    <div className="space-y-4">
+                                        <p className="text-xl text-[var(--cds-text-secondary)]">{item.benefit}</p>
+                                        <div className="flex gap-4 text-sm font-bold uppercase tracking-wider">
+                                            <span className="text-[var(--cds-interactive-01)]">ROI: {item.roi}</span>
+                                        </div>
+                                        <div className="text-sm italic text-[var(--cds-text-secondary)] border-l-2 border-[var(--cds-layer-03)] pl-4">
+                                            {item.proof}
+                                        </div>
+                                    </div>
                                 </div>
                             ))}
+                        </div>
+
+                        {/* Interactive Demo Placeholder */}
+                        <div className="aspect-square bg-[var(--cds-layer-01)] border border-[var(--cds-layer-02)] relative flex items-center justify-center overflow-hidden">
+                            <div className="absolute inset-0 bg-[var(--cds-interactive-01)]/5" />
+                            <div className="text-center p-8">
+                                <div className="text-[10px] font-black uppercase tracking-[0.4em] text-[var(--cds-interactive-01)] mb-4">Live_Preview</div>
+                                <h3 className="text-4xl font-black uppercase mb-4">Generative Studio</h3>
+                                <p className="text-[var(--cds-text-secondary)] max-w-sm mx-auto mb-8">
+                                    Drag, drop, and watch Brand OS generate 50 on-brand variations in real-time.
+                                </p>
+                                <Button variant="primary" className="h-12 px-8 uppercase tracking-widest text-xs font-black">
+                                    Try Interactive Demo
+                                </Button>
+                            </div>
                         </div>
                     </div>
                 </div>
             </section>
 
-            {/* 4. REAL-TIME DEMO: THE CONTROL CENTER */}
-            <section id="control" className="py-64 px-8 relative border-t border-[var(--cds-layer-02)] transition-colors">
+            {/* 4. HOW IT WORKS: 3-STEP FLOW */}
+            <section className="py-24 px-8 bg-[var(--cds-interactive-01)] text-[var(--cds-text-on-color)]">
                 <div className="max-w-[1800px] mx-auto">
-                    <div className="grid grid-cols-1 lg:grid-cols-12 gap-32 items-center">
-                        <motion.div className="lg:col-span-4" {...fastFadeIn}>
-                            <div className="text-[10px] font-black text-[var(--cds-support-warning)] uppercase tracking-[0.4em] mb-6 font-mono">[ MODULE_TRX_04 ]</div>
-                            <h2 className="text-[clamp(4rem,7vw,9rem)] font-black tracking-tighter leading-[0.85] uppercase mb-16">
-                                Compliance <br /> Scoring.
-                            </h2>
-                            <p className="text-xl text-[var(--cds-text-secondary)] font-light leading-relaxed mb-12 max-w-md group-hover:text-foreground transition-colors">
-                                Stop revisions before they start. Watch the system audit every pixel against your Visual Doctrine in real-time.
-                            </p>
-                            <Button
-                                onClick={onLoginClick}
-                                variant="ghost"
-                                size="lg"
-                                className="bg-transparent border border-foreground/20 text-foreground hover:bg-foreground hover:text-background h-20 px-12 rounded-none text-[16px] font-black uppercase tracking-[0.2em] transition-all w-full relative group overflow-hidden"
-                            >
-                                <span className="relative z-10 flex items-center justify-center gap-4">
-                                    Initialize Audit <ArrowRight className="group-hover:translate-x-2 transition-transform" size={20} />
-                                </span>
-                                <div className="absolute inset-0 bg-foreground translate-x-[-101%] group-hover:translate-x-0 transition-transform duration-500 ease-[0.16,1,0.3,1] mix-blend-difference" />
-                            </Button>
-                        </motion.div>
+                    <motion.div {...fastFadeIn} className="mb-20 text-center">
+                        <h2 className="text-[clamp(3rem,6vw,7rem)] font-black tracking-tighter uppercase leading-none mb-6">
+                            Three Steps to <br /> Perfection.
+                        </h2>
+                    </motion.div>
 
-                        <motion.div
-                            initial={{ opacity: 0, x: 100 }}
-                            whileInView={{ opacity: 1, x: 0 }}
-                            transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
-                            className="lg:col-span-8 bg-[var(--cds-ui-background)] border border-[var(--cds-layer-03)] p-2 aura-glow relative group overflow-hidden hardware-accelerated"
-                        >
-                            {/* Technical Overlays */}
-                            <div className="scanline-effect opacity-20 pointer-events-none" />
-                            <div className="absolute inset-0 border border-[var(--cds-support-warning)]/10 pointer-events-none z-10 opacity-0 group-hover:opacity-100 transition-opacity" />
-
-                            <div className="h-14 bg-[var(--cds-ui-background)] border-b border-[var(--cds-layer-03)] flex items-center px-6 justify-between relative z-20">
-                                <div className="flex gap-3">
-                                    <div className="w-2.5 h-2.5 rounded-none bg-[var(--cds-support-warning)] scale-75" />
-                                    <div className="w-2.5 h-2.5 rounded-none bg-[var(--cds-support-warning)] scale-75 rotate-45" />
-                                    <div className="w-2.5 h-2.5 rounded-none bg-[var(--cds-support-success)] scale-75" />
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                        {[
+                            {
+                                step: "01",
+                                title: "Upload & Extract",
+                                desc: "Upload your existing assets. AI extracts your DNA (fonts, colors, vibe) in 60 seconds."
+                            },
+                            {
+                                step: "02",
+                                title: "Generate & Scale",
+                                desc: "Create perfect social posts, ads, and emails instantly. 10x your output."
+                            },
+                            {
+                                step: "03",
+                                title: "Audit & Optimize",
+                                desc: "Every pixel is scored. Track 92%+ consistency forever with automated guardrails."
+                            }
+                        ].map((item, i) => (
+                            <div key={i} className="relative p-12 border border-[var(--cds-text-on-color)]/20 hover:bg-[var(--cds-text-on-color)]/10 transition-colors group">
+                                <div className="text-[80px] font-black text-[var(--cds-text-on-color)]/10 absolute top-4 right-8 select-none leading-none">
+                                    {item.step}
                                 </div>
-                                <div className="flex items-center gap-8">
-                                    <div className="text-[10px] font-mono font-black text-[var(--cds-text-placeholder)] uppercase tracking-[0.4em]">system_active_v3.0.0</div>
-                                    <div className="h-4 w-[1px] bg-[var(--cds-layer-03)]" />
-                                    <div className="text-[10px] font-mono font-black text-[var(--cds-support-warning)] animate-pulse uppercase tracking-[0.2em]">Live Stream</div>
+                                <div className="relative z-10">
+                                    <h3 className="text-2xl font-black uppercase tracking-wide mb-6">{item.title}</h3>
+                                    <p className="text-[var(--cds-text-on-color)]/80 text-lg leading-relaxed">
+                                        {item.desc}
+                                    </p>
+                                </div>
+                                <div className="mt-8 w-12 h-1 bg-[var(--cds-text-on-color)]/20 group-hover:w-full transition-all duration-500" />
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            </section>
+
+            {/* 5. SOCIAL PROOF: RESULTS */}
+            <section className="py-24 px-8 border-t border-[var(--cds-layer-02)]">
+                <div className="max-w-[1800px] mx-auto">
+                    <motion.div {...fastFadeIn} className="mb-20 text-center">
+                        <h2 className="text-[clamp(2.5rem,5vw,5rem)] font-black tracking-tighter uppercase leading-none mb-6">
+                            Verified Results.
+                        </h2>
+                    </motion.div>
+
+                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                        {[
+                            {
+                                type: "SaaS Company",
+                                quote: "We were losing $8K/mo on design agency retainers. Brand OS replaced them in 2 weeks.",
+                                result: "$7,951/mo Saved",
+                                metric: "96% Consistency"
+                            },
+                            {
+                                type: "Marketing Agency",
+                                quote: "We now charge clients 30% more for 'Guaranteed Brand Consistency'. It's a no-brainer.",
+                                result: "+30% Revenue",
+                                metric: "8 New Clients"
+                            },
+                            {
+                                type: "FinTech Startup",
+                                quote: "Our Series A investors specifically praised our cohesive brand presence. We look like a unicorn.",
+                                result: "Series A Funded",
+                                metric: "Zero Brand Drift"
+                            }
+                        ].map((item, i) => (
+                            <div key={i} className="bg-[var(--cds-layer-01)] p-8 border border-[var(--cds-layer-02)] relative group hover:border-[var(--cds-text-primary)] transition-colors">
+                                <div className="text-[10px] font-black uppercase tracking-[0.2em] text-[var(--cds-text-secondary)] mb-6">{item.type}</div>
+                                <p className="text-xl font-light italic mb-8 opacity-80">"{item.quote}"</p>
+                                <div className="mt-auto border-t border-[var(--cds-layer-02)] pt-6">
+                                    <div className="text-2xl font-black uppercase text-[var(--cds-interactive-01)] mb-1">{item.result}</div>
+                                    <div className="text-sm font-bold text-[var(--cds-text-secondary)]">{item.metric}</div>
                                 </div>
                             </div>
+                        ))}
+                    </div>
+                </div>
+            </section>
 
-                            <div className="p-12 space-y-6 min-h-[600px] flex flex-col justify-end relative z-20">
-                                <AnimatePresence mode="popLayout">
-                                    {auditLogs.map((log) => (
-                                        <motion.div
-                                            key={log.id}
-                                            initial={{ opacity: 0, scale: 0.98, y: 15 }}
-                                            animate={{ opacity: 1, scale: 1, y: 0 }}
-                                            exit={{ opacity: 0, scale: 1.02, y: -15 }}
-                                            className="p-8 border border-[var(--cds-layer-03)] bg-[var(--cds-layer-01)]/80 backdrop-blur-md flex flex-wrap items-center justify-between gap-8 group/item hover:border-[var(--cds-support-warning)] transition-all relative overflow-hidden will-change-transform"
-                                        >
-                                            <div className="absolute top-0 left-0 w-[2px] h-0 bg-[var(--cds-support-warning)] group-hover/item:h-full transition-all duration-300" />
+            {/* 6. COMPARISON: BATTLE CARD */}
+            <section className="py-24 px-8 bg-[var(--cds-layer-01)] border-t border-[var(--cds-layer-02)]">
+                <div className="max-w-[1200px] mx-auto">
+                    <motion.div {...fastFadeIn} className="mb-20 text-center">
+                        <h2 className="text-[clamp(2.5rem,5vw,5rem)] font-black tracking-tighter uppercase leading-none mb-6">
+                            Brand OS vs. The Old Way.
+                        </h2>
+                    </motion.div>
 
-                                            <div className="flex items-center gap-8">
-                                                <div className="w-12 h-12 border border-[var(--cds-layer-03)] flex items-center justify-center font-mono text-[10px] text-[var(--cds-text-placeholder)] group-hover/item:border-[var(--cds-support-warning)]/50 group-hover/item:text-[var(--cds-support-warning)]">
-                                                    ID_{log.id}
-                                                </div>
-                                                <div>
-                                                    <div className="flex items-center gap-2 mb-1">
-                                                        <div className="w-1.5 h-1.5 bg-[var(--cds-support-warning)]" />
-                                                        <div className="text-[10px] font-black text-[var(--cds-support-warning)] uppercase tracking-[0.3em] font-mono">{log.task}</div>
-                                                    </div>
-                                                    <div className="text-2xl font-black uppercase tracking-tighter text-[var(--cds-text-primary)]">PROTOCOL_ENFORCEMENT</div>
-                                                </div>
-                                            </div>
-
-                                            <div className="flex items-center gap-16">
-                                                <div className="text-right hidden sm:block">
-                                                    <div className="text-[10px] font-black text-[var(--cds-text-placeholder)] uppercase tracking-[0.4em] mb-1">Hash_Key</div>
-                                                    <div className="text-[10px] font-mono text-[var(--cds-layer-03)]">SHA_256: 8C4B...77D0</div>
-                                                </div>
-
-                                                <div className="text-right">
-                                                    <div className="text-[10px] font-black text-[var(--cds-text-placeholder)] uppercase tracking-[0.4em] mb-1">Match</div>
-                                                    <div className="text-4xl font-black text-[var(--cds-text-primary)] tracking-tighter tabular-nums">{log.score}%</div>
-                                                </div>
-
-                                                <div className="px-6 py-2 bg-[var(--cds-support-success)]/10 border border-[var(--cds-support-success)]/30 text-[var(--cds-support-success)] text-[10px] font-black uppercase tracking-[0.3em] font-mono shadow-[0_0_15px_rgba(36,161,72,0.1)]">
-                                                    {log.status}_OK
-                                                </div>
-                                            </div>
-                                        </motion.div>
-                                    ))}
-                                </AnimatePresence>
-                                <div className="mt-12 flex justify-between items-center text-[var(--cds-text-placeholder)] font-mono text-[10px] uppercase tracking-[0.4em] font-black border-t border-[var(--cds-layer-01)] pt-8">
-                                    <div className="flex items-center gap-4">
-                                        <div className="flex gap-1">
-                                            {[1, 2, 3, 4].map(i => <div key={i} className="w-1 px-1 h-3 bg-[var(--cds-layer-01)] group-hover/item:bg-[var(--cds-support-warning)] transition-colors" style={{ transitionDelay: `${i * 100}ms` }} />)}
-                                        </div>
-                                        <span>[ ENCRYPTED_CHANNEL_OPEN ]</span>
-                                    </div>
-                                    <span className="flex items-center gap-3">
-                                        <span className="w-2 h-2 rounded-full bg-[var(--cds-support-success)] animate-ping" />
-                                        RE-SYNCING_ALL_NODES... [ v3.0.0 ]
-                                    </span>
-                                </div>
-                            </div>
-                        </motion.div>
+                    <div className="overflow-x-auto">
+                        <table className="w-full border-collapse">
+                            <thead>
+                                <tr className="border-b-2 border-[var(--cds-text-primary)]">
+                                    <th className="text-left py-6 px-4 text-sm font-black uppercase tracking-widest text-[var(--cds-text-secondary)]">Solution</th>
+                                    <th className="text-left py-6 px-4 text-sm font-black uppercase tracking-widest text-[var(--cds-text-secondary)]">Setup Time</th>
+                                    <th className="text-left py-6 px-4 text-sm font-black uppercase tracking-widest text-[var(--cds-text-secondary)]">Cost</th>
+                                    <th className="text-left py-6 px-4 text-sm font-black uppercase tracking-widest text-[var(--cds-text-secondary)]">Consistency</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr className="bg-[var(--cds-interactive-01)]/10 border-b border-[var(--cds-text-primary)]">
+                                    <td className="py-8 px-4 font-black uppercase text-xl text-[var(--cds-interactive-01)]">Brand OS</td>
+                                    <td className="py-8 px-4 font-bold">60 Seconds</td>
+                                    <td className="py-8 px-4 font-bold">$49/mo</td>
+                                    <td className="py-8 px-4 font-black text-[var(--cds-interactive-01)]">92%+ Guaranteed</td>
+                                </tr>
+                                <tr className="border-b border-[var(--cds-layer-02)] opacity-60 hover:opacity-100 transition-opacity">
+                                    <td className="py-6 px-4 font-bold">Manual Guidelines (PDF)</td>
+                                    <td className="py-6 px-4">2-4 Weeks</td>
+                                    <td className="py-6 px-4">$3K - $5K</td>
+                                    <td className="py-6 px-4">40-60% (Drift)</td>
+                                </tr>
+                                <tr className="border-b border-[var(--cds-layer-02)] opacity-60 hover:opacity-100 transition-opacity">
+                                    <td className="py-6 px-4 font-bold">Design Tools (Canva/Figma)</td>
+                                    <td className="py-6 px-4">Ongoing</td>
+                                    <td className="py-6 px-4">$30/user/mo</td>
+                                    <td className="py-6 px-4">50-70% (Manual)</td>
+                                </tr>
+                                <tr className="opacity-60 hover:opacity-100 transition-opacity">
+                                    <td className="py-6 px-4 font-bold">Creative Agency</td>
+                                    <td className="py-6 px-4">2+ Weeks</td>
+                                    <td className="py-6 px-4">$5K+/mo</td>
+                                    <td className="py-6 px-4">60-80% (Slow)</td>
+                                </tr>
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </section>
@@ -670,15 +450,15 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onLoginClick, onInfoCl
                 </div>
             </section>
 
-            {/* 5. TRUST & PRICING: THE NEW STANDARD */}
-            <section id="pricing" className="py-64 px-8 border-t border-[var(--cds-layer-02)] transition-colors">
+            {/* 7. PRICING: VALUE-BASED TEASER */}
+            <section id="pricing" className="py-24 px-8 border-t border-[var(--cds-layer-02)] transition-colors">
                 <div className="max-w-[1800px] mx-auto flex flex-col items-center">
-                    <motion.div {...fastFadeIn} className="text-center mb-24">
-                        <h2 className="text-[clamp(3rem,6vw,8rem)] font-black tracking-tighter uppercase leading-none mb-8">
-                            The New Standard.
+                    <motion.div {...fastFadeIn} className="text-center mb-20">
+                        <h2 className="text-[clamp(2.5rem,5vw,5rem)] font-black tracking-tighter uppercase leading-none mb-4">
+                            Pays for Itself in 11 Days.
                         </h2>
                         <p className="text-xl text-[var(--cds-text-secondary)] font-light max-w-4xl mx-auto">
-                            Used by forward-thinking teams to eliminate manual overhead and build the future of branding.
+                            Average customer saves <span className="text-foreground font-bold">$3,700/month</span>. Stop leaking revenue today.
                         </p>
                     </motion.div>
 
@@ -686,9 +466,9 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onLoginClick, onInfoCl
                         className="grid grid-cols-1 lg:grid-cols-3 gap-px bg-[var(--cds-layer-03)]/20 dark:bg-[var(--cds-layer-03)] border border-[var(--cds-layer-03)]/20 dark:border-[var(--cds-layer-03)] w-full"
                     >
                         {[
-                            { name: "Creator", price: "Free", desc: "Build your personal DNA.", color: "var(--cds-text-primary)" },
-                            { name: "Pro", price: "$49", desc: "For teams who want speed.", color: "var(--cds-interactive-01)" },
-                            { name: "Enterprise", price: "Custom", desc: "Total governance at scale.", color: "var(--cds-support-warning)" }
+                            { name: "Free", price: "Free", desc: "Proof it works. 1 brand, 20 assets/mo.", color: "var(--cds-text-primary)" },
+                            { name: "Pro", price: "$49", desc: "Costs less than 1 hour of agency time.", color: "var(--cds-interactive-01)", popular: true },
+                            { name: "Agency", price: "$249", desc: "Charge clients $1,000/mo for consistency.", color: "var(--cds-interactive-02)" }
                         ].map((plan, i) => (
                             <motion.div
                                 key={i}
@@ -699,7 +479,11 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onLoginClick, onInfoCl
                                 <div className="absolute top-0 left-0 w-full h-[1px] bg-foreground/10 group-hover:bg-[#f1c21b] transition-colors duration-500" style={{ backgroundColor: plan.color === 'var(--cds-text-primary)' ? 'var(--cds-text-primary)' : plan.color + '40' }} />
                                 <div className="absolute top-0 left-0 w-0 h-[1px] group-hover:w-full transition-all duration-700 ease-[0.16,1,0.3,1]" style={{ backgroundColor: plan.color }} />
 
-                                <div className="text-[10px] font-black uppercase tracking-[0.4em] text-[var(--cds-text-placeholder)] mb-8 group-hover:text-foreground transition-colors duration-500">Protocol_Tier_0{i + 1}</div>
+                                {plan.popular && (
+                                    <div className="absolute top-8 right-8 text-[10px] font-black uppercase tracking-widest bg-[var(--cds-interactive-01)] text-white px-3 py-1">Most Popular</div>
+                                )}
+
+                                <div className="text-[10px] font-black uppercase tracking-[0.4em] text-[var(--cds-text-placeholder)] mb-8 group-hover:text-foreground transition-colors duration-500">Tier_0{i + 1}</div>
                                 <h3 className="text-4xl font-black uppercase mb-2 tracking-tighter group-hover:translate-x-1 transition-transform duration-500">{plan.name}</h3>
                                 <div className="text-6xl font-black mb-10 tracking-tighter tabular-nums">{plan.price}<span className="text-sm opacity-30 tracking-normal font-normal">/mo</span></div>
                                 <p className="text-lg font-light text-[var(--cds-text-secondary)] mb-12 flex-1 leading-tight group-hover:text-foreground transition-colors duration-500">{plan.desc}</p>
@@ -721,7 +505,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onLoginClick, onInfoCl
                 </div>
             </section>
 
-            {/* FINAL CTA */}
+            {/* 8. FINAL CTA: RISK REVERSAL */}
             <section className="py-80 px-8 relative overflow-hidden flex flex-col items-center text-center hardware-accelerated">
                 <div className="absolute inset-0 bg-[var(--cds-interactive-01)] aura-glow z-0" />
                 <div className="mesh-gradient opacity-100 rotate-12 scale-150 relative z-0" />
@@ -732,15 +516,26 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onLoginClick, onInfoCl
                         whileInView={{ scale: 1, opacity: 1 }}
                         transition={{ duration: 0.8 }}
                     >
-                        <h2 className="text-[clamp(4rem,12vw,15rem)] font-black tracking-[-0.04em] leading-[0.8] uppercase mb-16 italic text-white">
-                            ACTIVATE <br /> THE DNA.
+                        <h2 className="text-[clamp(4rem,10vw,12rem)] font-black tracking-[-0.04em] leading-[0.8] uppercase mb-12 italic text-[var(--cds-text-on-color)]">
+                            Stop Losing <br /> Money.
                         </h2>
-                        <p className="text-3xl md:text-5xl font-light mb-24 opacity-90 max-w-4xl mx-auto leading-tight text-white/90">
-                            The future doesn't have PDFs. <br /> It has Brand OS.
+                        <p className="text-3xl md:text-5xl font-light mb-16 opacity-90 max-w-4xl mx-auto leading-tight text-[var(--cds-text-on-color)]/90">
+                            Start Scaling Your Brand Today.
                         </p>
-                        <Button onClick={onLoginClick} variant="primary" size="lg" className="bg-white !text-black hover:bg-white/90 h-24 px-24 rounded-none text-2xl font-black uppercase tracking-widest shadow-[0_0_100px_rgba(255,255,255,0.4)] transition-all hover:scale-110 active:scale-95">
-                            Initialize Now
-                        </Button>
+
+                        <div className="flex flex-col md:flex-row items-center justify-center gap-8 mb-12">
+                            <Button onClick={onCalculatorClick} variant="primary" size="lg" className="bg-[var(--cds-ui-background)] !text-[var(--cds-text-primary)] hover:bg-[var(--cds-ui-background)]/90 h-20 px-12 rounded-none text-xl font-black uppercase tracking-widest shadow-[0_0_50px_rgba(255,255,255,0.2)] transition-all hover:scale-105 active:scale-95">
+                                Calculate ROI (Free)
+                            </Button>
+                            <Button onClick={onLoginClick} variant="ghost" size="lg" className="border-2 border-[var(--cds-text-on-color)] text-[var(--cds-text-on-color)] hover:bg-[var(--cds-text-on-color)] hover:text-[var(--cds-interactive-01)] h-20 px-12 rounded-none text-xl font-black uppercase tracking-widest transition-all">
+                                Start Free Trial
+                            </Button>
+                        </div>
+
+                        <div className="flex items-center justify-center gap-2 text-[var(--cds-text-on-color)]/80 text-sm font-medium tracking-wide">
+                            <Shield size={16} />
+                            <span>30-Day Money-Back Guarantee. Save 10 hours or full refund.</span>
+                        </div>
                     </motion.div>
                 </div>
             </section>

@@ -44,37 +44,26 @@ export const SettingsLayout: React.FC<SettingsLayoutProps> = ({ onAuth }) => {
     return (
         <div className="flex flex-col h-full bg-background relative overflow-hidden">
             {/* Top Navigation Bar */}
-            <div className="w-full border-b border-border bg-card/30 backdrop-blur-md z-10">
-                <div className="w-full px-6 md:px-10 pt-1.5 pb-2">
-                    <div className="flex flex-col gap-2">
-                        <div className="h-1" />
+            {/* Top Navigation Bar - Carbon Style */}
+            <div className="w-full bg-background border-b border-border z-10 pt-8 px-8 md:px-12">
+                <h1 className="text-3xl font-light tracking-tight mb-8">Settings</h1>
 
-                        <div className="flex items-center gap-1 overflow-x-auto custom-scrollbar pb-1 -mx-4 px-4 md:px-0">
-                            {MENU.map((item) => (
-                                <button
-                                    key={item.id}
-                                    onClick={() => setActiveSection(item.id as SettingsSection)}
-                                    className={`
-                                        relative flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-medium transition-all duration-300 whitespace-nowrap
-                                        ${activeSection === item.id
-                                            ? 'bg-primary text-primary-foreground shadow-lg shadow-primary/20 ring-1 ring-primary/20'
-                                            : 'text-muted-foreground hover:bg-muted/50 hover:text-foreground'
-                                        }
-                                    `}
-                                >
-                                    <item.icon size={14} strokeWidth={activeSection === item.id ? 2.5 : 2} />
-                                    <span>{item.label}</span>
-                                    {activeSection === item.id && (
-                                        <motion.div
-                                            layoutId="activeTab"
-                                            className="absolute inset-0 bg-primary/10 rounded-full -z-10 mix-blend-multiply opacity-0"
-                                        // Handled by CSS class but kept for potential future layout anims
-                                        />
-                                    )}
-                                </button>
-                            ))}
-                        </div>
-                    </div>
+                <div className="flex items-center gap-8 overflow-x-auto custom-scrollbar">
+                    {MENU.map((item) => (
+                        <button
+                            key={item.id}
+                            onClick={() => setActiveSection(item.id as SettingsSection)}
+                            className={`
+                                relative flex items-center gap-2 pb-3 text-sm font-medium transition-colors whitespace-nowrap
+                                ${activeSection === item.id
+                                    ? 'text-primary border-b-2 border-primary'
+                                    : 'text-muted-foreground hover:text-foreground border-b-2 border-transparent'
+                                }
+                            `}
+                        >
+                            <span>{item.label}</span>
+                        </button>
+                    ))}
                 </div>
             </div>
 

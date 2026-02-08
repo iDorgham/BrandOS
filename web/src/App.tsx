@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { Box, Zap } from 'lucide-react';
-import { Sidebar, Header } from './components/layout';
+import { Sidebar, Header, SiteHeader } from './components/layout';
 import { AuthGuard } from './components/auth/Auth';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { SettingsProvider, useSettings } from './contexts/SettingsContext';
@@ -12,7 +13,7 @@ import { Toaster } from 'sonner';
 import { ErrorBoundary } from './components/common/ErrorBoundary';
 import { CookiesPolicyPopup } from './components/common/CookiesPolicyPopup';
 import { InfoPage, InfoTopic } from './features/info/InfoPage';
-import { ProductPage, ProductSlug } from './features/info/ProductPage';
+import { ProductSlug } from './features/info/ProductPage';
 import { CompanySlug } from './features/info/CompanyPage';
 import { ResourcesPage, ResourcesSlug } from './features/info/ResourcesPage';
 
@@ -31,16 +32,72 @@ const AuditView = React.lazy(() => import('./features/audit/AuditView').then(m =
 const AnalyticsView = React.lazy(() => import('./features/analytics/AnalyticsView').then(m => ({ default: m.AnalyticsView })));
 const IdentityView = React.lazy(() => import('./features/identity/IdentityView').then(m => ({ default: m.IdentityView })));
 const LandingPage = React.lazy(() => import('./features/landing/LandingPage').then(m => ({ default: m.LandingPage })));
+const SolutionPage = React.lazy(() => import('./features/info/SolutionPage').then(m => ({ default: m.SolutionPage })));
+const IndustriesPage = React.lazy(() => import('./features/info/IndustriesPage').then(m => ({ default: m.IndustriesPage })));
+const CaseStudiesPage = React.lazy(() => import('./features/info/CaseStudiesPage').then(m => ({ default: m.CaseStudiesPage })));
+const PricingPage = React.lazy(() => import('./features/info/PricingPage').then(m => ({ default: m.PricingPage })));
 const CompanyPage = React.lazy(() => import('./features/info/CompanyPage').then(m => ({ default: m.CompanyPage })));
+const ROICalculator = React.lazy(() => import('./features/calculator/ROICalculator').then(m => ({ default: m.ROICalculator })));
+const OnboardingWizard = React.lazy(() => import('./features/onboarding/OnboardingWizard').then(m => ({ default: m.OnboardingWizard })));
 
 // Loading component for Suspense
 const ViewLoader = () => (
-    <div className="flex-1 flex items-center justify-center bg-background/50 backdrop-blur-sm">
-        <div className="flex flex-col items-center gap-4">
-            <Zap className="w-8 h-8 text-primary animate-pulse" />
-            <div className="text-[10px] font-mono uppercase tracking-[0.2em] text-primary/60">
-                Initializing Protocol...
+    <div className="fixed inset-0 w-screen h-screen flex items-center justify-center bg-[var(--cds-ui-background)] z-[1000] overflow-hidden">
+        <div className="absolute inset-0 mesh-gradient opacity-20 pointer-events-none" />
+        <div className="flex flex-col items-center gap-8 relative z-10">
+            <motion.div
+                initial={{ scale: 0.8, opacity: 0 }}
+                animate={{ scale: [0.8, 1.1, 1], opacity: 1 }}
+                transition={{ duration: 1.5, ease: "easeOut" }}
+                className="relative"
+            >
+                {/* Rotating Technical Ring */}
+                <motion.div
+                    animate={{ rotate: 360 }}
+                    transition={{ duration: 10, repeat: Infinity, ease: "linear" }}
+                    className="absolute -inset-8 border-[1px] border-dashed border-[var(--cds-interactive-01)]/30 rounded-full"
+                />
+                <motion.div
+                    animate={{ rotate: -360 }}
+                    transition={{ duration: 15, repeat: Infinity, ease: "linear" }}
+                    className="absolute -inset-12 border-[1px] border-dotted border-[var(--cds-layer-03)] rounded-full"
+                />
+
+                <div className="w-16 h-16 bg-[var(--cds-interactive-01)] flex items-center justify-center aura-glow relative z-10">
+                    <Zap className="text-[var(--cds-text-on-color)]" size={32} fill="currentColor" />
+                </div>
+            </motion.div>
+
+            <div className="flex flex-col items-center gap-2">
+                <motion.div
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.5 }}
+                    className="text-[12px] font-black font-mono uppercase tracking-[0.4em] text-[var(--cds-text-primary)]"
+                >
+                    Initializing Protocol
+                </motion.div>
+                <div className="flex items-center gap-2">
+                    {[0, 1, 2].map((i) => (
+                        <motion.div
+                            key={i}
+                            animate={{ opacity: [0.2, 1, 0.2] }}
+                            transition={{ duration: 1, repeat: Infinity, delay: i * 0.2 }}
+                            className="w-1 h-1 bg-[var(--cds-interactive-01)]"
+                        />
+                    ))}
+                </div>
             </div>
+
+            {/* Subtle Technical readout */}
+            <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 0.4 }}
+                transition={{ delay: 1 }}
+                className="absolute bottom-[-100px] text-[8px] font-mono text-[var(--cds-text-secondary)] whitespace-nowrap tracking-widest uppercase"
+            >
+                System.Status: Nominal // Kernel.Link: Secured // DNA.Buffer: Syncing
+            </motion.div>
         </div>
     </div>
 );
@@ -57,6 +114,10 @@ const AppContent: React.FC = () => {
     const [productView, setProductView] = useState<ProductSlug | null>(null);
     const [companyView, setCompanyView] = useState<CompanySlug | null>(null);
     const [resourcesView, setResourcesView] = useState<ResourcesSlug | null>(null);
+    const [calculatorView, setCalculatorView] = useState(false);
+    const [industriesView, setIndustriesView] = useState(false);
+    const [caseStudiesView, setCaseStudiesView] = useState(false);
+    const [pricingView, setPricingView] = useState(false);
 
     // Reset header actions when tab changes
     useEffect(() => {
@@ -158,48 +219,129 @@ const AppContent: React.FC = () => {
             setProductView(null);
             setCompanyView(null);
             setResourcesView(null);
+            setCalculatorView(false);
+            setIndustriesView(false);
+            setCaseStudiesView(false);
+            setPricingView(false);
         }
     }, [user]);
+
+    const handleNavigate = (view: 'landing' | 'products' | 'industries' | 'results' | 'pricing' | 'company' | 'resources' | 'calculator' | 'auth', params?: any) => {
+        // Reset all views first
+        setProductView(null);
+        setIndustriesView(false);
+        setCaseStudiesView(false);
+        setPricingView(false);
+        setCompanyView(null);
+        setResourcesView(null);
+        setCalculatorView(false);
+        setInfoView(null);
+        setShowAuth(false);
+
+        // Set specific view
+        switch (view) {
+            case 'products': setProductView(params); break;
+            case 'industries': setIndustriesView(true); break;
+            case 'results': setCaseStudiesView(true); break;
+            case 'pricing': setPricingView(true); break;
+            case 'company': setCompanyView(params); break;
+            case 'resources': setResourcesView(params); break;
+            case 'calculator': setCalculatorView(true); break;
+            case 'auth': setShowAuth(true); break;
+            case 'landing': break; // All reset
+        }
+    };
 
     if (loading) {
         return <ViewLoader />;
     }
 
     if (!user) {
+        // Determine if we need dark mode header (for dark pages like Industries)
+        const isDarkPage = industriesView || caseStudiesView || pricingView;
+
         return (
             <React.Suspense fallback={<ViewLoader />}>
+                {!showAuth && (
+                    <SiteHeader
+                        onLoginClick={() => handleNavigate('auth')}
+                        onProductClick={(slug) => handleNavigate('products', slug)}
+                        onCompanyClick={(slug) => handleNavigate('company', slug)}
+                        onResourcesClick={(slug) => handleNavigate('resources', slug)}
+                        onIndustriesClick={() => handleNavigate('industries')}
+                        onCaseStudiesClick={() => handleNavigate('results')}
+                        onPricingClick={() => handleNavigate('pricing')}
+                        dark={isDarkPage}
+                    />
+                )}
+
                 {productView ? (
-                    <ProductPage
-                        slug={productView}
-                        onBack={() => setProductView(null)}
-                        onLoginClick={() => setShowAuth(true)}
-                        onNavigate={(slug) => setProductView(slug)}
+                    <SolutionPage
+                        initialTab={
+                            productView === 'identity' || productView === 'doctrine' ? 'dna' :
+                                productView === 'studio' ? 'generate' :
+                                    'audit'
+                        }
+                        onBack={() => handleNavigate('landing')}
+                        onLoginClick={() => handleNavigate('auth')}
+                    />
+                ) : calculatorView ? (
+                    <ROICalculator
+                        onSignup={() => handleNavigate('auth')}
+                        onBack={() => handleNavigate('landing')}
+                    />
+                ) : industriesView ? (
+                    <IndustriesPage
+                        onBack={() => handleNavigate('landing')}
+                        onLoginClick={() => handleNavigate('auth')}
+                    />
+                ) : caseStudiesView ? (
+                    <CaseStudiesPage
+                        onBack={() => handleNavigate('landing')}
+                        onLoginClick={() => handleNavigate('auth')}
+                    />
+                ) : pricingView ? (
+                    <PricingPage
+                        onBack={() => handleNavigate('landing')}
+                        onLoginClick={() => handleNavigate('auth')}
                     />
                 ) : companyView ? (
                     <CompanyPage
                         slug={companyView}
-                        onBack={() => setCompanyView(null)}
-                        onNavigate={(slug) => setCompanyView(slug)}
+                        onBack={() => handleNavigate('landing')}
+                        onNavigate={(slug) => handleNavigate('company', slug)}
                     />
                 ) : resourcesView ? (
                     <ResourcesPage
                         slug={resourcesView}
-                        onBack={() => setResourcesView(null)}
-                        onNavigate={(slug) => setResourcesView(slug)}
+                        onBack={() => handleNavigate('landing')}
+                        onNavigate={(slug) => handleNavigate('resources', slug)}
                     />
                 ) : infoView ? (
                     <InfoPage topic={infoView} onBack={() => setInfoView(null)} />
                 ) : showAuth ? (
-                    <AuthGuard onBack={() => setShowAuth(false)} />
+                    <AuthGuard onBack={() => handleNavigate('landing')} />
                 ) : (
                     <LandingPage
-                        onLoginClick={() => setShowAuth(true)}
+                        onLoginClick={() => handleNavigate('auth')}
                         onInfoClick={(topic: InfoTopic) => setInfoView(topic)}
-                        onProductClick={(slug: ProductSlug) => setProductView(slug)}
-                        onCompanyClick={(slug: CompanySlug) => setCompanyView(slug)}
-                        onResourcesClick={(slug: ResourcesSlug) => setResourcesView(slug)}
+                        onProductClick={(slug: ProductSlug) => handleNavigate('products', slug)}
+                        onCompanyClick={(slug: CompanySlug) => handleNavigate('company', slug)}
+                        onResourcesClick={(slug: ResourcesSlug) => handleNavigate('resources', slug)}
+                        onCalculatorClick={() => handleNavigate('calculator')}
+                        onIndustriesClick={() => handleNavigate('industries')}
+                        onCaseStudiesClick={() => handleNavigate('results')}
+                        onPricingClick={() => handleNavigate('pricing')}
                     />
                 )}
+            </React.Suspense>
+        );
+    }
+
+    if (brands.length === 0 && !loading) {
+        return (
+            <React.Suspense fallback={<ViewLoader />}>
+                <OnboardingWizard />
             </React.Suspense>
         );
     }

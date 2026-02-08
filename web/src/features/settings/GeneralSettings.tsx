@@ -47,11 +47,7 @@ export const GeneralSettings = () => {
     if (!activeWorkspace) return null;
 
     return (
-        <div className="space-y-4 animate-in fade-in slide-in-from-bottom-4 duration-500 w-full">
-            <div className="flex flex-col gap-0.5 mb-1">
-                <h2 className="text-xl font-display font-black tracking-tighter">General Settings</h2>
-                <p className="text-muted-foreground text-[10px] font-medium opacity-60">Manage workspace identity and monitor system infrastructure.</p>
-            </div>
+        <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500 w-full">
 
             {/* --- System Telemetry Section (Merged) --- */}
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">

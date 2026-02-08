@@ -233,7 +233,13 @@ export const DashboardView: React.FC<DashboardViewProps> = React.memo(({
                     </Card>
 
                     {/* 3. Real-Time Telemetry & Visual Analysis (4/12) */}
-                    <Card className="lg:col-span-4 p-5 bg-card backdrop-blur-sm border border-border flex flex-col justify-between rounded-sm">
+                    <Card className="lg:col-span-4 p-5 bg-card backdrop-blur-sm border border-border flex flex-col justify-between rounded-sm relative overflow-hidden">
+                        {selectedBrand.doctrine?.match(/\[ROI_GOAL: (.*?)\]/) && (
+                            <div className="absolute top-4 left-4 z-10 bg-[var(--cds-layer-01)]/80 backdrop-blur px-3 py-1.5 rounded-sm border border-[var(--cds-support-success)]/30 flex items-center gap-2">
+                                <span className="text-[9px] uppercase tracking-wider text-[var(--cds-support-success)] font-black">Target</span>
+                                <span className="text-[11px] font-mono font-bold">{selectedBrand.doctrine.match(/\[ROI_GOAL: (.*?)\]/)![1]}</span>
+                            </div>
+                        )}
                         <div className="h-full w-full">
                             <DNAVisualization
                                 brand={selectedBrand}
