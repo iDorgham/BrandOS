@@ -68,4 +68,5 @@ export const Skeleton = ({ className, ...props }: React.HTMLAttributes<HTMLDivEl
 
 export * from './EmptyState';
 export * from './Switch';
+export * from './ThemeToggle';
 

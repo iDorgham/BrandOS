@@ -34,16 +34,62 @@ html {
     --mega-title-lg: 10rem;
     --mega-title-weight: 600;
 
+    /* Landing Specific */
+    --landing-bg: #000000;
+    --landing-text: #f4f4f4;
+    --landing-accent: #0f62fe;
+    --landing-grid: rgba(255, 255, 255, 0.05);
+
+    /* Carbon Design System - Gray 100 Theme Tokens */
+    --cds-text-primary: #f4f4f4;
+    --cds-text-secondary: #c6c6c6;
+    --cds-text-placeholder: #525252;
+    --cds-link-primary: #0f62fe;
+    --cds-link-primary-hover: #0043ce;
+    --cds-icon-primary: #f4f4f4;
+    --cds-icon-secondary: #c6c6c6;
+    --cds-support-error: #da1e28;
+    --cds-support-success: #24a148;
+    --cds-support-warning: #f1c21b;
+    --cds-support-info: #4589ff;
+    --cds-layer-01: #161616;
+    --cds-layer-02: #262626;
+    --cds-layer-03: #393939;
+    --cds-layer-selected: #393939;
+    --cds-layer-hover: #353535;
+    --cds-interactive-01: #0f62fe;
+    /* Primary */
+    --cds-interactive-02: #393939;
+    /* Secondary */
+    --cds-interactive-03: #0f62fe;
+    /* Tertiary */
+    --cds-interactive-04: #d12771;
+    /* Danger */
+    --cds-ui-background: #161616;
+
     /* Carbon Table & UI Shell */
     --carbon-table-header: #262626;
     --carbon-table-border: #393939;
     --carbon-table-row-hover: #353535;
+
+    transition: background-color 0.4s cubic-bezier(0.16, 1, 0.3, 1), color 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .light {
+    --landing-bg: #f4f4f4;
+    --landing-text: #161616;
+    --landing-grid: rgba(0, 0, 0, 0.05);
+    --carbon-table-header: #e0e0e0;
+    --carbon-table-border: #dde1e6;
   }
 
   body {
     @apply bg-background text-foreground;
+    background-color: var(--landing-bg);
+    color: var(--landing-text);
     font-family: 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     font-feature-settings: "rlig" 1, "calt" 1;
+    overflow-x: hidden;
   }
 }
 
@@ -77,8 +123,8 @@ html {
       radial-gradient(at 100% 0%, hsla(230, 100%, 15%, 1) 0, transparent 50%),
       radial-gradient(at 100% 100%, hsla(240, 100%, 10%, 1) 0, transparent 50%),
       radial-gradient(at 0% 100%, hsla(225, 100%, 15%, 1) 0, transparent 50%);
-    filter: blur(100px);
-    opacity: 0.6;
+    filter: blur(80px);
+    opacity: 0.5;
   }
 
   /* Glow Utilities */
@@ -109,6 +155,20 @@ html {
   .no-scrollbar {
     -ms-overflow-style: none;
     scrollbar-width: none;
+  }
+
+  .will-change-transform {
+    will-change: transform;
+  }
+
+  .will-change-opacity {
+    will-change: opacity;
+  }
+
+  .hardware-accelerated {
+    transform: translate3d(0, 0, 0);
+    backface-visibility: hidden;
+    perspective: 1000;
   }
 }
 
