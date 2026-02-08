@@ -10,8 +10,11 @@ import { useSupabaseBrands, useSupabaseAssets, useSupabasePromptHistory } from '
 import { useTheme } from './contexts/ThemeContext';
 import { Toaster } from 'sonner';
 import { ErrorBoundary } from './components/common/ErrorBoundary';
+import { CookiesPolicyPopup } from './components/common/CookiesPolicyPopup';
 import { InfoPage, InfoTopic } from './features/info/InfoPage';
 import { ProductPage, ProductSlug } from './features/info/ProductPage';
+import { CompanySlug } from './features/info/CompanyPage';
+import { ResourcesPage, ResourcesSlug } from './features/info/ResourcesPage';
 
 // Lazy load feature views for performance
 const ProfileView = React.lazy(() => import('./features/profile/ProfileView').then(m => ({ default: m.ProfileView })));
@@ -28,6 +31,7 @@ const AuditView = React.lazy(() => import('./features/audit/AuditView').then(m =
 const AnalyticsView = React.lazy(() => import('./features/analytics/AnalyticsView').then(m => ({ default: m.AnalyticsView })));
 const IdentityView = React.lazy(() => import('./features/identity/IdentityView').then(m => ({ default: m.IdentityView })));
 const LandingPage = React.lazy(() => import('./features/landing/LandingPage').then(m => ({ default: m.LandingPage })));
+const CompanyPage = React.lazy(() => import('./features/info/CompanyPage').then(m => ({ default: m.CompanyPage })));
 
 // Loading component for Suspense
 const ViewLoader = () => (
@@ -51,6 +55,8 @@ const AppContent: React.FC = () => {
     const [showAuth, setShowAuth] = useState(false);
     const [infoView, setInfoView] = useState<InfoTopic | null>(null);
     const [productView, setProductView] = useState<ProductSlug | null>(null);
+    const [companyView, setCompanyView] = useState<CompanySlug | null>(null);
+    const [resourcesView, setResourcesView] = useState<ResourcesSlug | null>(null);
 
     // Reset header actions when tab changes
     useEffect(() => {
@@ -150,6 +156,8 @@ const AppContent: React.FC = () => {
             setShowAuth(false);
             setInfoView(null);
             setProductView(null);
+            setCompanyView(null);
+            setResourcesView(null);
         }
     }, [user]);
 
@@ -165,6 +173,19 @@ const AppContent: React.FC = () => {
                         slug={productView}
                         onBack={() => setProductView(null)}
                         onLoginClick={() => setShowAuth(true)}
+                        onNavigate={(slug) => setProductView(slug)}
+                    />
+                ) : companyView ? (
+                    <CompanyPage
+                        slug={companyView}
+                        onBack={() => setCompanyView(null)}
+                        onNavigate={(slug) => setCompanyView(slug)}
+                    />
+                ) : resourcesView ? (
+                    <ResourcesPage
+                        slug={resourcesView}
+                        onBack={() => setResourcesView(null)}
+                        onNavigate={(slug) => setResourcesView(slug)}
                     />
                 ) : infoView ? (
                     <InfoPage topic={infoView} onBack={() => setInfoView(null)} />
@@ -175,6 +196,8 @@ const AppContent: React.FC = () => {
                         onLoginClick={() => setShowAuth(true)}
                         onInfoClick={(topic: InfoTopic) => setInfoView(topic)}
                         onProductClick={(slug: ProductSlug) => setProductView(slug)}
+                        onCompanyClick={(slug: CompanySlug) => setCompanyView(slug)}
+                        onResourcesClick={(slug: ResourcesSlug) => setResourcesView(slug)}
                     />
                 )}
             </React.Suspense>
@@ -310,6 +333,7 @@ const App: React.FC = () => {
     return (
         <AuthProvider>
             <SettingsProvider>
+                <CookiesPolicyPopup />
                 <AppContent />
             </SettingsProvider>
         </AuthProvider>
