@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Box, Zap } from 'lucide-react';
-import { Sidebar, Header, SiteHeader } from './components/layout';
+import { Sidebar, Header, SiteHeader, BottomNav } from './components/layout';
 import { AuthGuard } from './components/auth/Auth';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { SettingsProvider, useSettings } from './contexts/SettingsContext';
@@ -354,7 +354,7 @@ const AppContent: React.FC = () => {
             />
 
             <main
-                className={`flex-1 min-w-0 flex flex-col transition-all duration-500 ease-in-out ${isSidebarCollapsed ? 'ml-[48px]' : 'ml-[48px] md:ml-[240px]'}`}
+                className={`flex-1 min-w-0 flex flex-col transition-all duration-500 ease-in-out ${isSidebarCollapsed ? 'ml-[48px]' : 'ml-0 md:ml-[48px] lg:ml-[240px]'}`}
             >
                 <Header
                     activeTab={activeTab}
@@ -368,8 +368,8 @@ const AppContent: React.FC = () => {
                     ${['moodboard'].includes(activeTab)
                         ? 'p-0 max-w-none overflow-hidden h-full'
                         : ['dashboard', 'library', 'profile', 'identity', 'doctrine', 'creative', 'training', 'audit', 'analytics', 'team', 'deployment', 'settings'].includes(activeTab)
-                            ? 'p-0 max-w-none overflow-y-auto custom-scrollbar h-full'
-                            : 'p-6 md:p-10 w-full max-w-[2400px] overflow-y-auto custom-scrollbar'
+                            ? 'p-0 max-w-none overflow-y-auto custom-scrollbar h-full pb-20 md:pb-0'
+                            : 'p-4 md:p-10 w-full max-w-[2400px] overflow-y-auto custom-scrollbar pb-24 md:pb-10'
                     }
                 `}>
                     <ErrorBoundary>
@@ -463,6 +463,7 @@ const AppContent: React.FC = () => {
                     </ErrorBoundary>
                 </div>
             </main>
+            <BottomNav activeTab={activeTab} onTabChange={setActiveTab} />
         </div>
     );
 };

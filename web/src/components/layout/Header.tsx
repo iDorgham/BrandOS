@@ -103,18 +103,18 @@ export const Header: React.FC<HeaderProps> = ({ activeTab, activeBrand, onNaviga
                         {actions}
                     </div>
                 )}
-                <div className="flex items-center gap-4">
-                    {activeTab !== 'moodboard' && <WorkspaceSwitcher />}
+                <div className="flex items-center gap-2 md:gap-4">
+                    {activeTab !== 'moodboard' && <div className="hidden sm:block"><WorkspaceSwitcher /></div>}
 
                     {/* Active Identity Indicator */}
                     {activeTab !== 'moodboard' && <div className="h-6 w-px bg-border/40 hidden md:block" />}
 
                     {activeTab !== 'moodboard' && (
                         <div className="flex items-center gap-2 px-1">
-                            <span className="text-[10px] font-medium text-muted-foreground/60">Active Identity</span>
-                            <div className="flex items-center gap-2 px-2.5 py-1 rounded-sm border border-border/60 bg-muted/20 hover:bg-muted/30 transition-colors cursor-default">
-                                <ShieldCheck size={13} className="text-primary" />
-                                <span className="text-[12px] font-medium text-foreground truncate max-w-[150px]">
+                            <span className="text-[10px] font-medium text-muted-foreground/60 hidden md:block">Active Identity</span>
+                            <div className="flex items-center gap-2 px-2 py-1 rounded-sm border border-border/60 bg-muted/20 hover:bg-muted/30 transition-colors cursor-default">
+                                <ShieldCheck size={12} className="text-primary" />
+                                <span className="text-[11px] font-medium text-foreground truncate max-w-[100px] md:max-w-[150px]">
                                     {activeBrand?.name || 'No Identity'}
                                 </span>
                             </div>

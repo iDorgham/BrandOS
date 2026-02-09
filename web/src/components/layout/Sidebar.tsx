@@ -52,8 +52,8 @@ export const Sidebar: React.FC<SidebarProps> = ({ activeTab, onTabChange, isColl
     return (
         <aside
             className={`
-                h-screen border-r border-border flex flex-col fixed left-0 top-0 z-50 bg-background transition-all duration-300 ease-in-out
-                ${isCollapsed ? 'w-[48px]' : 'w-[48px] md:w-[240px]'}
+                h-screen border-r border-border flex flex-col fixed left-0 top-0 z-50 bg-background transition-all duration-300 ease-in-out hidden md:flex
+                ${isCollapsed ? 'w-[48px]' : 'w-[240px]'}
             `}
         >
             <div className={`flex items-center gap-3 h-14 mb-6 ${isCollapsed ? 'justify-center px-0' : 'px-4'}`}>
