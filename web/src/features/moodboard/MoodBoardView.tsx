@@ -154,20 +154,26 @@ const NodeContainer = ({ children, selected, title, icon: Icon, typeColor, onEdi
       {isActive && resizer}
       {isActive && handles}
 
+      {/* Top Header - Color coded from map */}
+      <div className={`
+        h-1.5 w-full bg-opacity-80 transition-opacity duration-300
+        ${typeColor}
+      `} />
+
       {/* Window Title Bar */}
       <div className={`
-        flex items-center justify-between px-3 py-1.5 border-b border-border/20
+        flex items-center justify-between px-3 py-2 border-b border-border/20
         ${selected ? 'bg-primary/10' : 'bg-muted/5'}
         transition-colors duration-500
       `}>
-        <div className="flex items-center gap-2.5">
+        <div className="flex-1 flex items-center gap-2.5 min-w-0">
           <button
             onClick={(e) => {
               e.stopPropagation();
               data.onChange?.(id, { isActive: !isActive });
             }}
             className={`
-              p-1 rounded-none transition-all duration-300 group/power
+              p-1 rounded-none transition-all duration-300 group/power shrink-0
               ${isActive ? 'bg-primary/10 text-primary border border-primary/20' : 'bg-muted/20 text-muted-foreground/40 border border-border/20 grayscale-0'}
               hover:scale-110 active:scale-95
             `}
@@ -175,35 +181,33 @@ const NodeContainer = ({ children, selected, title, icon: Icon, typeColor, onEdi
           >
             <Power size={8} strokeWidth={3} className={isActive ? 'drop-shadow-[0_0_5px_rgba(15,98,254,0.5)]' : ''} />
           </button>
-          <div className="w-[1px] h-3 bg-border/20 mx-1" />
-          <div className={`
-            p-1 rounded-none ${typeColor} bg-opacity-10 ring-1 ring-inset ring-black/5 dark:ring-white/5 
-             shadow-sm transition-transform duration-500 group-hover/node:scale-110
-          `}>
-            <Icon className={typeColor.replace('bg-', 'text-')} size={10} strokeWidth={2.5} />
-          </div>
-          <div className="flex flex-col">
-            <span className="text-[9px] font-black uppercase tracking-[0.2em] text-foreground/80 font-display leading-tight">
-              {isEditing ? 'SYNC_ACTIVE' : title}
-            </span>
+
+          <div className="flex flex-col flex-1 min-w-0">
+            <input
+              value={data.label}
+              onChange={(e) => data.onChange?.(id, { label: e.target.value })}
+              className="bg-transparent border-none outline-none text-[10px] font-black uppercase tracking-[0.15em] text-foreground/90 font-display leading-tight w-full hover:bg-foreground/5 focus:bg-foreground/10 px-1 -ml-1 transition-colors"
+              onClick={(e) => e.stopPropagation()}
+            />
             {data?.type && (
-              <span className="text-[6px] font-mono font-bold text-primary/30 group-hover/node:text-primary/60 transition-colors -mt-0.5 uppercase">
+              <span className="text-[6px] font-mono font-bold text-primary/30 group-hover/node:text-primary/60 transition-colors uppercase px-1">
                 MOD::{data.type}
               </span>
             )}
           </div>
         </div>
 
-        <div className="flex items-center gap-2">
-          <div className="flex gap-1.5 opacity-10 group-hover/node:opacity-40 transition-opacity">
-            <div className="w-1.5 h-1.5 border border-foreground/30 rounded-none transform rotate-45" />
-            <div className="w-1.5 h-1.5 border border-foreground/30 rounded-none transform rotate-45" />
-            <div className="w-1.5 h-1.5 border border-foreground/30 rounded-none transform rotate-45" />
+        <div className="flex items-center gap-2 shrink-0">
+          <div className={`
+            p-1 rounded-none ${typeColor} bg-opacity-10 ring-1 ring-inset ring-black/5 dark:ring-white/5 
+             shadow-sm transition-transform duration-500 group-hover/node:scale-110
+          `}>
+            <Icon className={typeColor.replace('bg-', 'text-')} size={10} strokeWidth={2.5} />
           </div>
           {isActive && (
             <button
               onClick={onEdit}
-              className="p-1 hover:bg-primary/10 rounded-none transition-all text-muted-foreground/30 hover:text-primary opacity-0 group-hover/node:opacity-100 ml-2"
+              className="p-1 hover:bg-primary/10 rounded-none transition-all text-muted-foreground/30 hover:text-primary opacity-0 group-hover/node:opacity-100 ml-1"
               title="Adjust Parameters"
             >
               <Edit3 size={11} />
@@ -1941,25 +1945,28 @@ const MoodBoardViewContent = React.memo<MoodBoardViewProps>(({ brand, setHeaderA
                       ))}
                     </div>
 
-                    {/* Secondary Actions */}
-                    <div className="flex flex-col gap-1 pt-3 border-t border-border/20">
+                    {/* Secondary Actions - Icons only row */}
+                    <div className="flex items-center gap-2 pt-3 border-t border-border/20 px-1">
                       <button
                         onClick={onShare}
-                        className="w-full flex items-center gap-2 h-7 px-2 text-[8px] font-mono font-bold tracking-widest uppercase text-muted-foreground/60 hover:text-foreground hover:bg-muted/20 transition-all rounded-none"
+                        className="flex-1 flex items-center justify-center h-8 bg-muted/20 hover:bg-muted/30 border border-border/40 hover:border-primary/40 transition-all text-muted-foreground/60 hover:text-primary"
+                        title="Share Moodboard"
                       >
-                        <Share2 size={10} /> Share
+                        <Share2 size={12} />
                       </button>
                       <button
                         onClick={onExport}
-                        className="w-full flex items-center gap-2 h-7 px-2 text-[8px] font-mono font-bold tracking-widest uppercase text-muted-foreground/60 hover:text-foreground hover:bg-muted/20 transition-all rounded-none"
+                        className="flex-1 flex items-center justify-center h-8 bg-muted/20 hover:bg-muted/30 border border-border/40 hover:border-primary/40 transition-all text-muted-foreground/60 hover:text-primary"
+                        title="Export Matrix"
                       >
-                        <Download size={10} /> Export Matrix
+                        <Download size={12} />
                       </button>
                       <button
                         onClick={() => setIsResetModalOpen(true)}
-                        className="w-full flex items-center gap-2 h-7 px-2 text-[8px] font-mono font-bold tracking-widest uppercase text-rose-500/60 hover:text-rose-500 hover:bg-rose-500/10 transition-all rounded-none"
+                        className="flex-1 flex items-center justify-center h-8 bg-rose-500/5 hover:bg-rose-500/10 border border-rose-500/20 hover:border-rose-500/40 transition-all text-rose-500/60 hover:text-rose-500"
+                        title="Reset Canvas"
                       >
-                        <Trash2 size={10} /> Reset Canvas
+                        <Trash2 size={12} />
                       </button>
                     </div>
                   </div>

@@ -253,9 +253,9 @@ export const DashboardView: React.FC<DashboardViewProps> = React.memo(({
                 {/* Middle Row: Grid of Identities */}
                 <div className="mt-20 pt-8 border-t border-border flex-1 overflow-hidden flex flex-col">
                     <div className="flex items-center justify-between mb-4 shrink-0">
-                        <div className="space-y-0.5">
-                            <h4 className="text-[11px] font-medium text-primary">Active Profiles</h4>
-                            <p className="text-[10px] text-muted-foreground font-normal opacity-60">Brand Management Hub</p>
+                        <div className="space-y-1">
+                            <h4 className="text-sm font-bold text-primary uppercase tracking-tight">Active Profiles</h4>
+                            <p className="text-xs text-muted-foreground font-medium opacity-70">Brand Management Hub</p>
                         </div>
                         <Button
                             size="sm"
