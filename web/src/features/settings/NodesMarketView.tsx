@@ -98,57 +98,60 @@ export const NodesMarketView = () => {
                                     <div
                                         key={node.id}
                                         className={`
-                                            group relative p-4 rounded-xl border transition-all duration-300 flex flex-col h-full
+                                            group relative rounded-xl border transition-all duration-300 flex flex-col h-full overflow-hidden
                                             ${installed
                                                 ? 'bg-card border-border/60 shadow-sm'
                                                 : 'bg-muted/5 border-transparent hover:bg-card hover:border-border hover:shadow-md'
                                             }
                                         `}
                                     >
-                                        <div className="flex justify-between items-start mb-3">
-                                            <div className={`p-2 rounded-lg ${node.defaultColor} bg-opacity-10 text-${node.defaultColor.replace('bg-', '')}`}>
-                                                <node.icon size={16} />
+                                        <div className={`h-1.5 w-full bg-opacity-80 transition-opacity duration-300 ${node.defaultColor}`} />
+                                        <div className="p-4 flex flex-col h-full">
+                                            <div className="flex justify-between items-start mb-3">
+                                                <div className={`p-2 rounded-lg ${node.defaultColor} bg-opacity-10 text-${node.defaultColor.replace('bg-', '')}`}>
+                                                    <node.icon size={16} />
+                                                </div>
+                                                {node.isCore ? (
+                                                    <span className="text-[9px] font-bold uppercase tracking-widest opacity-40 bg-foreground/5 px-1.5 py-0.5 rounded-sm">Core</span>
+                                                ) : (
+                                                    <span className={`text-[9px] font-mono opacity-60 ${node.cost ? 'text-amber-500 font-bold' : ''}`}>
+                                                        {node.cost ? `${node.cost} Credits` : 'Free'}
+                                                    </span>
+                                                )}
                                             </div>
-                                            {node.isCore ? (
-                                                <span className="text-[9px] font-bold uppercase tracking-widest opacity-40 bg-foreground/5 px-1.5 py-0.5 rounded-sm">Core</span>
-                                            ) : (
-                                                <span className={`text-[9px] font-mono opacity-60 ${node.cost ? 'text-amber-500 font-bold' : ''}`}>
-                                                    {node.cost ? `${node.cost} Credits` : 'Free'}
-                                                </span>
-                                            )}
-                                        </div>
 
-                                        <div className="space-y-1 mb-4 flex-1">
-                                            <h4 className="font-bold text-xs tracking-tight text-foreground">{node.label}</h4>
-                                            <p className="text-[10px] text-muted-foreground leading-relaxed line-clamp-2">{node.description}</p>
-                                        </div>
+                                            <div className="space-y-1 mb-4 flex-1">
+                                                <h4 className="font-bold text-xs tracking-tight text-foreground">{node.label}</h4>
+                                                <p className="text-[10px] text-muted-foreground leading-relaxed line-clamp-2">{node.description}</p>
+                                            </div>
 
-                                        <div className="mt-auto pt-3 border-t border-border/30">
-                                            {installed ? (
-                                                node.isCore ? (
-                                                    <Button disabled variant="ghost" size="sm" className="w-full justify-start gap-2 h-7 text-[10px] bg-muted/20 opacity-50 cursor-not-allowed px-0 pl-2">
-                                                        <Check size={12} /> Installed
-                                                    </Button>
+                                            <div className="mt-auto pt-3 border-t border-border/30">
+                                                {installed ? (
+                                                    node.isCore ? (
+                                                        <Button disabled variant="ghost" size="sm" className="w-full justify-start gap-2 h-7 text-[10px] bg-muted/20 opacity-50 cursor-not-allowed px-0 pl-2">
+                                                            <Check size={12} /> Installed
+                                                        </Button>
+                                                    ) : (
+                                                        <Button
+                                                            variant="secondary"
+                                                            size="sm"
+                                                            onClick={() => uninstallNode(node.id)}
+                                                            className="w-full justify-between h-7 text-[10px] group-hover:bg-destructive/10 group-hover:text-destructive group-hover:border-destructive/20 transition-all border-transparent"
+                                                        >
+                                                            <span className="flex items-center gap-1.5"><Check size={12} /> Installed</span>
+                                                            <span className="opacity-0 group-hover:opacity-100 transition-opacity">Uninstall</span>
+                                                        </Button>
+                                                    )
                                                 ) : (
                                                     <Button
-                                                        variant="secondary"
+                                                        onClick={() => installNode(node.id)}
                                                         size="sm"
-                                                        onClick={() => uninstallNode(node.id)}
-                                                        className="w-full justify-between h-7 text-[10px] group-hover:bg-destructive/10 group-hover:text-destructive group-hover:border-destructive/20 transition-all border-transparent"
+                                                        className="w-full gap-2 h-7 text-[10px] shadow-sm"
                                                     >
-                                                        <span className="flex items-center gap-1.5"><Check size={12} /> Installed</span>
-                                                        <span className="opacity-0 group-hover:opacity-100 transition-opacity">Uninstall</span>
+                                                        <Download size={12} /> Install
                                                     </Button>
-                                                )
-                                            ) : (
-                                                <Button
-                                                    onClick={() => installNode(node.id)}
-                                                    size="sm"
-                                                    className="w-full gap-2 h-7 text-[10px] shadow-sm"
-                                                >
-                                                    <Download size={12} /> Install
-                                                </Button>
-                                            )}
+                                                )}
+                                            </div>
                                         </div>
                                     </div>
                                 );
