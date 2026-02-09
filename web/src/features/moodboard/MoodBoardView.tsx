@@ -106,27 +106,31 @@ interface MoodNodeData extends Record<string, unknown> {
   onChange?: (id: string, newData: Partial<MoodNodeData>, newStyle?: React.CSSProperties) => void;
 }
 
-const CustomHandle = ({ type, position, id, className }: { type: 'source' | 'target', position: Position, id?: string, className?: string }) => (
-  <div className={`absolute z-50 group/handle ${position === Position.Top || position === Position.Bottom ? 'w-full h-6 left-0' : 'h-full w-6 top-0'} flex items-center justify-center pointer-events-none ${position === Position.Top ? '-top-3' : position === Position.Bottom ? '-bottom-3' : position === Position.Left ? '-left-3' : '-right-3'}`}>
-    <Handle
-      type={type}
-      position={position}
-      id={id}
-      className={`
-        !w-3 !h-3 !border-2 !border-primary/40 !bg-background hover:!bg-primary hover:!border-primary hover:!scale-125 transition-all duration-300 ease-out
-        !opacity-30 group-hover/node:!opacity-60 group-hover/handle:!opacity-100 pointer-events-auto
-        ${className}
-      `}
-    />
-  </div>
-);
+const CustomHandle = ({ type, position, id, className, nodeColor }: { type: 'source' | 'target', position: Position, id?: string, className?: string, nodeColor?: string }) => {
+  const colorClass = nodeColor ? nodeColor.replace('bg-', '') : 'primary';
+  return (
+    <div className={`absolute z-50 group/handle ${position === Position.Top || position === Position.Bottom ? 'w-full h-6 left-0' : 'h-full w-6 top-0'} flex items-center justify-center pointer-events-none ${position === Position.Top ? '-top-3' : position === Position.Bottom ? '-bottom-3' : position === Position.Left ? '-left-3' : '-right-3'}`}>
+      <Handle
+        type={type}
+        position={position}
+        id={id}
+        className={`
+          !w-3 !h-3 !border-[3px] !bg-background hover:!scale-125 transition-all duration-300 ease-out
+          !opacity-30 group-hover/node:!opacity-60 group-hover/handle:!opacity-100 pointer-events-auto
+          ${nodeColor ? `!border-${colorClass} hover:!bg-${colorClass} hover:!border-${colorClass}` : '!border-primary/40 hover:!bg-primary hover:!border-primary'}
+          ${className}
+        `}
+      />
+    </div>
+  );
+};
 
-const NodeHandles = () => (
+const NodeHandles = ({ nodeColor }: { nodeColor?: string }) => (
   <>
-    <CustomHandle type="target" position={Position.Top} id="t" />
-    <CustomHandle type="source" position={Position.Bottom} id="b" />
-    <CustomHandle type="source" position={Position.Left} id="l" />
-    <CustomHandle type="source" position={Position.Right} id="r" />
+    <CustomHandle type="target" position={Position.Top} id="t" nodeColor={nodeColor} />
+    <CustomHandle type="source" position={Position.Bottom} id="b" nodeColor={nodeColor} />
+    <CustomHandle type="source" position={Position.Left} id="l" nodeColor={nodeColor} />
+    <CustomHandle type="source" position={Position.Right} id="r" nodeColor={nodeColor} />
   </>
 );
 
@@ -157,7 +161,7 @@ const NodeContainer = ({ children, selected, title, icon: Icon, typeColor, onEdi
       {/* Top Header - Color coded from map */}
       <div className={`
         h-1.5 w-full bg-opacity-80 transition-opacity duration-300
-        ${typeColor}
+        ${data.customColor || typeColor}
       `} />
 
       {/* Window Title Bar */}
@@ -308,7 +312,7 @@ const ImageNode = React.memo(({ id, data, selected }: { id: string; data: MoodNo
       typeColor="bg-blue-600"
       onEdit={() => setIsEditing(!isEditing)}
       isEditing={isEditing}
-      handles={<NodeHandles />}
+      handles={<NodeHandles nodeColor="bg-blue-600" />}
       data={{ ...data, id, type: 'image' }}
       id={id}
       resizer={
@@ -379,7 +383,7 @@ const TextNode = React.memo(({ id, data, selected }: { id: string; data: MoodNod
       typeColor="bg-blue-600"
       onEdit={() => setIsEditing(!isEditing)}
       isEditing={isEditing}
-      handles={<NodeHandles />}
+      handles={<NodeHandles nodeColor="bg-blue-600" />}
       data={{ ...data, id, type: 'text' }}
       id={id}
       resizer={
@@ -434,7 +438,7 @@ const TitleNode = React.memo(({ id, data, selected }: { id: string; data: MoodNo
       typeColor="bg-blue-600"
       onEdit={() => setIsEditing(!isEditing)}
       isEditing={isEditing}
-      handles={<NodeHandles />}
+      handles={<NodeHandles nodeColor="bg-blue-600" />}
       data={{ ...data, id, type: 'title' }}
       id={id}
       resizer={
@@ -480,7 +484,7 @@ const ParagraphNode = React.memo(({ id, data, selected }: { id: string; data: Mo
       typeColor="bg-blue-600"
       onEdit={() => setIsEditing(!isEditing)}
       isEditing={isEditing}
-      handles={<NodeHandles />}
+      handles={<NodeHandles nodeColor="bg-blue-600" />}
       data={{ ...data, id, type: 'paragraph' }}
       id={id}
       resizer={
@@ -528,7 +532,7 @@ const TypographyNode = ({ id, data, selected }: { id: string; data: MoodNodeData
       title="Type Spec"
       icon={CaseUpper}
       typeColor="bg-blue-600"
-      handles={<NodeHandles />}
+      handles={<NodeHandles nodeColor="bg-blue-600" />}
       data={{ ...data, id, type: 'typography' }}
       id={id}
     >
@@ -589,7 +593,7 @@ const GridSysNode = ({ id, data, selected }: { id: string; data: MoodNodeData; s
     title="Grid Sys"
     icon={Grid3X3}
     typeColor="bg-blue-600"
-    handles={<NodeHandles />}
+    handles={<NodeHandles nodeColor="bg-blue-600" />}
     data={{ ...data, id, type: 'grid' }}
     id={id}
   >
@@ -640,7 +644,7 @@ const ToneNode = ({ id, data, selected }: { id: string; data: MoodNodeData; sele
     title="Vibration"
     icon={SlidersHorizontal}
     typeColor="bg-amber-500"
-    handles={<NodeHandles />}
+    handles={<NodeHandles nodeColor="bg-amber-500" />}
     data={{ ...data, id, type: 'tone' }}
     id={id}
   >
@@ -685,7 +689,7 @@ const CompetitorNode = ({ id, data, selected }: { id: string; data: MoodNodeData
     title="Comparison"
     icon={Swords}
     typeColor="bg-emerald-600"
-    handles={<NodeHandles />}
+    handles={<NodeHandles nodeColor="bg-emerald-600" />}
     data={{ ...data, id, type: 'competitor' }}
     id={id}
   >
@@ -730,7 +734,7 @@ const MoodGaugeNode = ({ id, data, selected }: { id: string; data: MoodNodeData;
     title="Pressure"
     icon={Gauge}
     typeColor="bg-fuchsia-600"
-    handles={<NodeHandles />}
+    handles={<NodeHandles nodeColor="bg-fuchsia-600" />}
     data={{ ...data, id, type: 'mood_gauge' }}
     id={id}
   >
@@ -774,7 +778,7 @@ const IconsNode = ({ id, data, selected }: { id: string; data: MoodNodeData; sel
     title="Symbols"
     icon={Shapes}
     typeColor="bg-blue-600"
-    handles={<NodeHandles />}
+    handles={<NodeHandles nodeColor="bg-blue-600" />}
     data={{ ...data, id, type: 'icons' }}
     id={id}
   >
@@ -802,7 +806,7 @@ const ReferenceNode = ({ id, data, selected }: { id: string; data: MoodNodeData;
     title="Metadata"
     icon={Link2}
     typeColor="bg-emerald-600"
-    handles={<NodeHandles />}
+    handles={<NodeHandles nodeColor="bg-emerald-600" />}
     data={{ ...data, id, type: 'reference' }}
     id={id}
   >
@@ -853,7 +857,7 @@ const AttributeNode = ({ id, data, selected }: { id: string; data: MoodNodeData;
     title="Trait"
     icon={Sparkles}
     typeColor="bg-amber-500"
-    handles={<NodeHandles />}
+    handles={<NodeHandles nodeColor="bg-amber-500" />}
     data={{ ...data, id, type: 'attribute' }}
     id={id}
   >
@@ -883,7 +887,7 @@ const LogicNode = ({ id, data, selected }: { id: string; data: MoodNodeData; sel
     title="Logic Gate"
     icon={GitBranch}
     typeColor="bg-amber-500"
-    handles={<NodeHandles />}
+    handles={<NodeHandles nodeColor="bg-amber-500" />}
     data={{ ...data, id, type: 'logic' }}
     id={id}
   >
@@ -912,7 +916,7 @@ const PresetNode = ({ id, data, selected }: { id: string; data: MoodNodeData; se
     title="Aesthetic"
     icon={Zap}
     typeColor="bg-blue-600"
-    handles={<NodeHandles />}
+    handles={<NodeHandles nodeColor="bg-blue-600" />}
     data={{ ...data, id, type: 'preset' }}
     id={id}
   >
@@ -950,7 +954,7 @@ const PaletteNode = ({ id, data, selected }: { id: string; data: MoodNodeData; s
       title="Chromatic"
       icon={Palette}
       typeColor="bg-blue-600"
-      handles={<NodeHandles />}
+      handles={<NodeHandles nodeColor="bg-blue-600" />}
       data={{ ...data, id, type: 'palette' }}
       id={id}
     >
@@ -993,7 +997,7 @@ const TextureNode = ({ id, data, selected }: { id: string; data: MoodNodeData; s
     title="Material"
     icon={Layers}
     typeColor="bg-amber-500"
-    handles={<NodeHandles />}
+    handles={<NodeHandles nodeColor="bg-amber-500" />}
     data={{ ...data, id, type: 'texture' }}
     id={id}
   >
@@ -1041,7 +1045,7 @@ const NegativeNode = ({ id, data, selected }: { id: string; data: MoodNodeData; 
     title="Anti_DNA"
     icon={X}
     typeColor="bg-amber-500"
-    handles={<NodeHandles />}
+    handles={<NodeHandles nodeColor="bg-amber-500" />}
     data={{ ...data, id, type: 'negative' }}
     id={id}
   >
@@ -1412,13 +1416,9 @@ const MoodBoardViewContent = React.memo<MoodBoardViewProps>(({ brand, setHeaderA
   const onPaneDoubleClick = useCallback((event: React.MouseEvent) => {
     // We only want to trigger on the pane itself, not on nodes
     if ((event.target as HTMLElement).classList.contains('react-flow__pane')) {
-      const position = screenToFlowPosition({
-        x: event.clientX,
-        y: event.clientY,
-      });
       setQuickAddMenu({ x: event.clientX, y: event.clientY });
     }
-  }, [screenToFlowPosition]);
+  }, []);
 
   const addNode = useCallback((type: MoodNodeData['type'], position?: { x: number, y: number }) => {
     const defaults: Partial<MoodNodeData> = { isActive: true };
@@ -2094,6 +2094,27 @@ const MoodBoardViewContent = React.memo<MoodBoardViewProps>(({ brand, setHeaderA
                 className="fixed z-[1000] bg-secondary border border-border rounded-sm p-1 min-w-[140px] animate-in fade-in duration-200"
                 style={{ top: contextMenu.y, left: contextMenu.x }}
               >
+                <div className="px-3 py-1 text-[8px] font-bold text-muted-foreground/40 uppercase tracking-widest border-t border-border/20 mt-1 pt-1">Thematic Override</div>
+                <div className="flex items-center gap-1.5 px-3 py-2 border-b border-border/20">
+                  {[
+                    { id: 'blue', color: 'bg-blue-600' },
+                    { id: 'amber', color: 'bg-amber-500' },
+                    { id: 'emerald', color: 'bg-emerald-600' },
+                    { id: 'fuchsia', color: 'bg-fuchsia-600' },
+                    { id: 'slate', color: 'bg-slate-500' }
+                  ].map(c => (
+                    <button
+                      key={c.id}
+                      onClick={() => {
+                        const node = nodes.find(n => n.id === contextMenu.id);
+                        if (node) updateNodeData(node.id, { customColor: c.color });
+                        setContextMenu(null);
+                      }}
+                      className={`w-4 h-4 rounded-full ${c.color} border border-white/10 hover:scale-125 transition-transform`}
+                    />
+                  ))}
+                </div>
+
                 <button
                   onClick={() => {
                     const node = nodes.find(n => n.id === contextMenu.id);
@@ -2121,7 +2142,7 @@ const MoodBoardViewContent = React.memo<MoodBoardViewProps>(({ brand, setHeaderA
                   }}
                   className="w-full flex items-center gap-3 px-3 py-2 rounded-none text-rose-500 hover:bg-rose-500/10 transition-colors text-[11px] font-normal"
                 >
-                  <Trash2 size={12} /> Purge
+                  <Trash2 size={12} /> Delete
                 </button>
               </div>
             )}
