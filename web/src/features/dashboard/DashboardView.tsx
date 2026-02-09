@@ -133,9 +133,9 @@ export const DashboardView: React.FC<DashboardViewProps> = React.memo(({
         >
             <ViewHeader
                 icon={LayoutGrid}
-                title="Nexus"
+                title="Brand OS"
                 subtitle="Dashboard"
-                badge="Nexus Command"
+                badge="Brand OS Command"
                 rightContent={
                     <>
                         <div className="text-right hidden md:block">

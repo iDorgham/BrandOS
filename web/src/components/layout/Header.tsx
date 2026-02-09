@@ -56,7 +56,7 @@ export const Header: React.FC<HeaderProps> = ({ activeTab, activeBrand, onNaviga
                     )}
                     {activeTab === 'dashboard' && (
                         <span className="text-[10px] font-medium normal-case opacity-40 tracking-normal hidden md:block border-l border-border/50 pl-3">
-                            Nexus Operation Intelligence Hub
+                            Brand OS Operation Intelligence Hub
                         </span>
                     )}
                     {activeTab === 'creative' && (

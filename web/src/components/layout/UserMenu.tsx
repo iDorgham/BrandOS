@@ -107,7 +107,7 @@ export const UserMenu: React.FC<UserMenuProps> = ({ onNavigate }) => {
                             >
                                 <div className="flex items-center gap-3">
                                     <CreditCard size={16} className="group-hover:text-primary transition-colors" />
-                                    <span className="tracking-normal text-[10px]">Nexus Subscription</span>
+                                    <span className="tracking-normal text-[10px]">Brand OS Subscription</span>
                                 </div>
                                 <div className="px-2 py-0.5 rounded-full bg-primary/20 text-primary text-[8px] font-medium">Pro</div>
                             </button>

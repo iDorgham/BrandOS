@@ -58,8 +58,8 @@ export const INITIAL_BRANDS: BrandProfile[] = [];
 export const MOCK_WORKSPACES: Workspace[] = [
     {
         id: '123e4567-e89b-12d3-a456-426614174000',
-        name: 'Nexus Alpha',
-        slug: 'nexus-alpha',
+        name: 'Brand OS Alpha',
+        slug: 'brand-os-alpha',
         ownerId: '123e4567-e89b-12d3-a456-426614174001',
         createdAt: Date.now() - 86400000 * 30
     },
