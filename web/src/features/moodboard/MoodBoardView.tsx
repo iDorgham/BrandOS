@@ -113,7 +113,7 @@ const CustomHandle = ({ type, position, id, className }: { type: 'source' | 'tar
       position={position}
       id={id}
       className={`
-        !w-2.5 !h-2.5 !border-[1px] !border-border !bg-background hover:!bg-primary hover:!scale-125 transition-all duration-300 ease-out
+        !w-3 !h-3 !border-2 !border-primary/40 !bg-background hover:!bg-primary hover:!border-primary hover:!scale-125 transition-all duration-300 ease-out
         !opacity-30 group-hover/node:!opacity-60 group-hover/handle:!opacity-100 pointer-events-auto
         ${className}
       `}
