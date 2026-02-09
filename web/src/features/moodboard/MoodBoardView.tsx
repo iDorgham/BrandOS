@@ -141,7 +141,7 @@ const hexToRgbForDisplay = (hex: string) => {
 
 
 
-const NodeContainer = ({ children, selected, title, icon: Icon, typeColor, onEdit, isEditing, handles, resizer, data, id }: any) => {
+const NodeContainer = ({ children, selected, title, icon: Icon, typeColor, onEdit, isEditing, handles, resizer, data, id, hideHeaderBar }: any) => {
   const isActive = data?.isActive !== false;
 
   return (
@@ -159,10 +159,12 @@ const NodeContainer = ({ children, selected, title, icon: Icon, typeColor, onEdi
       {isActive && handles}
 
       {/* Top Header - Color coded from map */}
-      <div className={`
-        h-1.5 w-full bg-opacity-80 transition-opacity duration-300
-        ${data.customColor || typeColor}
-      `} />
+      {!hideHeaderBar && (
+        <div className={`
+          h-1.5 w-full bg-opacity-80 transition-opacity duration-300
+          ${data.customColor || typeColor}
+        `} />
+      )}
 
       {/* Window Title Bar */}
       <div className={`
@@ -647,6 +649,7 @@ const ToneNode = ({ id, data, selected }: { id: string; data: MoodNodeData; sele
     handles={<NodeHandles nodeColor="bg-amber-500" />}
     data={{ ...data, id, type: 'tone' }}
     id={id}
+    hideHeaderBar
   >
     <div className="flex flex-col gap-4">
       <div className="space-y-4 py-2">
@@ -692,6 +695,7 @@ const CompetitorNode = ({ id, data, selected }: { id: string; data: MoodNodeData
     handles={<NodeHandles nodeColor="bg-emerald-600" />}
     data={{ ...data, id, type: 'competitor' }}
     id={id}
+    hideHeaderBar
   >
     <div className="flex flex-col gap-3">
       <input
@@ -809,6 +813,7 @@ const ReferenceNode = ({ id, data, selected }: { id: string; data: MoodNodeData;
     handles={<NodeHandles nodeColor="bg-emerald-600" />}
     data={{ ...data, id, type: 'reference' }}
     id={id}
+    hideHeaderBar
   >
     <div className="flex flex-col gap-3">
       <div className="space-y-2">
@@ -890,6 +895,7 @@ const LogicNode = ({ id, data, selected }: { id: string; data: MoodNodeData; sel
     handles={<NodeHandles nodeColor="bg-amber-500" />}
     data={{ ...data, id, type: 'logic' }}
     id={id}
+    hideHeaderBar
   >
     <div className="flex flex-col gap-4">
       <div className="text-[11px] font-bold tracking-tight bg-violet-500/10 border border-violet-500/20 p-2 rounded-none text-violet-400 font-mono italic">IF::BRAND_FLOW â†’ {data.label.toUpperCase()}</div>
@@ -919,6 +925,7 @@ const PresetNode = ({ id, data, selected }: { id: string; data: MoodNodeData; se
     handles={<NodeHandles nodeColor="bg-blue-600" />}
     data={{ ...data, id, type: 'preset' }}
     id={id}
+    hideHeaderBar
   >
     <div className="flex flex-col gap-4 py-1">
       <div className="space-y-1.5">
@@ -957,6 +964,7 @@ const PaletteNode = ({ id, data, selected }: { id: string; data: MoodNodeData; s
       handles={<NodeHandles nodeColor="bg-blue-600" />}
       data={{ ...data, id, type: 'palette' }}
       id={id}
+      hideHeaderBar
     >
       <div className="flex flex-col gap-4">
         <div className="flex items-center gap-3 bg-card/50 border border-border/50 p-2 group/pal">
@@ -1000,6 +1008,7 @@ const TextureNode = ({ id, data, selected }: { id: string; data: MoodNodeData; s
     handles={<NodeHandles nodeColor="bg-amber-500" />}
     data={{ ...data, id, type: 'texture' }}
     id={id}
+    hideHeaderBar
   >
     <div className="flex flex-col gap-4 py-1">
       <select
@@ -1048,6 +1057,7 @@ const NegativeNode = ({ id, data, selected }: { id: string; data: MoodNodeData; 
     handles={<NodeHandles nodeColor="bg-amber-500" />}
     data={{ ...data, id, type: 'negative' }}
     id={id}
+    hideHeaderBar
   >
     <div className="space-y-4">
       <Input
