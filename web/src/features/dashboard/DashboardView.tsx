@@ -260,27 +260,27 @@ export const DashboardView: React.FC<DashboardViewProps> = React.memo(({
                         <Button
                             size="sm"
                             onClick={() => setIsNewBrandModalOpen(true)}
-                            className="rounded-sm bg-primary/10 hover:bg-primary/20 text-primary border border-primary/20 text-[10px] font-medium px-4 h-8"
+                            className="rounded-sm bg-primary/10 hover:bg-primary/20 text-primary border border-primary/20 text-xs font-medium px-6 h-10"
                         >
-                            <Plus size={14} className="mr-1.5" /> New Profile
+                            <Plus size={16} className="mr-2" /> New Profile
                         </Button>
                     </div>
 
-                    <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 2xl:grid-cols-10 gap-3 overflow-y-auto pt-2 pr-2 pb-2">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-4 overflow-y-auto pt-2 pr-2 pb-2">
                         {brandsWithBrandId.map(brand => (
                             <Card
                                 key={brand.brandId}
                                 onClick={() => onSelectBrand(brand)}
-                                className={`group cursor-pointer transition-all hover:border-primary/40 relative overflow-hidden h-28 flex flex-col p-3 bg-card hover:-translate-y-0.5 active:scale-[0.98] rounded-sm ${selectedBrand?.id === brand.id ? 'border-primary/40 bg-primary/10 ring-1 ring-primary/20' : 'border-border'}`}
+                                className={`group cursor-pointer transition-all hover:border-primary/40 relative overflow-hidden h-40 flex flex-col p-5 bg-card hover:-translate-y-0.5 active:scale-[0.98] rounded-sm ${selectedBrand?.id === brand.id ? 'border-primary/40 bg-primary/10 ring-1 ring-primary/20' : 'border-border'}`}
                             >
                                 <div className="flex items-start justify-between relative z-10">
-                                    <div className={`w-7 h-7 rounded-sm flex items-center justify-center transition-all ${selectedBrand?.id === brand.id ? 'bg-primary text-primary-foreground' : 'bg-accent text-muted-foreground group-hover:bg-primary/10 group-hover:text-primary'}`}>
-                                        <Fingerprint size={14} />
+                                    <div className={`w-10 h-10 rounded-sm flex items-center justify-center transition-all ${selectedBrand?.id === brand.id ? 'bg-primary text-primary-foreground' : 'bg-accent text-muted-foreground group-hover:bg-primary/10 group-hover:text-primary'}`}>
+                                        <Fingerprint size={20} />
                                     </div>
                                 </div>
 
-                                <div className="mt-auto space-y-1.5 relative z-10">
-                                    <h5 className="font-display font-medium text-[11px] tracking-tight truncate group-hover:text-primary transition-colors">{brand.name}</h5>
+                                <div className="mt-auto space-y-2 relative z-10">
+                                    <h5 className="font-display font-medium text-sm tracking-tight truncate group-hover:text-primary transition-colors">{brand.name}</h5>
                                     <div className="flex gap-1">
                                         {brand.palette.slice(0, 4).map(c => (
                                             <div key={c.id} className="w-1.5 h-1.5 rounded-full border border-border" style={{ backgroundColor: c.hex }} />
@@ -292,10 +292,10 @@ export const DashboardView: React.FC<DashboardViewProps> = React.memo(({
 
                         <button
                             onClick={() => setIsNewBrandModalOpen(true)}
-                            className="group h-28 border border-dashed border-border rounded-sm flex flex-col items-center justify-center gap-2 hover:border-primary/40 hover:bg-primary/5 transition-all bg-muted/30"
+                            className="group h-40 border border-dashed border-border rounded-sm flex flex-col items-center justify-center gap-3 hover:border-primary/40 hover:bg-primary/5 transition-all bg-muted/30"
                         >
-                            <Plus size={18} className="text-muted-foreground/60 group-hover:text-primary" />
-                            <span className="text-[9px] font-medium text-muted-foreground/80">Add Brand</span>
+                            <Plus size={24} className="text-muted-foreground/60 group-hover:text-primary" />
+                            <span className="text-xs font-medium text-muted-foreground/80">Add Brand</span>
                         </button>
                     </div>
                 </div>
