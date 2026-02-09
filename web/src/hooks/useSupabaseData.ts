@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import React, { useState, useCallback } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { toast } from 'sonner';
 import { brandService, assetService, promptHistoryService } from '../services/persistence.service';
@@ -55,13 +55,13 @@ export const useSupabaseBrands = () => {
     }
   }, [refreshData]);
 
-  return {
+  return React.useMemo(() => ({
     brands,
     loading,
     addBrand,
     updateBrand,
     deleteBrand,
-  };
+  }), [brands, loading, addBrand, updateBrand, deleteBrand]);
 };
 
 // Hook to replace localStorage for assets
@@ -83,7 +83,7 @@ export const useSupabaseAssets = () => {
     } finally {
       setLoading(false);
     }
-  }, [refreshData]);
+  }, [activeWorkspace?.id, refreshData]);
 
   const deleteAsset = useCallback(async (assetId: string) => {
     try {
@@ -113,13 +113,13 @@ export const useSupabaseAssets = () => {
     }
   }, []);
 
-  return {
+  return React.useMemo(() => ({
     assets,
     loading,
     addAsset,
     deleteAsset,
     getAssetsByBrand,
-  };
+  }), [assets, loading, addAsset, deleteAsset, getAssetsByBrand]);
 };
 
 // Hook to replace localStorage for prompt history
@@ -140,7 +140,7 @@ export const useSupabasePromptHistory = () => {
     } finally {
       setLoading(false);
     }
-  }, [refreshData]);
+  }, [activeWorkspace?.id, refreshData]);
 
   const clearHistory = useCallback(async () => {
     try {
@@ -170,11 +170,11 @@ export const useSupabasePromptHistory = () => {
     }
   }, []);
 
-  return {
+  return React.useMemo(() => ({
     promptHistory,
     loading,
     addToHistory,
     clearHistory,
     getHistoryByBrand,
-  };
+  }), [promptHistory, loading, addToHistory, clearHistory, getHistoryByBrand]);
 };

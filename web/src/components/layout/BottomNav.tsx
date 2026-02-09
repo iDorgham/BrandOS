@@ -7,7 +7,7 @@ interface BottomNavProps {
     onTabChange: (tab: string) => void;
 }
 
-export const BottomNav: React.FC<BottomNavProps> = ({ activeTab, onTabChange }) => {
+export const BottomNav: React.FC<BottomNavProps> = React.memo(({ activeTab, onTabChange }) => {
     const { visibleTabs } = useSettings();
 
     const tabs = [
@@ -45,4 +45,4 @@ export const BottomNav: React.FC<BottomNavProps> = ({ activeTab, onTabChange }) 
             })}
         </nav>
     );
-};
+});

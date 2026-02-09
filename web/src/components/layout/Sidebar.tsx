@@ -31,7 +31,7 @@ export const SIDEBAR_TABS: SidebarTab[] = [
     { id: 'deployment', icon: Rocket, label: 'Deployment', category: 'MANAGEMENT' },
 ];
 
-export const Sidebar: React.FC<SidebarProps> = ({ activeTab, onTabChange, isCollapsed, onToggle }) => {
+export const Sidebar: React.FC<SidebarProps> = React.memo(({ activeTab, onTabChange, isCollapsed, onToggle }) => {
     const { userRole } = useAuth();
     const { visibleTabs, tabOrder } = useSettings();
 
@@ -133,4 +133,4 @@ export const Sidebar: React.FC<SidebarProps> = ({ activeTab, onTabChange, isColl
             </div>
         </aside>
     );
-};
+});

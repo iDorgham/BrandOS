@@ -24,10 +24,7 @@ interface LandingPageProps {
     onPricingClick: () => void;
 }
 
-export const LandingPage: React.FC<LandingPageProps> = ({ onLoginClick, onInfoClick, onProductClick, onCompanyClick, onResourcesClick, onCalculatorClick, onIndustriesClick, onCaseStudiesClick, onPricingClick }) => {
-
-
-
+const LiveAuditTerminal: React.FC = () => {
     const [auditLogs, setAuditLogs] = useState([
         { id: '822', status: 'OK', score: 98.2, task: 'HEX_VALIDATION' },
         { id: '144', status: 'OK', score: 94.7, task: 'SPATIAL_CHECK' },
@@ -45,17 +42,35 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onLoginClick, onInfoCl
                 next.push(last);
                 return next;
             });
-        }, 1500); // Faster updates for 2026 feel
+        }, 1500);
         return () => clearInterval(interval);
     }, []);
 
+    return (
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-8 border-t border-[var(--cds-layer-02)] pt-12">
+            {[
+                { label: "Growth", value: "30% Faster", sub: "For 1,247 brands" },
+                { label: "Efficiency", value: "8 Hours/Wk", sub: "Saved on reviews" },
+                { label: "Accuracy", value: "92% Guaranteed", sub: "Visual consistency" },
+                { label: "Output", value: "$50K/Month", sub: "Assets generated" }
+            ].map((stat, i) => (
+                <div key={i} className="flex flex-col">
+                    <span className="text-[10px] font-black uppercase tracking-[0.2em] text-[var(--cds-text-secondary)] mb-2">{stat.label}</span>
+                    <span className="text-3xl font-black uppercase tracking-tighter text-foreground overflow-visible whitespace-nowrap">{stat.value}</span>
+                    <span className="text-sm text-[var(--cds-text-secondary)] mt-1">{stat.sub}</span>
+                </div>
+            ))}
+        </div>
+    );
+};
+
+export const LandingPage: React.FC<LandingPageProps> = ({ onLoginClick, onInfoClick, onProductClick, onCompanyClick, onResourcesClick, onCalculatorClick, onIndustriesClick, onCaseStudiesClick, onPricingClick }) => {
     const fastFadeIn = {
         initial: { opacity: 0, y: 15 },
         whileInView: { opacity: 1, y: 0 },
         viewport: { once: true, margin: "-50px" },
         transition: { duration: 0.5, ease: [0.16, 1, 0.3, 1] as any }
     };
-
 
     return (
         <div className="min-h-screen selection:bg-[var(--cds-interactive-01)]/30 font-sans relative overflow-x-hidden">
@@ -114,20 +129,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onLoginClick, onInfoCl
                     </div>
 
                     {/* Trust Bar */}
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-8 border-t border-[var(--cds-layer-02)] pt-12">
-                        {[
-                            { label: "Growth", value: "30% Faster", sub: "For 1,247 brands" },
-                            { label: "Efficiency", value: "8 Hours/Wk", sub: "Saved on reviews" },
-                            { label: "Accuracy", value: "92% Guaranteed", sub: "Visual consistency" },
-                            { label: "Output", value: "$50K/Month", sub: "Assets generated" }
-                        ].map((stat, i) => (
-                            <div key={i} className="flex flex-col">
-                                <span className="text-[10px] font-black uppercase tracking-[0.2em] text-[var(--cds-text-secondary)] mb-2">{stat.label}</span>
-                                <span className="text-3xl font-black uppercase tracking-tighter text-foreground overflow-visible whitespace-nowrap">{stat.value}</span>
-                                <span className="text-sm text-[var(--cds-text-secondary)] mt-1">{stat.sub}</span>
-                            </div>
-                        ))}
-                    </div>
+                    <LiveAuditTerminal />
                 </motion.div>
 
                 {/* Scroll Indicator */}

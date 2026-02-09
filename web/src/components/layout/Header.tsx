@@ -13,7 +13,7 @@ interface HeaderProps {
     actions?: React.ReactNode;
 }
 
-export const Header: React.FC<HeaderProps> = ({ activeTab, activeBrand, onNavigate, actions }) => {
+export const Header: React.FC<HeaderProps> = React.memo(({ activeTab, activeBrand, onNavigate, actions }) => {
     const tabLabels: Record<string, string> = {
         dashboard: 'Dashboard',
         identity: 'Identity',
@@ -129,4 +129,4 @@ export const Header: React.FC<HeaderProps> = ({ activeTab, activeBrand, onNaviga
             </div>
         </header>
     );
-};
+});

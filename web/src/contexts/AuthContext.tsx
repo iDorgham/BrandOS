@@ -227,16 +227,23 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     initAuth();
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (event, session) => {
-        setUser(session?.user ?? null);
-        // If sign out, clear data
-        if (event === 'SIGNED_OUT') {
+      async (event, session) => {
+        const currentUser = session?.user ?? null;
+        setUser(currentUser);
+
+        // If sign out, clear data aggressively
+        if (event === 'SIGNED_OUT' || !currentUser) {
           setBrands([]);
           setAssets([]);
           setWorkspaces([]);
+          setPromptHistory([]);
           setActiveWorkspace(null);
           setUserProfile(null);
+          setUserRole('designer'); // Reset to lowest role
           localStorage.clear(); // Clear all cache on sign out
+        } else if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED' || (event === 'INITIAL_SESSION' && currentUser)) {
+          // Re-validate everything on re-auth
+          loadInitialData();
         }
         setLoading(false);
       }
@@ -321,7 +328,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   };
 
-  const value: AuthContextType = {
+  const value: AuthContextType = React.useMemo(() => ({
     user,
     loading,
     signIn,
@@ -338,7 +345,17 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     setActiveWorkspace,
     updateProfile,
     refreshData,
-  };
+  }), [
+    user,
+    loading,
+    brands,
+    assets,
+    promptHistory,
+    workspaces,
+    activeWorkspace,
+    userRole,
+    userProfile
+  ]);
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
