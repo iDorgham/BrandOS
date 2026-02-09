@@ -114,7 +114,7 @@ const CustomHandle = ({ type, position, id, className }: { type: 'source' | 'tar
       id={id}
       className={`
         !w-2.5 !h-2.5 !border-[1px] !border-border !bg-background hover:!bg-primary hover:!scale-125 transition-all duration-300 ease-out
-        !opacity-0 group-hover/node:!opacity-60 group-hover/handle:!opacity-100 pointer-events-auto
+        !opacity-30 group-hover/node:!opacity-60 group-hover/handle:!opacity-100 pointer-events-auto
         ${className}
       `}
     />
@@ -2020,6 +2020,7 @@ const MoodBoardViewContent = React.memo<MoodBoardViewProps>(({ brand, setHeaderA
                 onPaneClick={onPaneClick}
                 onPaneContextMenu={onPaneContextMenu}
                 onDoubleClick={onPaneDoubleClick}
+                onEdgeDoubleClick={(_, edge) => onEdgesDelete([edge])}
                 nodeTypes={nodeTypes}
                 connectionMode={connectionMode as ConnectionMode}
                 defaultViewport={{ x: 0, y: 0, zoom: 0.92 }}
@@ -2029,7 +2030,7 @@ const MoodBoardViewContent = React.memo<MoodBoardViewProps>(({ brand, setHeaderA
                 defaultEdgeOptions={{
                   type: 'smoothstep',
                   animated: true,
-                  style: { stroke: 'hsl(var(--primary))', strokeWidth: 2, opacity: 0.4 },
+                  style: { stroke: 'hsl(var(--primary))', strokeWidth: 2, opacity: 0.8 },
                 }}
               >
                 <Background color="#111" gap={20} size={1} />
