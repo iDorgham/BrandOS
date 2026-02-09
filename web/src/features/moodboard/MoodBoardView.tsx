@@ -305,7 +305,7 @@ const ImageNode = React.memo(({ id, data, selected }: { id: string; data: MoodNo
       selected={selected}
       title={data.label}
       icon={ImageIcon}
-      typeColor="bg-emerald-500"
+      typeColor="bg-blue-600"
       onEdit={() => setIsEditing(!isEditing)}
       isEditing={isEditing}
       handles={<NodeHandles />}
@@ -314,7 +314,7 @@ const ImageNode = React.memo(({ id, data, selected }: { id: string; data: MoodNo
       resizer={
         <NodeResizer
           minWidth={120}
-          minHeight={80}
+          minHeight={100}
           isVisible={selected}
           lineClassName="!border-primary/30"
           handleClassName="!w-1.5 !h-1.5 !bg-primary/40 !border-background !rounded-none"
@@ -376,7 +376,7 @@ const TextNode = React.memo(({ id, data, selected }: { id: string; data: MoodNod
       selected={selected}
       title={data.label}
       icon={Type}
-      typeColor="bg-blue-500"
+      typeColor="bg-blue-600"
       onEdit={() => setIsEditing(!isEditing)}
       isEditing={isEditing}
       handles={<NodeHandles />}
@@ -384,8 +384,8 @@ const TextNode = React.memo(({ id, data, selected }: { id: string; data: MoodNod
       id={id}
       resizer={
         <NodeResizer
-          minWidth={120}
-          minHeight={80}
+          minWidth={150}
+          minHeight={100}
           isVisible={selected}
           lineClassName="!border-primary/30"
           handleClassName="!w-1.5 !h-1.5 !bg-primary/40 !border-background !rounded-none"
@@ -431,7 +431,7 @@ const TitleNode = React.memo(({ id, data, selected }: { id: string; data: MoodNo
       selected={selected}
       title="Section"
       icon={Heading1}
-      typeColor="bg-indigo-600"
+      typeColor="bg-blue-600"
       onEdit={() => setIsEditing(!isEditing)}
       isEditing={isEditing}
       handles={<NodeHandles />}
@@ -477,7 +477,7 @@ const ParagraphNode = React.memo(({ id, data, selected }: { id: string; data: Mo
       selected={selected}
       title="Copy"
       icon={AlignLeft}
-      typeColor="bg-slate-600"
+      typeColor="bg-blue-600"
       onEdit={() => setIsEditing(!isEditing)}
       isEditing={isEditing}
       handles={<NodeHandles />}
@@ -486,7 +486,7 @@ const ParagraphNode = React.memo(({ id, data, selected }: { id: string; data: Mo
       resizer={
         <NodeResizer
           minWidth={200}
-          minHeight={100}
+          minHeight={120}
           isVisible={selected}
           lineClassName="!border-primary/30"
           handleClassName="!w-1.5 !h-1.5 !bg-primary/40 !border-background !rounded-none"
@@ -527,7 +527,7 @@ const TypographyNode = ({ id, data, selected }: { id: string; data: MoodNodeData
       selected={selected}
       title="Type Spec"
       icon={CaseUpper}
-      typeColor="bg-violet-600"
+      typeColor="bg-blue-600"
       handles={<NodeHandles />}
       data={{ ...data, id, type: 'typography' }}
       id={id}
@@ -588,7 +588,7 @@ const GridSysNode = ({ id, data, selected }: { id: string; data: MoodNodeData; s
     selected={selected}
     title="Grid Sys"
     icon={Grid3X3}
-    typeColor="bg-slate-700"
+    typeColor="bg-blue-600"
     handles={<NodeHandles />}
     data={{ ...data, id, type: 'grid' }}
     id={id}
@@ -639,7 +639,7 @@ const ToneNode = ({ id, data, selected }: { id: string; data: MoodNodeData; sele
     selected={selected}
     title="Vibration"
     icon={SlidersHorizontal}
-    typeColor="bg-orange-600"
+    typeColor="bg-amber-500"
     handles={<NodeHandles />}
     data={{ ...data, id, type: 'tone' }}
     id={id}
@@ -684,7 +684,7 @@ const CompetitorNode = ({ id, data, selected }: { id: string; data: MoodNodeData
     selected={selected}
     title="Comparison"
     icon={Swords}
-    typeColor="bg-stone-600"
+    typeColor="bg-emerald-600"
     handles={<NodeHandles />}
     data={{ ...data, id, type: 'competitor' }}
     id={id}
@@ -729,7 +729,7 @@ const MoodGaugeNode = ({ id, data, selected }: { id: string; data: MoodNodeData;
     selected={selected}
     title="Pressure"
     icon={Gauge}
-    typeColor="bg-lime-500"
+    typeColor="bg-fuchsia-600"
     handles={<NodeHandles />}
     data={{ ...data, id, type: 'mood_gauge' }}
     id={id}
@@ -773,7 +773,7 @@ const IconsNode = ({ id, data, selected }: { id: string; data: MoodNodeData; sel
     selected={selected}
     title="Symbols"
     icon={Shapes}
-    typeColor="bg-sky-500"
+    typeColor="bg-blue-600"
     handles={<NodeHandles />}
     data={{ ...data, id, type: 'icons' }}
     id={id}
@@ -801,7 +801,7 @@ const ReferenceNode = ({ id, data, selected }: { id: string; data: MoodNodeData;
     selected={selected}
     title="Metadata"
     icon={Link2}
-    typeColor="bg-blue-600"
+    typeColor="bg-emerald-600"
     handles={<NodeHandles />}
     data={{ ...data, id, type: 'reference' }}
     id={id}
@@ -882,7 +882,7 @@ const LogicNode = ({ id, data, selected }: { id: string; data: MoodNodeData; sel
     selected={selected}
     title="Logic Gate"
     icon={GitBranch}
-    typeColor="bg-violet-500"
+    typeColor="bg-amber-500"
     handles={<NodeHandles />}
     data={{ ...data, id, type: 'logic' }}
     id={id}
@@ -911,7 +911,7 @@ const PresetNode = ({ id, data, selected }: { id: string; data: MoodNodeData; se
     selected={selected}
     title="Aesthetic"
     icon={Zap}
-    typeColor="bg-sky-400"
+    typeColor="bg-blue-600"
     handles={<NodeHandles />}
     data={{ ...data, id, type: 'preset' }}
     id={id}
@@ -949,7 +949,7 @@ const PaletteNode = ({ id, data, selected }: { id: string; data: MoodNodeData; s
       selected={selected}
       title="Chromatic"
       icon={Palette}
-      typeColor="bg-pink-500"
+      typeColor="bg-blue-600"
       handles={<NodeHandles />}
       data={{ ...data, id, type: 'palette' }}
       id={id}
@@ -992,7 +992,7 @@ const TextureNode = ({ id, data, selected }: { id: string; data: MoodNodeData; s
     selected={selected}
     title="Material"
     icon={Layers}
-    typeColor="bg-slate-400"
+    typeColor="bg-amber-500"
     handles={<NodeHandles />}
     data={{ ...data, id, type: 'texture' }}
     id={id}
@@ -1040,7 +1040,7 @@ const NegativeNode = ({ id, data, selected }: { id: string; data: MoodNodeData; 
     selected={selected}
     title="Anti_DNA"
     icon={X}
-    typeColor="bg-rose-600"
+    typeColor="bg-amber-500"
     handles={<NodeHandles />}
     data={{ ...data, id, type: 'negative' }}
     id={id}
@@ -1430,11 +1430,30 @@ const MoodBoardViewContent = React.memo<MoodBoardViewProps>(({ brand, setHeaderA
     }
     if (type === 'negative') defaults.content = '';
 
+    const getInitialDimensions = (nodeType: MoodNodeData['type']) => {
+      switch (nodeType) {
+        case 'title': return { width: 300, height: 100 };
+        case 'image': return { width: 260, height: 240 };
+        case 'text': return { width: 260, height: 200 };
+        case 'paragraph': return { width: 300, height: 220 };
+        case 'attribute': return { width: 220, height: 120 };
+        case 'palette': return { width: 240, height: 200 };
+        case 'typography': return { width: 260, height: 260 };
+        case 'grid': return { width: 240, height: 280 };
+        case 'mood_gauge': return { width: 220, height: 240 };
+        case 'logic': return { width: 240, height: 160 };
+        case 'negative': return { width: 260, height: 160 };
+        default: return { width: 260, height: 180 };
+      }
+    };
+
+    const dims = getInitialDimensions(type);
+
     const newNode: Node<MoodNodeData> = {
       id: generateId(),
       type,
       position: position || { x: Math.random() * 400, y: Math.random() * 300 },
-      style: { width: 260, height: 180 },
+      style: { width: dims.width, height: dims.height },
       data: {
         label: `${type.charAt(0).toUpperCase() + type.slice(1)} Module`,
         type,
@@ -2039,10 +2058,27 @@ const MoodBoardViewContent = React.memo<MoodBoardViewProps>(({ brand, setHeaderA
                   className="!bg-card/40 !backdrop-blur-md !border-border !rounded-none !opacity-20 hover:!opacity-100 transition-opacity overflow-hidden"
                   nodeColor={(node) => {
                     switch (node.data.type) {
-                      case 'image': return '#10b981';
-                      case 'text': return '#3b82f6';
-                      case 'attribute': return '#f59e0b';
-                      case 'logic': return '#8b5cf6';
+                      // Foundation
+                      case 'image':
+                      case 'text':
+                      case 'title':
+                      case 'paragraph':
+                      case 'typography':
+                      case 'grid':
+                      case 'icons':
+                      case 'preset':
+                      case 'palette': return '#2563eb';
+                      // Orchestration
+                      case 'attribute':
+                      case 'texture':
+                      case 'logic':
+                      case 'tone':
+                      case 'negative': return '#f59e0b';
+                      // External
+                      case 'competitor':
+                      case 'reference': return '#059669';
+                      // Generative
+                      case 'mood_gauge': return '#c026d3';
                       default: return '#6b7280';
                     }
                   }}
