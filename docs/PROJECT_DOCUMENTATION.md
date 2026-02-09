@@ -491,6 +491,20 @@ Brand DNA represents a **paradigm shift** in brand management:
 
 ---
 
+## 🛡️ **Security & Compliance**
+
+### **Hardening Measures**
+- **Row Level Security (RLS)**: Mandatory for all tables with consolidated, optimized policies.
+- **Function Isolation**: Database functions use fixed `search_path` to prevent search-path hijacking attacks.
+- **Audit Logging**: Comprehensive tracking of all critical workspace and brand modifications.
+- **Session Security**: Aggressive state clearing and session validation on auth changes.
+
+### **Recommendations**
+- **Leaked Password Protection**: Should be enabled in the Supabase Dashboard (Auth -> Password Strength) to prevent the use of compromised credentials.
+- **Point-in-Time Recovery**: Recommended for production environments to mitigate accidental data loss.
+
+---
+
 ## 🚀 **Future Roadmap**
 
 ### **Phase 4: Ecosystem Expansion** (Q1 2027)

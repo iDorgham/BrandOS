@@ -77,3 +77,16 @@ export const getContrastRatio = (hex1: string, hex2: string): number => {
 
     return (lighter + 0.05) / (darker + 0.05);
 };
+
+/**
+ * Copy text to clipboard
+ */
+export const copyToClipboard = async (text: string): Promise<boolean> => {
+    try {
+        await navigator.clipboard.writeText(text);
+        return true;
+    } catch (err) {
+        console.error('Failed to copy: ', err);
+        return false;
+    }
+};

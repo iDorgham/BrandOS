@@ -166,6 +166,34 @@ export interface Comment {
   };
 }
 
+export type DeploymentStatus = 'pending' | 'approved' | 'rejected' | 'deployed';
+
+export interface DeploymentRequest {
+  id: string;
+  assetId: string;
+  targetId: string;
+  status: DeploymentStatus;
+  requestedBy: string;
+  requestedAt: number;
+  approvedBy?: string;
+  approvedAt?: number;
+  deployedAt?: number;
+  notes?: string;
+  workspaceId?: string;
+  userId: string;
+}
+
+export interface AuditLog {
+  id: string;
+  workspaceId: string;
+  userId?: string;
+  action: string;
+  entityType: string;
+  entityId?: string;
+  metadata: any;
+  createdAt: number;
+}
+
 export type NodeType = 'REFERENCE' | 'ENGINE' | 'MODIFIER' | 'OUTPUT';
 
 export interface WorkflowNode {

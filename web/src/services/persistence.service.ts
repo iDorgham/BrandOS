@@ -1,5 +1,5 @@
 import { supabase, Database, getCurrentUser } from './supabase.service';
-import { BrandProfile, GeneratedAsset, PromptHistoryItem, Workspace, WorkspaceMember, Comment, UserProfile, UserRole, Moodboard } from '../types';
+import { BrandProfile, GeneratedAsset, PromptHistoryItem, Workspace, WorkspaceMember, Comment, UserProfile, UserRole, Moodboard, DeploymentRequest, DeploymentStatus, AuditLog } from '../types';
 import { toast } from 'sonner';
 
 // Brand Profile Services
@@ -116,7 +116,18 @@ export const brandService = {
 
     if (error) throw error;
 
-    return this.mapDbBrandToApp(data);
+    const newBrand = this.mapDbBrandToApp(data);
+
+    // Audit Log
+    await auditService.logAction({
+      workspaceId: newBrand.workspaceId || '',
+      action: 'BRAND_CREATE',
+      entityType: 'brand',
+      entityId: newBrand.id,
+      metadata: { name: newBrand.name }
+    });
+
+    return newBrand;
   },
 
   // Update an existing brand (or create if it doesn't exist - upsert pattern)
@@ -145,9 +156,19 @@ export const brandService = {
       .select()
       .single();
 
-    // If update succeeded, return the result
     if (!error) {
-      return this.mapDbBrandToApp(data);
+      const updatedBrand = this.mapDbBrandToApp(data);
+
+      // Audit Log
+      await auditService.logAction({
+        workspaceId: updatedBrand.workspaceId || '',
+        action: 'BRAND_UPDATE',
+        entityType: 'brand',
+        entityId: updatedBrand.id,
+        metadata: { name: updatedBrand.name }
+      });
+
+      return updatedBrand;
     }
 
     // If update failed because row doesn't exist (406 Not Acceptable or PGRST116), create it
@@ -508,6 +529,181 @@ export const moodboardService = {
   },
 };
 
+// Deployment Services
+export const deploymentService = {
+  // Get all deployment requests for current user or organization
+  async getDeploymentRequests(orgId?: string): Promise<DeploymentRequest[]> {
+    try {
+      const user = await getCurrentUser();
+      if (!user) return [];
+
+      let query = supabase.from('deployments').select('*');
+
+      if (orgId) {
+        query = query.eq('workspace_id', orgId);
+      } else {
+        query = query.eq('user_id', user.id).is('workspace_id', null);
+      }
+
+      const { data, error } = await query.order('requested_at', { ascending: false });
+
+      if (error) throw error;
+      return (data || []).map(this.mapDbDeploymentToApp);
+    } catch (error: any) {
+      console.warn('Failed to fetch deployments:', error.message);
+      return [];
+    }
+  },
+
+  // Create a new deployment request
+  async createDeploymentRequest(request: Omit<DeploymentRequest, 'id' | 'requestedAt' | 'status' | 'requestedBy' | 'userId'>, orgId?: string): Promise<DeploymentRequest> {
+    const user = await getCurrentUser();
+    if (!user) throw new Error('User not authenticated');
+
+    const { data, error } = await supabase
+      .from('deployments')
+      .insert({
+        asset_id: request.assetId,
+        target_id: request.targetId,
+        workspace_id: orgId || request.workspaceId || null,
+        user_id: user.id,
+        notes: request.notes,
+        status: 'pending'
+      })
+      .select()
+      .single();
+
+    if (error) throw error;
+    return this.mapDbDeploymentToApp(data);
+  },
+
+  // Update deployment status (Approve/Reject/Deploy)
+  async updateDeploymentStatus(
+    id: string,
+    status: DeploymentStatus,
+    notes?: string
+  ): Promise<DeploymentRequest> {
+    const user = await getCurrentUser();
+    if (!user) throw new Error('User not authenticated');
+
+    const updateData: any = { status };
+    if (notes) updateData.notes = notes;
+
+    if (status === 'approved') {
+      updateData.approved_by = user.id;
+      updateData.approved_at = new Date().toISOString();
+    } else if (status === 'deployed') {
+      updateData.deployed_at = new Date().toISOString();
+    }
+
+    const { data, error } = await supabase
+      .from('deployments')
+      .update(updateData)
+      .eq('id', id)
+      .select()
+      .single();
+
+    if (error) throw error;
+
+    // Audit Log
+    const updatedRequest = this.mapDbDeploymentToApp(data);
+    await auditService.logAction({
+      workspaceId: updatedRequest.workspaceId || '',
+      action: `DEPLOYMENT_${status.toUpperCase()}`,
+      entityType: 'deployment',
+      entityId: updatedRequest.id,
+      metadata: { target: updatedRequest.targetId, status }
+    });
+
+    return updatedRequest;
+  },
+
+  // Delete a deployment request
+  async deleteDeploymentRequest(id: string): Promise<void> {
+    const { error } = await supabase
+      .from('deployments')
+      .delete()
+      .eq('id', id);
+
+    if (error) throw error;
+  },
+
+  // Helper function to map database deployment to app deployment
+  mapDbDeploymentToApp(dbDeployment: any): DeploymentRequest {
+    return {
+      id: dbDeployment.id,
+      assetId: dbDeployment.asset_id,
+      targetId: dbDeployment.target_id,
+      status: dbDeployment.status as DeploymentStatus,
+      requestedBy: dbDeployment.user_id,
+      requestedAt: new Date(dbDeployment.requested_at).getTime(),
+      approvedBy: dbDeployment.approved_by || undefined,
+      approvedAt: dbDeployment.approved_at ? new Date(dbDeployment.approved_at).getTime() : undefined,
+      deployedAt: dbDeployment.deployed_at ? new Date(dbDeployment.deployed_at).getTime() : undefined,
+      notes: dbDeployment.notes || undefined,
+      workspaceId: dbDeployment.workspace_id || undefined,
+      userId: dbDeployment.user_id,
+    };
+  }
+};
+
+// Audit Services
+export const auditService = {
+  // Record a new audit log
+  async logAction(log: Omit<AuditLog, 'id' | 'createdAt' | 'userId'>): Promise<void> {
+    try {
+      const user = await getCurrentUser();
+
+      const { error } = await supabase
+        .from('audit_logs')
+        .insert({
+          workspace_id: log.workspaceId,
+          user_id: user?.id || null,
+          action: log.action,
+          entity_type: log.entityType,
+          entity_id: log.entityId,
+          metadata: log.metadata || {},
+          user_agent: typeof window !== 'undefined' ? window.navigator.userAgent : 'Server'
+        });
+
+      if (error) throw error;
+    } catch (error: any) {
+      console.warn('Failed to record audit log:', error.message);
+    }
+  },
+
+  // Get audit logs for a workspace
+  async getAuditLogs(workspaceId: string): Promise<AuditLog[]> {
+    try {
+      const { data, error } = await supabase
+        .from('audit_logs')
+        .select('*')
+        .eq('workspace_id', workspaceId)
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+      return (data || []).map(this.mapDbLogToApp);
+    } catch (error: any) {
+      console.warn('Failed to fetch audit logs:', error.message);
+      return [];
+    }
+  },
+
+  // Helper function to map database log to app log
+  mapDbLogToApp(dbLog: any): AuditLog {
+    return {
+      id: dbLog.id,
+      workspaceId: dbLog.workspace_id,
+      userId: dbLog.user_id || undefined,
+      action: dbLog.action,
+      entityType: dbLog.entity_type,
+      entityId: dbLog.entity_id || undefined,
+      metadata: dbLog.metadata,
+      createdAt: new Date(dbLog.created_at).getTime(),
+    };
+  }
+};
+
 // Workspace Services
 export const organizationService = {
   // Get all workspaces the user belongs to
@@ -584,7 +780,18 @@ export const organizationService = {
       throw memberError;
     }
 
-    return this.mapDbOrgToApp(newOrg);
+    const ws = this.mapDbOrgToApp(newOrg);
+
+    // Audit Log
+    await auditService.logAction({
+      workspaceId: ws.id,
+      action: 'WORKSPACE_CREATE',
+      entityType: 'workspace',
+      entityId: ws.id,
+      metadata: { name: ws.name, slug: ws.slug }
+    });
+
+    return ws;
   },
 
   // Get workspace members

@@ -30,10 +30,11 @@ import {
   ChevronRight
 } from 'lucide-react';
 import { Button, Card } from '@/components/ui';
-import { GeneratedAsset, BrandProfile } from '@/types';
-import { generateId, downloadFile } from '@/utils';
+import { GeneratedAsset, BrandProfile, DeploymentRequest, DeploymentStatus } from '@/types';
+import { generateId, downloadFile, copyToClipboard } from '@/utils';
 import { toast } from 'sonner';
 import { fadeIn, slideUp, staggerContainer, scaleIn, cardHover } from '@/utils/animations';
+import { deploymentService, auditService } from '@/services/persistence.service';
 
 interface DeploymentViewProps {
   brand: BrandProfile;
@@ -51,18 +52,7 @@ interface DeploymentTarget {
   color: string;
 }
 
-interface DeploymentRequest {
-  id: string;
-  assetId: string;
-  targetId: string;
-  status: 'pending' | 'approved' | 'rejected' | 'deployed';
-  requestedBy: string;
-  requestedAt: Date;
-  approvedBy?: string;
-  approvedAt?: Date;
-  deployedAt?: Date;
-  notes?: string;
-}
+// Use global types from @/types
 
 export const DeploymentView = React.memo<DeploymentViewProps>(({ brand, assets }) => {
   const [selectedAssets, setSelectedAssets] = useState<string[]>([]);
@@ -71,8 +61,25 @@ export const DeploymentView = React.memo<DeploymentViewProps>(({ brand, assets }
   const [selectedTarget, setSelectedTarget] = useState<string>('');
   const [selectedAsset, setSelectedAsset] = useState<string>('');
   const [notes, setNotes] = useState('');
+  const [loadingRequests, setLoadingRequests] = useState(true);
+
+  // Load initial deployment requests
+  useEffect(() => {
+    const loadRequests = async () => {
+      try {
+        const requests = await deploymentService.getDeploymentRequests(brand.workspaceId);
+        setDeploymentRequests(requests);
+      } catch (error) {
+        console.error('Failed to load deployment requests:', error);
+      } finally {
+        setLoadingRequests(false);
+      }
+    };
+    loadRequests();
+  }, [brand.workspaceId]);
 
   const deploymentTargets: DeploymentTarget[] = React.useMemo(() => [
+    // ... (rest of the file remains similar but using service calls)
     {
       id: 'figma',
       name: 'Figma Sync',
@@ -143,55 +150,58 @@ export const DeploymentView = React.memo<DeploymentViewProps>(({ brand, assets }
     );
   };
 
-  const handleApprove = (requestId: string) => {
-    setDeploymentRequests(prev => prev.map(req =>
-      req.id === requestId
-        ? { ...req, status: 'approved', approvedBy: 'art-director@nexus.ai', approvedAt: new Date() }
-        : req
-    ));
-    toast.success('Request authorized for deployment');
+  const handleApprove = async (requestId: string) => {
+    try {
+      const updated = await deploymentService.updateDeploymentStatus(requestId, 'approved');
+      setDeploymentRequests(prev => prev.map(req => req.id === requestId ? updated : req));
+      toast.success('Request authorized for deployment');
+    } catch (error) {
+      toast.error('Failed to update status');
+    }
   };
 
-  const handleReject = (requestId: string) => {
-    setDeploymentRequests(prev => prev.map(req =>
-      req.id === requestId
-        ? { ...req, status: 'rejected', approvedBy: 'art-director@nexus.ai', approvedAt: new Date() }
-        : req
-    ));
-    toast.error('Deployment request denied');
+  const handleReject = async (requestId: string) => {
+    try {
+      const updated = await deploymentService.updateDeploymentStatus(requestId, 'rejected');
+      setDeploymentRequests(prev => prev.map(req => req.id === requestId ? updated : req));
+      toast.error('Deployment request denied');
+    } catch (error) {
+      toast.error('Failed to update status');
+    }
   };
 
-  const handleDeploy = (requestId: string) => {
-    setDeploymentRequests(prev => prev.map(req =>
-      req.id === requestId
-        ? { ...req, status: 'deployed', deployedAt: new Date() }
-        : req
-    ));
-    toast.success('Payload successfully synchronized to target');
+  const handleDeploy = async (requestId: string) => {
+    try {
+      const updated = await deploymentService.updateDeploymentStatus(requestId, 'deployed');
+      setDeploymentRequests(prev => prev.map(req => req.id === requestId ? updated : req));
+      toast.success('Payload successfully synchronized to target');
+    } catch (error) {
+      toast.error('Synchronisation failed');
+    }
   };
 
-  const createDeploymentRequest = () => {
+  const createDeploymentRequest = async () => {
     if (!selectedAsset || !selectedTarget) {
       toast.error('Specify payload and destination');
       return;
     }
 
-    const newRequest: DeploymentRequest = {
-      id: generateId(),
-      assetId: selectedAsset,
-      targetId: selectedTarget,
-      status: 'pending',
-      requestedBy: 'current-user@nexus.ai',
-      requestedAt: new Date(),
-      notes,
-    };
+    try {
+      const newRequest = await deploymentService.createDeploymentRequest({
+        assetId: selectedAsset,
+        targetId: selectedTarget,
+        notes,
+      }, brand.workspaceId);
 
-    setDeploymentRequests(prev => [newRequest, ...prev]);
-    setShowNewRequest(false);
-    setSelectedAsset('');
-    setSelectedTarget('');
-    setNotes('');
-    toast.success('Synchronization initialized');
+      setDeploymentRequests(prev => [newRequest, ...prev]);
+      setShowNewRequest(false);
+      setSelectedAsset('');
+      setSelectedTarget('');
+      setNotes('');
+      toast.success('Synchronization initialized');
+    } catch (error) {
+      toast.error('Failed to initialize sync');
+    }
   };
 
   return (
@@ -269,9 +279,27 @@ export const DeploymentView = React.memo<DeploymentViewProps>(({ brand, assets }
                         )}
                       </div>
                       <div className="flex-1 min-w-0 space-y-1.5">
-                        <p className="text-[11px] font-mono font-black text-foreground/80 truncate uppercase tracking-wider">
-                          {asset.subject || 'Payload Alpha'}
-                        </p>
+                        <div className="flex justify-between items-start">
+                          <p className="text-[11px] font-mono font-black text-foreground/80 truncate uppercase tracking-wider">
+                            {asset.subject || 'Payload Alpha'}
+                          </p>
+                          <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                            <button
+                              onClick={(e) => { e.stopPropagation(); copyToClipboard(asset.url); toast.success('URL replicated to clipboard'); }}
+                              className="p-1 hover:text-primary transition-colors"
+                              title="Copy URL"
+                            >
+                              <ExternalLink size={12} />
+                            </button>
+                            <button
+                              onClick={(e) => { e.stopPropagation(); downloadFile(asset.url, `brand-asset-${asset.id}.png`); toast.success('Payload downloaded'); }}
+                              className="p-1 hover:text-primary transition-colors"
+                              title="Download Asset"
+                            >
+                              <Download size={12} />
+                            </button>
+                          </div>
+                        </div>
                         <div className="flex items-center gap-3">
                           <span className={`text-[8px] font-mono font-black px-2 py-0.5 border ${asset.complianceScore >= 90 ? 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20' :
                             'bg-amber-500/10 text-amber-500 border-amber-500/20'
@@ -408,7 +436,7 @@ export const DeploymentView = React.memo<DeploymentViewProps>(({ brand, assets }
                               </div>
                               <div className="flex flex-wrap gap-6 text-[9px] font-mono font-bold text-muted-foreground/60 uppercase tracking-widest">
                                 <span className="flex items-center gap-2 border-r border-border/20 pr-4"><User size={10} className="text-primary/40" /> {request.requestedBy}</span>
-                                <span className="flex items-center gap-2"><Calendar size={10} className="text-primary/40" /> {request.requestedAt.toLocaleDateString()}</span>
+                                <span className="flex items-center gap-2"><Calendar size={10} className="text-primary/40" /> {new Date(request.requestedAt).toLocaleDateString()}</span>
                               </div>
                             </div>
 
@@ -431,6 +459,50 @@ export const DeploymentView = React.memo<DeploymentViewProps>(({ brand, assets }
                                     Deny
                                   </Button>
                                 </>
+                              )}
+                              {(request.status === 'approved' || request.status === 'deployed') && (
+                                <div className="flex gap-2">
+                                  <Button
+                                    size="sm"
+                                    onClick={async () => {
+                                      const asset = assets.find(a => a.id === request.assetId);
+                                      if (asset) {
+                                        await copyToClipboard(asset.url);
+                                        await auditService.logAction({
+                                          workspaceId: brand.workspaceId,
+                                          action: 'ASSET_COPIED',
+                                          entityType: 'asset',
+                                          entityId: asset.id,
+                                          metadata: { requestId: request.id }
+                                        });
+                                        toast.success('Asset URL replicated');
+                                      }
+                                    }}
+                                    className="h-9 px-3 border border-border/40 text-[9px] font-mono font-black tracking-widest uppercase hover:bg-primary hover:text-white transition-all rounded-none"
+                                  >
+                                    Copy
+                                  </Button>
+                                  <Button
+                                    size="sm"
+                                    onClick={async () => {
+                                      const asset = assets.find(a => a.id === request.assetId);
+                                      if (asset) {
+                                        downloadFile(asset.url, `deployment-${request.id}.png`);
+                                        await auditService.logAction({
+                                          workspaceId: brand.workspaceId,
+                                          action: 'ASSET_DOWNLOADED',
+                                          entityType: 'asset',
+                                          entityId: asset.id,
+                                          metadata: { requestId: request.id }
+                                        });
+                                        toast.success('Asset payload downloaded');
+                                      }
+                                    }}
+                                    className="h-9 px-3 border border-border/40 text-[9px] font-mono font-black tracking-widest uppercase hover:bg-primary hover:text-white transition-all rounded-none"
+                                  >
+                                    DL
+                                  </Button>
+                                </div>
                               )}
                               {request.status === 'approved' && (
                                 <Button
