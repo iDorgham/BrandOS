@@ -131,7 +131,7 @@ export const UserMenu: React.FC<UserMenuProps> = ({ onNavigate }) => {
                                 className="w-full flex items-center gap-3 px-3 py-3 rounded-xl text-[10px] font-black uppercase tracking-[0.2em] text-rose-500 hover:bg-rose-500/10 transition-all group"
                             >
                                 <LogOut size={16} />
-                                Terminate Session
+                                Logout
                             </button>
                         </div>
 
