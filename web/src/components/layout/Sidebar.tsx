@@ -87,13 +87,13 @@ export const Sidebar: React.FC<SidebarProps> = React.memo(({ activeTab, onTabCha
                                     aria-label={`Navigate to ${tab.label}`}
                                     aria-current={activeTab === tab.id ? 'page' : undefined}
                                     title={isCollapsed ? tab.label : undefined}
-                                    className={`w-full flex items-center gap-4 h-[48px] px-0 relative group transition-colors ${activeTab === tab.id
-                                        ? 'bg-muted/80 text-foreground font-medium'
+                                    className={`w-full flex items-center gap-4 h-[48px] px-0 relative group transition-all duration-200 ${activeTab === tab.id
+                                        ? 'bg-card border-y border-r border-border/40 shadow-sm text-primary font-bold'
                                         : 'text-muted-foreground hover:bg-muted/40 hover:text-foreground'
                                         } ${isCollapsed ? 'justify-center' : 'pl-4'}`}
                                 >
                                     {activeTab === tab.id && (
-                                        <div className="absolute left-0 top-0 bottom-0 w-[4px] bg-primary" />
+                                        <div className="absolute left-0 top-0 bottom-0 w-[3px] bg-primary" />
                                     )}
                                     <tab.icon size={20} className={`shrink-0 ${activeTab === tab.id ? 'text-primary' : 'group-hover:text-primary transition-colors'}`} />
                                     {!isCollapsed && (

@@ -39,7 +39,7 @@ export const DoctrineView = React.memo<DoctrineViewProps>(({ brand, onUpdateBran
     const [isAnalyzingReference, setIsAnalyzingReference] = useState(false);
     const [analysisModalOpen, setAnalysisModalOpen] = useState(false);
     const [extractedData, setExtractedData] = useState<any>(null);
-    const [showWizard, setShowWizard] = useState(true); // Toggle between wizard and advanced
+    const [showWizard, setShowWizard] = useState(false); // Toggle between wizard and advanced
 
     const handleUpdateColor = (id: string, updates: Partial<BrandColor>) => {
         onUpdateBrand({ ...brand, palette: brand.palette.map(c => c.id === id ? { ...c, ...updates } : c) });

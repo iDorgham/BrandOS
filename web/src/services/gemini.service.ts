@@ -4,8 +4,7 @@ import { BrandProfile, GeneratedAsset } from "../types";
 
 const getAI = () => {
     // Try to get key from Vite's built-in env loader (VITE_ prefixed)
-    // or from a global fallback if provided by a secure injection pattern
-    const key = import.meta.env.VITE_GEMINI_API_KEY || (process.env as any).GEMINI_API_KEY;
+    const key = import.meta.env.VITE_GEMINI_API_KEY;
     if (!key) {
         console.warn("GEMINI_API_KEY is missing. AI features will be limited.");
     }
@@ -13,7 +12,7 @@ const getAI = () => {
 };
 
 export const checkApiKeyStatus = async () => {
-    const key = import.meta.env.VITE_GEMINI_API_KEY || (process.env as any).GEMINI_API_KEY;
+    const key = import.meta.env.VITE_GEMINI_API_KEY;
     if (!key) return false;
 
     if (typeof (window as any).aistudio?.hasSelectedApiKey === 'function') {

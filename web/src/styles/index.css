@@ -240,6 +240,53 @@ html {
     backface-visibility: hidden;
     perspective: 1000;
   }
+
+  /* Refined Carbon-style scrollbar */
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 4px;
+    height: 4px;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    background: var(--cds-layer-03);
+    border-radius: 2px;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: var(--cds-text-placeholder);
+  }
+
+  .light .custom-scrollbar::-webkit-scrollbar-thumb {
+    background: #c6c6c6;
+    /* Gray 30 */
+  }
+
+  .light .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: #8d8d8d;
+    /* Gray 50 */
+  }
+}
+
+@keyframes progress-indeterminate {
+  0% {
+    transform: translateX(-100%) scaleX(0.2);
+  }
+
+  50% {
+    transform: translateX(0%) scaleX(0.5);
+  }
+
+  100% {
+    transform: translateX(100%) scaleX(0.2);
+  }
+}
+
+.animate-progress-indeterminate {
+  animation: progress-indeterminate 1.5s infinite linear;
 }
 
 @keyframes shift {

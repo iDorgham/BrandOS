@@ -20,16 +20,20 @@ import { AppearanceSettings } from './AppearanceSettings';
 import { ProfileSettings } from './ProfileSettings';
 import { SecuritySettings } from './SecuritySettings';
 import { TeamView } from '../team/TeamView';
+import { AuditLogDashboard } from '../audit/AuditLogDashboard';
 import { AuthStatus } from '@/components/auth/Auth';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface SettingsLayoutProps {
     onAuth: () => void;
 }
 
-type SettingsSection = 'general' | 'profile' | 'security' | 'appearance' | 'team' | 'market' | 'api';
+type SettingsSection = 'general' | 'profile' | 'security' | 'appearance' | 'team' | 'market' | 'api' | 'compliance';
 
 export const SettingsLayout: React.FC<SettingsLayoutProps> = ({ onAuth }) => {
     const [activeSection, setActiveSection] = useState<SettingsSection>('general');
+    const { userRole } = useAuth();
+    const isAdmin = userRole === 'admin';
 
     const MENU = [
         { id: 'general', label: 'General', icon: Settings },
@@ -37,6 +41,7 @@ export const SettingsLayout: React.FC<SettingsLayoutProps> = ({ onAuth }) => {
         { id: 'security', label: 'Security', icon: Shield },
         { id: 'appearance', label: 'Appearance', icon: Monitor },
         { id: 'team', label: 'Team', icon: Users },
+        ...(isAdmin ? [{ id: 'compliance', label: 'Compliance', icon: Activity }] : []),
         { id: 'market', label: 'Modules', icon: Box },
         { id: 'api', label: 'API Keys', icon: Key },
     ];
@@ -84,6 +89,7 @@ export const SettingsLayout: React.FC<SettingsLayoutProps> = ({ onAuth }) => {
                             {activeSection === 'security' && <SecuritySettings />}
                             {activeSection === 'appearance' && <AppearanceSettings />}
                             {activeSection === 'team' && <TeamView />}
+                            {activeSection === 'compliance' && <AuditLogDashboard />}
                             {activeSection === 'api' && <ApiKeysView />}
                             {activeSection === 'market' && <NodesMarketView />}
                         </motion.div>

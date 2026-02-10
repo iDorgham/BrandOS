@@ -7,6 +7,7 @@ import { toast } from 'sonner';
 
 export const WorkspaceSwitcher: React.FC = () => {
     const { workspaces, activeWorkspace, setActiveWorkspace, refreshData } = useAuth();
+    console.log('DEBUG: WorkspaceSwitcher rendering with:', { workspaces, activeWorkspace });
     const [isOpen, setIsOpen] = useState(false);
     const [isCreating, setIsCreating] = useState(false);
     const [newOrgName, setNewOrgName] = useState('');
@@ -102,8 +103,8 @@ export const WorkspaceSwitcher: React.FC = () => {
                                     onKeyDown={(e) => e.key === 'Enter' && handleCreateOrg()}
                                 />
                                 <div className="flex gap-1">
-                                    <Button size="xs" className="flex-1 text-[10px]" onClick={handleCreateOrg}>Create</Button>
-                                    <Button size="xs" variant="ghost" className="flex-1 text-[10px]" onClick={() => setIsCreating(false)}>Cancel</Button>
+                                    <Button size="sm" className="flex-1 text-[10px]" onClick={handleCreateOrg}>Create</Button>
+                                    <Button size="sm" variant="ghost" className="flex-1 text-[10px]" onClick={() => setIsCreating(false)}>Cancel</Button>
                                 </div>
                             </div>
                         )}

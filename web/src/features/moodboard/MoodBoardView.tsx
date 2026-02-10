@@ -18,13 +18,15 @@ import {
   useViewport,
   useReactFlow,
   ReactFlowProvider,
+  SelectionMode,
   type ConnectionMode,
 } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
 
-import { Button, Card, Input } from '@/components/ui';
+import { Button, Card, Input, Popover, PopoverContent, PopoverTrigger } from '@/components/ui';
 import { NodesMarketView } from '@/features/settings/NodesMarketView';
 import { MoodboardSelector } from './MoodboardSelector';
+import { MoodBoardSettingsPanel } from './MoodBoardSettingsPanel';
 import { useMoodboards } from '@/hooks/useMoodboards';
 import {
   Plus,
@@ -36,9 +38,11 @@ import {
   Upload,
   Edit3,
   Save,
+  Settings,
   X,
   Maximize2,
   Minimize2,
+  Minus,
   MousePointer2,
   Zap,
   Palette,
@@ -65,23 +69,45 @@ import {
   Target,
   Heart,
   Power,
+  Lock,
+  Unlock,
   Search,
+  Terminal,
+  Navigation,
+  Hash,
+  Move,
   Undo2,
   Redo2,
   CircleDot,
   Globe,
-  Chrome
+  Chrome,
+  Blocks,
+  Loader2,
+  LogOut,
+  Play,
+  Square,
+  BoxSelect,
+  Hand,
+  Music,
+  CloudRain,
+  Cpu,
+  Database,
+  Code,
+  Share,
+  Link,
+  Smile
 } from 'lucide-react';
 import { BrandProfile } from '@/types';
 import { generateId } from '@/utils';
 import { toast } from 'sonner';
 import { usePresence, type PresenceState } from '@/hooks/usePresence';
 import { useNodeManager } from '@/hooks/useNodeManager';
+import { useTheme } from '@/contexts/ThemeContext';
 
 // Custom node types
-interface MoodNodeData extends Record<string, unknown> {
+export interface MoodNodeData extends Record<string, unknown> {
   label: string;
-  type: 'image' | 'text' | 'attribute' | 'logic' | 'preset' | 'palette' | 'texture' | 'negative' | 'title' | 'paragraph' | 'typography' | 'grid' | 'tone' | 'competitor' | 'mood_gauge' | 'icons' | 'reference';
+  type: 'image' | 'text' | 'attribute' | 'logic' | 'preset' | 'palette' | 'texture' | 'negative' | 'title' | 'paragraph' | 'typography' | 'grid' | 'tone' | 'competitor' | 'mood_gauge' | 'icons' | 'reference' | 'label' | 'section' | 'midjourney' | 'weather' | 'spotify' | 'web_ref' | 'cms_sync';
   content?: string;
   imageUrl?: string;
   color?: string;
@@ -103,21 +129,23 @@ interface MoodNodeData extends Record<string, unknown> {
   variant?: string;
   intensity?: number;
   isActive?: boolean;
+  isLocked?: boolean;
   onChange?: (id: string, newData: Partial<MoodNodeData>, newStyle?: React.CSSProperties) => void;
 }
 
 const CustomHandle = ({ type, position, id, className, nodeColor }: { type: 'source' | 'target', position: Position, id?: string, className?: string, nodeColor?: string }) => {
   const colorClass = nodeColor ? nodeColor.replace('bg-', '') : 'primary';
   return (
-    <div className={`absolute z-50 group/handle ${position === Position.Top || position === Position.Bottom ? 'w-full h-6 left-0' : 'h-full w-6 top-0'} flex items-center justify-center pointer-events-none ${position === Position.Top ? '-top-3' : position === Position.Bottom ? '-bottom-3' : position === Position.Left ? '-left-3' : '-right-3'}`}>
+    <div className={`absolute z-50 group/handle ${position === Position.Top || position === Position.Bottom ? 'w-full h-8 left-0' : 'h-full w-8 top-0'} flex items-center justify-center pointer-events-none ${position === Position.Top ? '-top-4' : position === Position.Bottom ? '-bottom-4' : position === Position.Left ? '-left-4' : '-right-4'}`}>
       <Handle
         type={type}
         position={position}
         id={id}
         className={`
-          !w-3 !h-3 !border-[3px] !bg-background hover:!scale-125 transition-all duration-300 ease-out
-          !opacity-30 group-hover/node:!opacity-60 group-hover/handle:!opacity-100 pointer-events-auto
-          ${nodeColor ? `!border-${colorClass} hover:!bg-${colorClass} hover:!border-${colorClass}` : '!border-primary/40 hover:!bg-primary hover:!border-primary'}
+          !w-2.5 !h-2.5 !border-[2px] !bg-background hover:!scale-150 transition-all duration-300 ease-in-out
+          !opacity-20 group-hover/node:!opacity-50 group-hover/handle:!opacity-100 pointer-events-auto
+          ${nodeColor ? `!border-${colorClass} hover:!bg-${colorClass} hover:!border-${colorClass}` : '!border-primary/60 hover:!bg-primary hover:!border-primary'}
+          !rounded-none !shadow-[0_0_10px_rgba(0,0,0,0.5)]
           ${className}
         `}
       />
@@ -146,107 +174,129 @@ const NodeContainer = ({ children, selected, title, icon: Icon, typeColor, onEdi
 
   return (
     <div className={`
-      relative rounded-none border transition-all duration-700 group/node
+      relative rounded-none border transition-all duration-300 group/node
       ${selected
-        ? 'border-primary/60 shadow-[0_0_50px_rgba(15,98,254,0.15)] bg-card/95 ring-1 ring-primary/30 z-30 scale-[1.02]'
-        : 'border-border/40 bg-card/80 hover:border-primary/40 hover:bg-card/95 hover:shadow-2xl hover:scale-[1.01] z-10'}
-      backdrop-blur-2xl min-w-[200px] h-full w-full flex flex-col overflow-visible
-      after:absolute after:inset-0 after:bg-gradient-to-br after:from-white/5 after:to-transparent after:pointer-events-none
-      ${!isActive ? 'opacity-40 grayscale-[0.8]' : ''}
+        ? 'border-primary shadow-[0_4px_20px_-10px_rgba(var(--primary-rgb),0.5)] z-30 ring-1 ring-primary brightness-110'
+        : 'border-border bg-card/95 hover:border-primary/60 hover:shadow-lg z-10'}
+      min-w-[200px] h-full w-full flex flex-col overflow-visible
+      ${!isActive ? 'opacity-40 grayscale blur-[1px]' : ''}
+      ${data?.isLocked ? 'cursor-default' : ''}
     `}>
-      {/* Utility Layers (Handles & Resizers) positioned relative to the window boundary */}
+      {/* CAD Corner Accents - Technical Detail */}
+      <div className={`absolute -top-[1px] -left-[1px] w-1.5 h-1.5 border-t border-l border-primary transition-opacity duration-300 pointer-events-none z-50 ${selected ? 'opacity-100' : 'opacity-0 group-hover/node:opacity-50'}`} />
+      <div className={`absolute -top-[1px] -right-[1px] w-1.5 h-1.5 border-t border-r border-primary transition-opacity duration-300 pointer-events-none z-50 ${selected ? 'opacity-100' : 'opacity-0 group-hover/node:opacity-50'}`} />
+      <div className={`absolute -bottom-[1px] -left-[1px] w-1.5 h-1.5 border-b border-l border-primary transition-opacity duration-300 pointer-events-none z-50 ${selected ? 'opacity-100' : 'opacity-0 group-hover/node:opacity-50'}`} />
+      <div className={`absolute -bottom-[1px] -right-[1px] w-1.5 h-1.5 border-b border-r border-primary transition-opacity duration-300 pointer-events-none z-50 ${selected ? 'opacity-100' : 'opacity-0 group-hover/node:opacity-50'}`} />
+
+      {/* Internal Grid/Scanlines Background */}
+      <div className="absolute inset-0 pointer-events-none overflow-hidden opacity-[0.02] z-0 mix-blend-overlay">
+        <div className="absolute inset-0 bg-[linear-gradient(rgba(18,16,16,0)_50%,rgba(0,0,0,0.25)_50%),linear-gradient(90deg,rgba(255,0,0,0.06),rgba(0,255,0,0.02),rgba(0,0,255,0.06))] bg-[length:100%_2px,3px_100%]" />
+      </div>
+
       {isActive && resizer}
       {isActive && handles}
 
-      {/* Top Header - Color coded from map */}
+      {/* Top Color Bar - Prominent Identification */}
       {!hideHeaderBar && (
         <div className={`
-          h-1.5 w-full bg-opacity-80 transition-opacity duration-300
-          ${data.customColor || typeColor}
-        `} />
+          h-[2px] w-full transition-all duration-300 relative overflow-hidden
+          ${data.customColor || (typeColor ? typeColor : 'bg-primary')}
+          ${selected ? 'opacity-100 shadow-[0_0_10px_rgba(var(--primary-rgb),0.4)]' : 'opacity-90'}
+        `}>
+          {selected && <div className="absolute inset-0 bg-white/20 animate-pulse" />}
+        </div>
       )}
 
-      {/* Window Title Bar */}
+      {/* Window Title Bar - Glassmorphic & Technical */}
       <div className={`
-        flex items-center justify-between px-3 py-2 border-b border-border/20
-        ${selected ? 'bg-primary/10' : 'bg-muted/5'}
-        transition-colors duration-500
+        flex items-center justify-between px-2 py-1.5 border-b border-border/10
+        ${selected ? 'bg-primary/5' : 'bg-muted/10'}
+        backdrop-blur-[1px]
+        transition-colors duration-300 relative z-10
       `}>
-        <div className="flex-1 flex items-center gap-2.5 min-w-0">
+        <div className="flex-1 flex items-center gap-2 min-w-0">
           <button
             onClick={(e) => {
               e.stopPropagation();
               data.onChange?.(id, { isActive: !isActive });
             }}
             className={`
-              p-1 rounded-none transition-all duration-300 group/power shrink-0
-              ${isActive ? 'bg-primary/10 text-primary border border-primary/20' : 'bg-muted/20 text-muted-foreground/40 border border-border/20 grayscale-0'}
-              hover:scale-110 active:scale-95
+              p-0.5 transition-all duration-200 group/power shrink-0
+              ${isActive ? 'text-primary opacity-80 hover:opacity-100' : 'text-muted-foreground/40 hover:text-muted-foreground'}
+              ${data?.isLocked ? 'opacity-30 cursor-not-allowed' : ''}
             `}
-            title={isActive ? 'Deactivate Module' : 'Activate Module'}
+            disabled={data?.isLocked}
+            title={data?.isLocked ? 'Locked' : (isActive ? 'System::Deactivate' : 'System::Initialize')}
           >
-            <Power size={8} strokeWidth={3} className={isActive ? 'drop-shadow-[0_0_5px_rgba(15,98,254,0.5)]' : ''} />
+            <Power size={10} strokeWidth={2.5} />
           </button>
 
           <div className="flex flex-col flex-1 min-w-0">
             <input
               value={data.label}
+              disabled={data?.isLocked}
               onChange={(e) => data.onChange?.(id, { label: e.target.value })}
-              className="bg-transparent border-none outline-none text-[10px] font-black uppercase tracking-[0.15em] text-foreground/90 font-display leading-tight w-full hover:bg-foreground/5 focus:bg-foreground/10 px-1 -ml-1 transition-colors"
+              className={`bg-transparent border-none outline-none text-[9px] font-black uppercase tracking-[0.15em] text-foreground/90 font-mono leading-tight w-full transition-colors ${data?.isLocked ? 'cursor-default' : 'hover:text-primary focus:text-primary'}`}
               onClick={(e) => e.stopPropagation()}
             />
-            {data?.type && (
-              <span className="text-[6px] font-mono font-bold text-primary/30 group-hover/node:text-primary/60 transition-colors uppercase px-1">
-                MOD::{data.type}
-              </span>
+            {selected && (
+              <div className="flex items-center gap-1.5 animate-in fade-in duration-300">
+                <span className="text-[5px] font-mono font-bold text-primary/60 uppercase tracking-[0.1em]">
+                  MOD::{data.type?.substring(0, 3).toUpperCase() || 'SYS'}
+                </span>
+                <span className="text-[5px] font-mono text-muted-foreground/30 uppercase tracking-tighter">
+                  ACTIVE
+                </span>
+              </div>
             )}
           </div>
         </div>
 
-        <div className="flex items-center gap-2 shrink-0">
+        <div className="flex items-center gap-1.5 shrink-0">
           <div className={`
-            p-1 rounded-none ${typeColor} bg-opacity-10 ring-1 ring-inset ring-black/5 dark:ring-white/5 
-             shadow-sm transition-transform duration-500 group-hover/node:scale-110
+            w-4 h-4 flex items-center justify-center bg-card/50 border border-border/20 shadow-sm
           `}>
-            <Icon className={typeColor.replace('bg-', 'text-')} size={10} strokeWidth={2.5} />
+            {Icon ? <Icon className={typeColor ? typeColor.replace('bg-', 'text-') : 'text-primary'} size={8} strokeWidth={2} /> : <div className="w-1 h-1 bg-primary rounded-full" />}
           </div>
-          {isActive && (
+          {data?.isLocked && (
+            <Lock size={8} className="text-muted-foreground/40" />
+          )}
+          {isActive && !data?.isLocked && (
             <button
               onClick={onEdit}
-              className="p-1 hover:bg-primary/10 rounded-none transition-all text-muted-foreground/30 hover:text-primary opacity-0 group-hover/node:opacity-100 ml-1"
-              title="Adjust Parameters"
+              className="hover:bg-primary/10 rounded-sm transition-all text-muted-foreground/40 hover:text-primary opacity-0 group-hover/node:opacity-100"
+              title="Edit"
             >
-              <Edit3 size={11} />
+              <Edit3 size={10} />
             </button>
           )}
         </div>
       </div>
 
-      {/* Window Body & Interaction Layer */}
+      {/* Content Area */}
       <div className={`
-        flex-1 flex flex-col relative overflow-visible z-10 bg-gradient-to-b from-transparent to-black/5 shadow-inner
-        ${!isActive ? 'pointer-events-none select-none' : ''}
-      `}>
-        {/* Main Content Area - removed default p-4 to allow edge-to-edge content */}
-        <div className="relative z-10 flex-1 flex flex-col h-full text-[10px] text-muted-foreground/80 leading-relaxed font-medium">
+        flex-1 flex flex-col relative overflow-visible z-10 
+        ${!isActive ? 'opacity-30 pointer-events-none select-none' : ''}
+      `} style={{
+          fontFamily: data.fontFamily || 'inherit',
+          fontSize: data.fontSize ? `${data.fontSize}px` : 'inherit',
+          color: data.color || 'inherit'
+        }}>
+        <div className="relative z-10 flex-1 flex flex-col h-full text-[10px] text-muted-foreground/90 leading-relaxed px-0">
           {children}
         </div>
 
-        {/* Advanced Metadata Footer (Visible on Hover) - adjusted padding */}
-        <div className="mt-auto px-4 pb-2 pt-2 border-t border-border/10 flex items-center justify-between opacity-0 group-hover/node:opacity-100 transition-all duration-500 delay-100 translate-y-1 group-hover/node:translate-y-0">
-          <div className="flex gap-1.5">
-            <div className={`w-1 h-1 rounded-full ${isActive ? 'bg-primary/40 animate-pulse' : 'bg-muted-foreground/20'}`} />
-            <div className={`w-1 h-1 rounded-full ${isActive ? 'bg-primary/20' : 'bg-muted-foreground/10'}`} />
-          </div>
-          <div className="flex items-center gap-2">
-            <span className="text-[7px] font-mono text-muted-foreground/20 uppercase tracking-[0.2em]">
-              sys_id::{data?.id?.substring(0, 8) || 'xxxx'}
-            </span>
-            <div className="w-2 h-[1px] bg-primary/20" />
-            <span className={`text-[7px] font-mono uppercase font-black ${isActive ? 'text-primary/40' : 'text-muted-foreground/20'}`}>
-              {isActive ? 'ACTIVE' : 'OFFLINE'}
+        {/* Tactical Footer - Minimized Status Bar */}
+        <div className="mt-auto px-2 py-1 border-t border-border/5 flex items-center justify-between opacity-60 group-hover/node:opacity-100 transition-opacity duration-300 bg-background/30 backdrop-blur-[1px]">
+          <div className="flex items-center gap-1.5">
+            <div className={`w-1 h-1 rounded-full ${isActive ? 'bg-primary animate-pulse' : 'bg-muted-foreground/20'}`} />
+            <span className="text-[5px] font-mono text-muted-foreground/50 uppercase tracking-[0.1em]">
+              {data.type?.toUpperCase() || 'UNKNOWN'}
             </span>
           </div>
+          <span className="text-[5px] font-mono text-muted-foreground/30 uppercase tracking-[0.2em]">
+            ID::{data?.id?.substring(0, 4) || 'NULL'}
+          </span>
         </div>
       </div>
     </div>
@@ -268,6 +318,7 @@ const useMoodBoard = () => {
 interface MoodBoardViewProps {
   brand: BrandProfile;
   setHeaderActions: (actions: React.ReactNode) => void;
+  setIsAppSidebarCollapsed?: (collapsed: boolean) => void;
 }
 
 const ImageNode = React.memo(({ id, data, selected }: { id: string; data: MoodNodeData; selected: boolean }) => {
@@ -322,48 +373,68 @@ const ImageNode = React.memo(({ id, data, selected }: { id: string; data: MoodNo
           minWidth={120}
           minHeight={100}
           isVisible={selected}
-          lineClassName="!border-primary/30"
-          handleClassName="!w-1.5 !h-1.5 !bg-primary/40 !border-background !rounded-none"
+          lineClassName="!border-primary/40"
+          handleClassName="!w-2 !h-2 !bg-primary !border-background !rounded-none shadow-xl"
         />
       }
     >
       {isEditing && (
-        <input
-          type="text"
-          value={tempLabel}
-          onChange={(e) => setTempLabel(e.target.value)}
-          onBlur={() => { data.onChange?.(id, { label: tempLabel }); setIsEditing(false); }}
-          className="w-full bg-accent/20 rounded-none px-2 py-1 text-[10px] mb-2 outline-none border border-primary/20 font-medium"
-          autoFocus
-        />
+        <div className="px-3 pt-2">
+          <input
+            type="text"
+            value={tempLabel}
+            onChange={(e) => setTempLabel(e.target.value)}
+            onBlur={() => { data.onChange?.(id, { label: tempLabel }); setIsEditing(false); }}
+            className="w-full bg-muted/40 border-b border-primary/40 text-[10px] font-mono font-black outline-none py-1 uppercase tracking-widest"
+            autoFocus
+          />
+        </div>
       )}
       <div
-        className="relative flex-1 bg-muted/20 rounded-none overflow-hidden group/img cursor-pointer border border-border/50 hover:border-primary/30 transition-all min-h-0 flex flex-col justify-center shadow-inner"
+        className="relative flex-1 bg-muted overflow-hidden group/img cursor-crosshair transition-all min-h-0 flex flex-col justify-center"
         onClick={() => fileInputRef.current?.click()}
       >
         {data.imageUrl ? (
           <>
-            <img src={data.imageUrl} alt={data.label} className="w-full h-full object-cover opacity-90 group-hover/img:opacity-50 transition-opacity duration-700 blur-[0px] group-hover/img:blur-[2px]" />
-            <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover/img:opacity-100 transition-opacity duration-300">
-              <div className="bg-popover/90 backdrop-blur-xl px-3 py-1.5 rounded-none border border-border flex items-center gap-2 transform translate-y-1 group-hover/img:translate-y-0 transition-transform shadow-2xl">
+            <img src={data.imageUrl} alt={data.label} className="w-full h-full object-cover transition-all duration-700 contrast-[1.1] saturate-[0.9]" />
+            {/* Viewport Overlay UI - Clean Technical */}
+            <div className="absolute inset-0 border border-primary/20 opacity-0 group-hover/img:opacity-100 transition-opacity pointer-events-none">
+              <div className="absolute top-0 left-0 w-2 h-2 border-t border-l border-primary" />
+              <div className="absolute top-0 right-0 w-2 h-2 border-t border-r border-primary" />
+              <div className="absolute bottom-0 left-0 w-2 h-2 border-b border-l border-primary" />
+              <div className="absolute bottom-0 right-0 w-2 h-2 border-b border-r border-primary" />
+            </div>
+
+            <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover/img:opacity-100 transition-all duration-300">
+              <div className="bg-background/90 backdrop-blur-sm px-3 py-1.5 border border-primary/30 flex items-center gap-2 transform translate-y-2 group-hover/img:translate-y-0 transition-transform shadow-sm">
                 <Upload size={10} className="text-primary" />
-                <span className="text-[8px] font-bold tracking-widest text-muted-foreground uppercase">Update_Asset</span>
+                <span className="text-[9px] font-mono font-bold tracking-widest text-foreground uppercase">INFUSE_DNA</span>
               </div>
             </div>
-            <div className="absolute bottom-0 left-0 right-0 p-2 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover/img:opacity-100 transition-opacity">
-              <div className="flex justify-between items-center text-[6px] font-mono text-white/70">
-                <span>ANALYSIS: ACTIVE</span>
-                <span>RES: {String(data.width)}x{String(data.height)}</span>
+
+            {/* Technical Metadata Bar */}
+            <div className="absolute bottom-0 left-0 right-0 p-2 bg-background/90 backdrop-blur-md border-t border-border/20 opacity-0 group-hover/img:opacity-100 transition-opacity">
+              <div className="flex justify-between items-center text-[7px] font-mono text-muted-foreground tracking-widest">
+                <div className="flex items-center gap-1.5">
+                  <div className="w-1 h-1 rounded-full bg-primary animate-pulse" />
+                  <span>ANALYSIS::ACTIVE_V2</span>
+                </div>
+                <div className="px-1.5 py-0.5 border border-border/40 bg-card/50">
+                  {String(data.width)}x{String(data.height)}
+                </div>
               </div>
             </div>
           </>
         ) : (
-          <div className="flex flex-col items-center justify-center h-full gap-2 opacity-30 group-hover/img:opacity-100 transition-all py-8">
-            <div className="w-8 h-8 rounded-none bg-muted/30 flex items-center justify-center border border-border group-hover/img:border-primary/30 transition-colors shadow-sm">
-              <Upload size={12} className="text-primary/60" />
+          <div className="flex flex-col items-center justify-center h-full gap-3 transition-all py-8">
+            <div className="w-10 h-10 bg-muted/20 flex items-center justify-center border border-border/40 group-hover/img:border-primary/50 transition-all relative">
+              <Upload size={14} className="text-muted-foreground/40 group-hover/img:text-primary/60" strokeWidth={1.5} />
+              <div className="absolute -top-px -left-px w-1.5 h-1.5 border-t border-l border-primary/40" />
+              <div className="absolute -bottom-px -right-px w-1.5 h-1.5 border-b border-r border-primary/40" />
             </div>
-            <div className="text-center">
-              <span className="text-[8px] font-black tracking-[0.2em] block uppercase text-primary/40">Inject_Visual</span>
+            <div className="space-y-0.5 text-center">
+              <span className="text-[9px] font-mono font-bold tracking-[0.2em] block uppercase text-muted-foreground/60 group-hover/img:text-primary/80 transition-colors">Capture_Ref</span>
+              <span className="text-[5px] font-mono text-muted-foreground/30 block tracking-widest uppercase">Input_Stream_Ready</span>
             </div>
           </div>
         )}
@@ -392,7 +463,7 @@ const TextNode = React.memo(({ id, data, selected }: { id: string; data: MoodNod
         <NodeResizer
           minWidth={150}
           minHeight={100}
-          isVisible={selected}
+          isVisible={selected && !data.isLocked}
           lineClassName="!border-primary/30"
           handleClassName="!w-1.5 !h-1.5 !bg-primary/40 !border-background !rounded-none"
         />
@@ -403,13 +474,13 @@ const TextNode = React.memo(({ id, data, selected }: { id: string; data: MoodNod
           value={tempContent}
           onChange={(e) => setTempContent(e.target.value)}
           onBlur={() => { data.onChange?.(id, { content: tempContent }); setIsEditing(false); }}
-          className="w-full h-full bg-muted/20 rounded-none p-4 text-[11px] leading-relaxed font-medium outline-none border border-primary/20 min-h-[120px] resize-none text-foreground/90 placeholder:text-muted-foreground/30 font-mono shadow-inner"
+          className="w-full h-full bg-muted/30 rounded-none p-3 text-[10px] leading-relaxed font-medium outline-none border border-primary/20 min-h-[120px] resize-none text-foreground font-mono shadow-sm focus:bg-background/80 transition-colors"
           placeholder="INJECT BRAND NARRATIVE..."
           autoFocus
         />
       ) : (
-        <div className="p-4 h-full flex flex-col group/text cursor-text overflow-y-auto scrollbar-thin scrollbar-thumb-white/10" onClick={() => setIsEditing(true)}>
-          <div className="flex items-center gap-1 mb-2 opacity-30 group-hover/text:opacity-80 transition-opacity">
+        <div className={`p-4 h-full flex flex-col group/text overflow-y-auto scrollbar-thin scrollbar-thumb-white/10 ${data.isLocked ? 'cursor-default' : 'cursor-text'}`} onClick={() => !data.isLocked && setIsEditing(true)}>
+          <div className="flex items-center gap-1 mb-2 opacity-60 group-hover/text:opacity-90 transition-opacity">
             <div className="w-1 h-3 bg-primary" />
             <span className="text-[7px] font-mono tracking-tighter">BLOCK_TYPE::NARRATIVE</span>
           </div>
@@ -447,7 +518,7 @@ const TitleNode = React.memo(({ id, data, selected }: { id: string; data: MoodNo
         <NodeResizer
           minWidth={150}
           minHeight={60}
-          isVisible={selected}
+          isVisible={selected && !data.isLocked}
           lineClassName="!border-primary/30"
           handleClassName="!w-1.5 !h-1.5 !bg-primary/40 !border-background !rounded-none"
         />
@@ -458,11 +529,11 @@ const TitleNode = React.memo(({ id, data, selected }: { id: string; data: MoodNo
           value={tempContent}
           onChange={(e) => setTempContent(e.target.value)}
           onBlur={() => { data.onChange?.(id, { content: tempContent }); setIsEditing(false); }}
-          className="w-full bg-muted/20 rounded-none px-4 py-3 text-xl font-bold outline-none border border-primary/20 text-foreground/80 font-display shadow-inner"
+          className="w-full bg-muted/30 rounded-none px-3 py-2 text-xl font-bold outline-none border border-primary/20 text-foreground font-display shadow-sm focus:bg-background/80 transition-colors uppercase"
           autoFocus
         />
       ) : (
-        <div className="p-6 h-full flex flex-col justify-center cursor-text group/title" onClick={() => setIsEditing(true)}>
+        <div className={`p-6 h-full flex flex-col justify-center group/title ${data.isLocked ? 'cursor-default' : 'cursor-text'}`} onClick={() => !data.isLocked && setIsEditing(true)}>
           <div className="text-[7px] font-mono tracking-[0.3em] uppercase text-primary/40 mb-2 opacity-0 group-hover/title:opacity-100 transition-opacity">TITLE_ELEMENT</div>
           <h1 className={`text-2xl font-black tracking-tighter transition-all duration-500 uppercase ${data.content ? 'text-foreground' : 'text-muted-foreground/20 italic'}`}>
             {data.content || 'ADD_TITLE'}
@@ -493,7 +564,7 @@ const ParagraphNode = React.memo(({ id, data, selected }: { id: string; data: Mo
         <NodeResizer
           minWidth={200}
           minHeight={120}
-          isVisible={selected}
+          isVisible={selected && !data.isLocked}
           lineClassName="!border-primary/30"
           handleClassName="!w-1.5 !h-1.5 !bg-primary/40 !border-background !rounded-none"
         />
@@ -504,12 +575,12 @@ const ParagraphNode = React.memo(({ id, data, selected }: { id: string; data: Mo
           value={tempContent}
           onChange={(e) => setTempContent(e.target.value)}
           onBlur={() => { data.onChange?.(id, { content: tempContent }); setIsEditing(false); }}
-          className="w-full h-full bg-muted/20 rounded-none p-4 text-[11px] leading-relaxed font-medium outline-none border border-primary/20 min-h-[120px] resize-none text-foreground/80 shadow-inner"
+          className="w-full h-full bg-muted/30 rounded-none p-3 text-[10px] leading-relaxed font-medium outline-none border border-primary/20 min-h-[120px] resize-none text-foreground/90 shadow-sm focus:bg-background/80 transition-colors font-mono"
           placeholder="Enter comprehensive narrative detail..."
           autoFocus
         />
       ) : (
-        <div className="p-4 h-full cursor-text overflow-y-auto scrollbar-thin scrollbar-thumb-white/10 pr-2" onClick={() => setIsEditing(true)}>
+        <div className={`p-4 h-full overflow-y-auto scrollbar-thin scrollbar-thumb-white/10 pr-2 ${data.isLocked ? 'cursor-default' : 'cursor-text'}`} onClick={() => !data.isLocked && setIsEditing(true)}>
           <div className="flex gap-1 mb-3 opacity-20">
             <div className="w-1 h-3 bg-slate-500" />
             <div className="w-1 h-3 bg-slate-500" />
@@ -531,57 +602,73 @@ const TypographyNode = ({ id, data, selected }: { id: string; data: MoodNodeData
   return (
     <NodeContainer
       selected={selected}
-      title="Type Spec"
+      title="Specimen"
       icon={CaseUpper}
       typeColor="bg-blue-600"
       handles={<NodeHandles nodeColor="bg-blue-600" />}
       data={{ ...data, id, type: 'typography' }}
       id={id}
     >
-      <div className="flex flex-col gap-4">
+      <div className="flex flex-col gap-4 p-4 bg-muted/10">
         <div className="space-y-2">
+          <div className="flex items-center gap-2 opacity-30 mb-1">
+            <div className="w-1 h-3 bg-primary" />
+            <span className="text-[7px] font-mono font-black uppercase tracking-[0.2em]">Font_Family_Selector</span>
+          </div>
           <select
             value={data.fontFamily}
             onChange={(e) => data.onChange?.(id, { fontFamily: e.target.value })}
-            className="w-full bg-muted border border-border/50 rounded-none px-2 py-1.5 text-[10px] font-bold outline-none focus:border-primary/50 transition-all font-mono text-foreground"
+            className="w-full bg-background border border-border/40 px-3 py-2 text-[10px] font-mono font-black outline-none focus:border-primary/60 transition-all text-foreground uppercase tracking-widest shadow-inner"
           >
-            {families.map(f => <option key={f} value={f} className="bg-background text-foreground">{f.toUpperCase()}</option>)}
+            {families.map(f => <option key={f} value={f} className="text-foreground bg-background">{f}</option>)}
           </select>
           <div className="flex gap-2">
             <select
               value={data.fontWeight}
               onChange={(e) => data.onChange?.(id, { fontWeight: e.target.value })}
-              className="flex-1 bg-muted border border-border/50 rounded-none px-2 py-1 text-[9px] font-medium outline-none text-foreground"
+              className="flex-1 bg-background border border-border/40 px-3 py-1.5 text-[9px] font-mono font-bold outline-none text-foreground uppercase tracking-wider"
             >
-              {weights.map(w => <option key={w} value={w} className="bg-background text-foreground">{w}</option>)}
+              {weights.map(w => <option key={w} value={w} className="text-foreground bg-background">{w}</option>)}
             </select>
-            <input
-              type="number"
-              value={data.fontSize || 16}
-              onChange={(e) => data.onChange?.(id, { fontSize: parseInt(e.target.value) })}
-              className="w-12 bg-muted/40 border border-border/50 rounded-none px-2 py-1 text-[9px] font-mono outline-none"
-            />
+            <div className="relative w-16 group/fs">
+              <input
+                type="number"
+                value={data.fontSize || 16}
+                onChange={(e) => data.onChange?.(id, { fontSize: parseInt(e.target.value) })}
+                className="w-full bg-background border border-border/40 px-3 py-1.5 text-[9px] font-mono font-black outline-none text-primary"
+              />
+              <span className="absolute right-2 top-1/2 -translate-y-1/2 text-[6px] font-mono opacity-20 pointer-events-none group-hover/fs:opacity-50 transition-opacity">PX</span>
+            </div>
           </div>
         </div>
 
-        <div className="p-4 bg-muted/10 border border-border/30 rounded-none min-h-[60px] flex items-center justify-center overflow-hidden">
-          <span style={{
-            fontFamily: data.fontFamily || 'Inter',
-            fontWeight: (data.fontWeight?.toLowerCase() === 'black' ? 900 : data.fontWeight?.toLowerCase() === 'bold' ? 700 : data.fontWeight?.toLowerCase() === 'medium' ? 500 : 400),
-            fontSize: `${Math.min(data.fontSize || 16, 40)}px`
-          }} className="text-foreground transition-all duration-700 truncate w-full text-center">
-            AaBbCc
-          </span>
+        <div className="p-6 bg-card border border-border/20 relative overflow-hidden group/specimen">
+          <div className="absolute top-1 left-1 w-1 h-1 bg-primary/20" />
+          <div className="absolute bottom-1 right-1 w-1 h-1 bg-primary/20" />
+
+          <div className="flex items-center justify-center min-h-[80px] overflow-hidden">
+            <span style={{
+              fontFamily: data.fontFamily || 'Inter',
+              fontWeight: (data.fontWeight?.toLowerCase() === 'black' ? 900 : data.fontWeight?.toLowerCase() === 'bold' ? 700 : data.fontWeight?.toLowerCase() === 'medium' ? 500 : 400),
+              fontSize: `${Math.min(data.fontSize || 16, 48)}px`
+            }} className="text-foreground transition-all duration-700 truncate w-full text-center tracking-tighter hover:scale-110">
+              AaBbCc123
+            </span>
+          </div>
+
+          <div className="absolute bottom-1 left-2 opacity-0 group-hover/specimen:opacity-100 transition-opacity">
+            <span className="text-[6px] font-mono text-primary/40 uppercase">Spec_Preview_Active</span>
+          </div>
         </div>
 
-        <div className="grid grid-cols-2 gap-2 text-[8px] font-mono opacity-40">
-          <div className="flex flex-col">
-            <span>L_SPACING</span>
-            <span className="text-primary">{data.letterSpacing || '0.02em'}</span>
+        <div className="grid grid-cols-2 gap-4 text-[7px] font-mono p-1">
+          <div className="flex flex-col gap-1 border-l border-primary/20 pl-2">
+            <span className="opacity-40 uppercase">Kerning</span>
+            <span className="text-primary font-black">{data.letterSpacing || 'AUTO_OPTIMIZED'}</span>
           </div>
-          <div className="flex flex-col items-end">
-            <span>L_HEIGHT</span>
-            <span className="text-primary">{data.lineHeight || '1.4'}</span>
+          <div className="flex flex-col gap-1 border-l border-primary/20 pl-2">
+            <span className="opacity-40 uppercase">Leading</span>
+            <span className="text-primary font-black">{data.lineHeight || '1.4_GRID'}</span>
           </div>
         </div>
       </div>
@@ -592,47 +679,55 @@ const TypographyNode = ({ id, data, selected }: { id: string; data: MoodNodeData
 const GridSysNode = ({ id, data, selected }: { id: string; data: MoodNodeData; selected: boolean }) => (
   <NodeContainer
     selected={selected}
-    title="Grid Sys"
+    title="Grid_Array"
     icon={Grid3X3}
     typeColor="bg-blue-600"
     handles={<NodeHandles nodeColor="bg-blue-600" />}
     data={{ ...data, id, type: 'grid' }}
     id={id}
   >
-    <div className="flex flex-col gap-4">
+    <div className="flex flex-col gap-4 p-4">
       <div className="grid grid-cols-2 gap-3">
-        <div className="space-y-1">
-          <span className="text-[8px] uppercase tracking-widest opacity-40 font-black">Columns</span>
+        <div className="space-y-1.5">
+          <div className="flex items-center gap-1.5 opacity-40">
+            <span className="text-[7px] uppercase font-black tracking-widest">Cols_Int</span>
+          </div>
           <input
             type="number"
             value={data.gridCols || 12}
             onChange={(e) => data.onChange?.(id, { gridCols: parseInt(e.target.value) })}
-            className="w-full bg-muted/40 border border-border/50 rounded-none px-2 py-1 text-[10px] font-mono outline-none"
+            className="w-full bg-background border border-border/40 px-3 py-2 text-[10px] font-mono font-black outline-none focus:border-primary/40 shadow-inner"
           />
         </div>
-        <div className="space-y-1">
-          <span className="text-[8px] uppercase tracking-widest opacity-40 font-black">Gap_PX</span>
+        <div className="space-y-1.5">
+          <div className="flex items-center gap-1.5 opacity-40">
+            <span className="text-[7px] uppercase font-black tracking-widest">Gap_Value</span>
+          </div>
           <input
             type="number"
             value={data.gap || 24}
             onChange={(e) => data.onChange?.(id, { gap: parseInt(e.target.value) })}
-            className="w-full bg-muted/40 border border-border/50 rounded-none px-2 py-1 text-[10px] font-mono outline-none"
+            className="w-full bg-background border border-border/40 px-3 py-2 text-[10px] font-mono font-black outline-none focus:border-primary/40 shadow-inner text-primary"
           />
         </div>
       </div>
 
-      <div className="aspect-square bg-muted/5 border border-border/30 rounded-none relative p-2 overflow-hidden group/gridview">
+      <div className="aspect-square bg-card border border-border/20 relative p-3 overflow-hidden group/gridview">
+        <div className="absolute inset-0 pointer-events-none opacity-[0.05]">
+          <div className="w-full h-full bg-[radial-gradient(circle,rgba(var(--primary-rgb),0.2)_1px,transparent_1px)] bg-[length:10px_10px]" />
+        </div>
+
         <div
-          className="w-full h-full grid gap-1 opacity-20 group-hover/gridview:opacity-50 transition-opacity duration-700"
+          className="w-full h-full grid gap-1 relative z-10"
           style={{ gridTemplateColumns: `repeat(${data.gridCols || 12}, 1fr)` }}
         >
           {Array.from({ length: (data.gridCols || 12) }).map((_, i) => (
-            <div key={i} className="h-full bg-primary/40 border-x border-primary/20" />
+            <div key={i} className="h-full bg-primary/10 border-x border-primary/5 group-hover/gridview:bg-primary/20 transition-colors duration-500" />
           ))}
         </div>
-        <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-          <span className="text-[9px] font-mono bg-popover/80 backdrop-blur-sm px-2 py-0.5 border border-border/50 shadow-2xl">
-            SYSTEM_ACTIVE
+        <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-20 opacity-0 group-hover/gridview:opacity-100 transition-opacity">
+          <span className="text-[9px] font-mono font-black bg-background/90 backdrop-blur-md px-3 py-1 border border-primary/30 shadow-2xl tracking-[0.2em] transform scale-90 group-hover/gridview:scale-100 transition-transform">
+            SYSTEM_SYNC_ACTIVE
           </span>
         </div>
       </div>
@@ -643,42 +738,52 @@ const GridSysNode = ({ id, data, selected }: { id: string; data: MoodNodeData; s
 const ToneNode = ({ id, data, selected }: { id: string; data: MoodNodeData; selected: boolean }) => (
   <NodeContainer
     selected={selected}
-    title="Vibration"
+    title="Frequency"
     icon={SlidersHorizontal}
     typeColor="bg-amber-500"
     handles={<NodeHandles nodeColor="bg-amber-500" />}
     data={{ ...data, id, type: 'tone' }}
     id={id}
   >
-    <div className="flex flex-col gap-4">
-      <div className="space-y-4 py-2">
-        <div className="space-y-1.5">
-          <div className="flex justify-between items-center text-[8px] font-black uppercase tracking-widest px-1">
-            <span className="text-muted-foreground/40">Clinical</span>
-            <span className="text-primary">{data.toneValue || 50}%</span>
-            <span className="text-muted-foreground/40">Visceral</span>
+    <div className="flex flex-col gap-5 p-4">
+      <div className="space-y-4">
+        <div className="space-y-2">
+          <div className="flex justify-between items-center text-[7px] font-mono font-black uppercase tracking-[0.2em] px-1 opacity-50">
+            <span>Precision</span>
+            <span>Resonance</span>
           </div>
-          <div className="relative h-6 flex items-center group/slider">
+          <div className="relative h-8 flex items-center group/slider bg-background p-1 border border-border/20 shadow-inner">
             <input
               type="range" min="0" max="100"
               value={data.toneValue || 50}
               onChange={(e) => data.onChange?.(id, { toneValue: parseInt(e.target.value) })}
-              className="w-full h-1 bg-muted/40 rounded-none appearance-none cursor-pointer accent-primary relative z-10"
+              className="w-full h-[2px] bg-muted appearance-none cursor-crosshair accent-primary relative z-10"
             />
-            <div className="absolute h-full w-[1px] bg-primary/20 left-1/2 -translate-x-1/2 z-0" />
+            <div className="absolute inset-0 flex items-center justify-between px-2 pointer-events-none">
+              {Array.from({ length: 11 }).map((_, i) => (
+                <div key={i} className={`h-1.5 w-[1px] ${i === 5 ? 'h-3 bg-primary' : 'bg-border/40'}`} />
+              ))}
+            </div>
+          </div>
+          <div className="flex justify-between items-center px-1">
+            <span className="text-[12px] font-mono font-black text-primary">{data.toneValue || 50}%</span>
+            <span className="text-[6px] font-mono text-muted-foreground/40 uppercase tracking-tighter">OS_TONAL_BIAS</span>
           </div>
         </div>
       </div>
 
-      <div className="p-3 bg-primary/5 border border-primary/10 rounded-none space-y-2">
-        <div className="flex items-center gap-1.5">
-          <div className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
-          <span className="text-[8px] font-bold uppercase tracking-widest text-primary/80">TONAL_ANALYSIS</span>
+      <div className="p-4 bg-primary/5 border-l-2 border-primary/40 relative overflow-hidden group/analysis">
+        <div className="absolute top-0 right-0 w-8 h-8 opacity-5">
+          <Zap size={32} className="text-primary" />
         </div>
-        <p className="text-[8px] leading-tight text-muted-foreground italic font-medium">
-          {(data.toneValue || 50) < 30 && "Profile optimized for precision, clarity, and architectural silence."}
-          {(data.toneValue || 50) >= 30 && (data.toneValue || 50) <= 70 && "Balanced frequency. Hybrid resonance between structure and emotion."}
-          {(data.toneValue || 50) > 70 && "Raw aesthetic energy. High visceral impact and organic displacement."}
+        <div className="flex items-center gap-2 mb-2">
+          <div className="w-1.5 h-1.5 rounded-full bg-primary animate-ping" />
+          <span className="text-[8px] font-mono font-black uppercase tracking-[0.2em] text-primary/80">TONAL_HEURISTICS</span>
+        </div>
+        <p className="text-[9px] leading-tight text-muted-foreground font-medium uppercase tracking-tight">
+          {(data.toneValue || 50) < 30 && ">> CLARITY_MODE: MINIMALIST_RESTRAINT_ACTIVE"}
+          {(data.toneValue || 50) >= 30 && (data.toneValue || 50) <= 70 && ">> BALANCED_MODE: DYNAMIC_EQUILIBRIUM_FOUND"}
+          {(data.toneValue || 50) > 70 && ">> HIGH_ENERGY: VISCERAL_MOMENTUM_MAX"}
         </p>
       </div>
     </div>
@@ -695,36 +800,42 @@ const CompetitorNode = ({ id, data, selected }: { id: string; data: MoodNodeData
     data={{ ...data, id, type: 'competitor' }}
     id={id}
   >
-    <div className="flex flex-col gap-3">
-      <input
-        type="text"
-        value={data.competitorName || ''}
-        placeholder="COMP_ID_NAME"
-        onChange={(e) => data.onChange?.(id, { competitorName: e.target.value.toUpperCase() })}
-        className="w-full bg-muted/40 border border-border/50 rounded-none px-3 py-2 text-[10px] font-black outline-none placeholder:opacity-20 font-mono tracking-widest"
-      />
-
-      <div className="space-y-2">
-        <div className="flex justify-between items-center text-[7px] font-bold uppercase opacity-40 px-1">
-          <span>MARKET_SATURATION</span>
-          <span>{data.marketShare || 20}%</span>
-        </div>
-        <div className="h-1.5 bg-muted/40 rounded-none overflow-hidden relative">
-          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent animate-shimmer" />
-          <div className="h-full bg-stone-500 transition-all duration-1000" style={{ width: `${data.marketShare || 20}%` }} />
-        </div>
+    <div className="flex flex-col gap-4 p-4">
+      <div className="space-y-1.5 px-1 border-l border-emerald-500/30">
+        <span className="text-[7px] font-mono font-black uppercase opacity-40">Comp_Entity_ID</span>
         <input
-          type="range" min="1" max="100"
-          value={data.marketShare || 20}
-          onChange={(e) => data.onChange?.(id, { marketShare: parseInt(e.target.value) })}
-          className="w-full h-1 bg-transparent rounded-none appearance-none cursor-pointer accent-stone-500"
+          type="text"
+          value={data.competitorName || ''}
+          placeholder="AWAITING_ID..."
+          onChange={(e) => data.onChange?.(id, { competitorName: e.target.value.toUpperCase() })}
+          className="w-full bg-background border border-border/40 px-3 py-2 text-[10px] font-black outline-none placeholder:opacity-20 font-mono tracking-widest text-emerald-500 shadow-inner"
         />
       </div>
 
-      <div className="flex items-center gap-2 mt-1">
-        <div className="flex-1 h-[1px] bg-border/20" />
-        <Chrome size={10} className="text-stone-500 opacity-40 hover:opacity-100 transition-opacity cursor-pointer" />
-        <div className="flex-1 h-[1px] bg-border/20" />
+      <div className="space-y-3 bg-card border border-border/20 p-3 relative overflow-hidden">
+        <div className="flex justify-between items-center text-[7px] font-mono font-bold uppercase opacity-60">
+          <span>Market_Satur_Data</span>
+          <span className="text-emerald-500 underline underline-offset-2">{data.marketShare || 20}%</span>
+        </div>
+        <div className="space-y-2">
+          <div className="h-2 bg-background border border-border/40 overflow-hidden relative p-[1px]">
+            <div className="h-full bg-emerald-500/60 relative transition-all duration-1000" style={{ width: `${data.marketShare || 20}%` }}>
+              <div className="absolute inset-0 bg-[linear-gradient(45deg,rgba(255,255,255,0.1)_25%,transparent_25%,transparent_50%,rgba(255,255,255,0.1)_50%,rgba(255,255,255,0.1)_75%,transparent_75%,transparent)] bg-[length:10px_10px]" />
+            </div>
+          </div>
+          <input
+            type="range" min="1" max="100"
+            value={data.marketShare || 20}
+            onChange={(e) => data.onChange?.(id, { marketShare: parseInt(e.target.value) })}
+            className="w-full h-1 appearance-none cursor-crosshair accent-emerald-500 bg-transparent"
+          />
+        </div>
+      </div>
+
+      <div className="flex items-center gap-3 pt-2 opacity-30 hover:opacity-100 transition-opacity">
+        <div className="flex-1 h-[1px] bg-gradient-to-r from-transparent via-border to-transparent" />
+        <Chrome size={12} className="text-emerald-500 cursor-pointer hover:scale-125 transition-transform" />
+        <div className="flex-1 h-[1px] bg-gradient-to-r from-border via-border to-transparent" />
       </div>
     </div>
   </NodeContainer>
@@ -740,35 +851,48 @@ const MoodGaugeNode = ({ id, data, selected }: { id: string; data: MoodNodeData;
     data={{ ...data, id, type: 'mood_gauge' }}
     id={id}
   >
-    <div className="flex flex-col items-center gap-4 py-2">
-      <div className="relative w-20 h-20 group/gauge">
-        <svg className="w-full h-full transform -rotate-90">
-          <circle cx="40" cy="40" r="34" fill="none" strokeWidth="4" className="stroke-muted/20" />
+    <div className="flex flex-col items-center gap-5 p-4 py-3">
+      <div className="relative w-24 h-24 group/gauge">
+        {/* Advanced Gauge Background */}
+        <div className="absolute inset-0 flex items-center justify-center opacity-10">
+          <div className="w-16 h-16 border border-fuchsia-500 rounded-full animate-[ping_3s_infinite]" />
+        </div>
+
+        <svg className="w-full h-full transform -rotate-90 filter drop-shadow-[0_0_8px_rgba(217,70,239,0.3)]">
+          <circle cx="48" cy="48" r="40" fill="none" strokeWidth="6" className="stroke-muted/10" strokeDasharray="1, 8" />
           <circle
-            cx="40" cy="40" r="34" fill="none" strokeWidth="4"
-            className="stroke-lime-500 transition-all duration-1000 ease-out"
-            strokeDasharray={213}
-            strokeDashoffset={213 - (213 * (data.moodLevel || 50)) / 100}
-            strokeLinecap="butt"
+            cx="48" cy="48" r="40" fill="none" strokeWidth="6"
+            className="stroke-fuchsia-500 transition-all duration-1000 ease-out"
+            strokeDasharray={251}
+            strokeDashoffset={251 - (251 * (data.moodLevel || 50)) / 100}
+            strokeLinecap="round"
           />
         </svg>
         <div className="absolute inset-0 flex flex-col items-center justify-center">
-          <span className="text-sm font-black tracking-tighter text-lime-500">{data.moodLevel || 50}%</span>
-          <span className="text-[6px] font-mono uppercase tracking-[0.2em] opacity-40">ENRG_FLOW</span>
+          <span className="text-xl font-mono font-black tracking-tighter text-fuchsia-500">{data.moodLevel || 50}%</span>
+          <div className="flex items-center gap-1 opacity-40">
+            <span className="text-[6px] font-mono uppercase tracking-[0.2em]">Flux_Cap</span>
+          </div>
         </div>
       </div>
 
-      <input
-        type="range" min="0" max="100"
-        value={data.moodLevel || 50}
-        onChange={(e) => data.onChange?.(id, { moodLevel: parseInt(e.target.value) })}
-        className="w-full h-1 bg-muted/40 rounded-none appearance-none cursor-pointer accent-lime-500"
-      />
+      <div className="w-full space-y-3">
+        <div className="flex justify-between items-center text-[7px] font-mono font-black uppercase tracking-[0.2em] opacity-40 px-1">
+          <span>Static</span>
+          <span>Kinetic</span>
+        </div>
+        <input
+          type="range" min="0" max="100"
+          value={data.moodLevel || 50}
+          onChange={(e) => data.onChange?.(id, { moodLevel: parseInt(e.target.value) })}
+          className="w-full h-1 appearance-none cursor-crosshair accent-fuchsia-500 bg-muted/20 border border-border/10"
+        />
 
-      <div className="w-full grid grid-cols-4 gap-1 h-3">
-        {Array.from({ length: 12 }).map((_, i) => (
-          <div key={i} className={`h-full ${i < (data.moodLevel || 50) / 8 ? 'bg-lime-500/40' : 'bg-muted/10'} rounded-none transition-colors duration-500`} />
-        ))}
+        <div className="w-full grid grid-cols-12 gap-[1px] h-3 border border-border/20 p-[1px] bg-background/50">
+          {Array.from({ length: 12 }).map((_, i) => (
+            <div key={i} className={`h-full transition-all duration-300 ${i < Math.floor((data.moodLevel || 50) / 8) ? 'bg-fuchsia-500/80 shadow-[0_0_5px_rgba(217,70,239,0.3)]' : 'bg-muted-foreground/5'}`} />
+          ))}
+        </div>
       </div>
     </div>
   </NodeContainer>
@@ -787,14 +911,15 @@ const IconsNode = ({ id, data, selected }: { id: string; data: MoodNodeData; sel
     <div className="flex flex-col gap-4">
       <div className="grid grid-cols-3 gap-2 py-1">
         {[Zap, Sparkles, Activity, ShieldCheck, Target, Heart].map((Icon, i) => (
-          <div key={i} className="aspect-square bg-muted/20 border border-border/40 rounded-none flex items-center justify-center hover:bg-sky-500/10 hover:border-sky-500/30 transition-all cursor-pointer group/sym">
-            <Icon size={12} className="text-muted-foreground/40 group-hover/sym:text-sky-500" />
+          <div key={i} className="aspect-square bg-muted/30 border border-border/40 rounded-none flex items-center justify-center hover:bg-sky-500/10 hover:border-sky-500/40 transition-all cursor-pointer group/sym relative">
+            <Icon size={12} className="text-muted-foreground/60 group-hover/sym:text-sky-500 transition-colors" strokeWidth={1.5} />
+            <div className="absolute inset-0 opacity-0 group-hover/sym:opacity-100 pointer-events-none border-[0.5px] border-sky-500/20" />
           </div>
         ))}
       </div>
       <div className="border-t border-border/10 pt-3 flex flex-col gap-1.5">
         <span className="text-[7px] font-black tracking-widest uppercase opacity-40">GLYPH_WEIGHT</span>
-        <div className="h-1 bg-muted/40 rounded-none flex">
+        <div className="h-1 bg-muted rounded-none flex">
           <div className="h-full bg-sky-500 w-2/3" />
         </div>
       </div>
@@ -819,10 +944,10 @@ const ReferenceNode = ({ id, data, selected }: { id: string; data: MoodNodeData;
           value={data.linkTitle || ''}
           placeholder="REFERENCE_LABEL"
           onChange={(e) => data.onChange?.(id, { linkTitle: e.target.value.toUpperCase() })}
-          className="w-full bg-muted/40 border border-border/50 rounded-none px-2 py-1.5 text-[10px] font-black outline-none tracking-widest font-mono"
+          className="w-full bg-muted border border-border/50 rounded-none px-2 py-1.5 text-[10px] font-black outline-none tracking-widest font-mono"
         />
-        <div className="flex items-center gap-2 p-2 bg-blue-500/5 border border-blue-500/20 rounded-none group/link">
-          <div className="p-2 bg-blue-500/10 rounded-none shadow-inner">
+        <div className="flex items-center gap-2 p-2 bg-blue-500/10 border border-blue-500/20 rounded-none group/link">
+          <div className="p-2 bg-blue-500/20 rounded-none shadow-inner">
             <Globe size={14} className="text-blue-500" />
           </div>
           <div className="flex-1 truncate">
@@ -866,7 +991,7 @@ const AttributeNode = ({ id, data, selected }: { id: string; data: MoodNodeData;
     <div className="flex flex-col gap-3">
       <div className="text-[11px] font-black tracking-tight uppercase group-hover/node:text-amber-500 transition-colors">{data.label}</div>
       {data.color && (
-        <div className="flex items-center gap-3 bg-amber-500/5 border border-amber-500/10 rounded-none px-3 py-2 w-full group/attr">
+        <div className="flex items-center gap-3 bg-amber-500/10 border border-amber-500/20 rounded-none px-3 py-2 w-full group/attr">
           <div className="w-4 h-4 rounded-none shadow-2xl group-hover/attr:scale-110 transition-transform" style={{ backgroundColor: data.color }} />
           <div className="flex flex-col">
             <span className="text-[9px] font-mono font-black tracking-widest text-foreground/80">{data.color.toUpperCase()}</span>
@@ -894,13 +1019,13 @@ const LogicNode = ({ id, data, selected }: { id: string; data: MoodNodeData; sel
     id={id}
   >
     <div className="flex flex-col gap-4">
-      <div className="text-[11px] font-bold tracking-tight bg-violet-500/10 border border-violet-500/20 p-2 rounded-none text-violet-400 font-mono italic">IF::BRAND_FLOW â†’ {data.label.toUpperCase()}</div>
+      <div className="text-[11px] font-bold tracking-tight bg-violet-500/20 border border-violet-500/40 p-2 rounded-none text-violet-400 font-mono italic">IF::BRAND_FLOW → {data.label.toUpperCase()}</div>
       <div className="space-y-2">
         <div className="flex justify-between items-center text-[7px] font-black uppercase opacity-40">
           <span>Signal_Resonance</span>
           <span className="text-violet-500 text-[8px]">98.4%</span>
         </div>
-        <div className="h-0.5 bg-violet-500/10 relative overflow-hidden">
+        <div className="h-0.5 bg-violet-500/20 relative overflow-hidden">
           <div className="absolute inset-0 bg-violet-500 w-4/5 animate-pulse" />
         </div>
       </div>
@@ -937,7 +1062,7 @@ const PresetNode = ({ id, data, selected }: { id: string; data: MoodNodeData; se
           <option value="industrial" className="bg-background text-foreground">INDUSTRIAL_V4</option>
         </select>
       </div>
-      <div className="p-2 border border-sky-400/20 bg-sky-400/5 flex items-center gap-2 group/preset">
+      <div className="p-2 border border-sky-400/40 bg-sky-400/10 flex items-center gap-2 group/preset">
         <div className="w-1.5 h-6 bg-sky-400 group-hover:scale-y-110 transition-transform" />
         <div className="flex flex-col">
           <span className="text-[9px] font-black tracking-tighter opacity-80 uppercase">{data.variant}</span>
@@ -960,33 +1085,64 @@ const PaletteNode = ({ id, data, selected }: { id: string; data: MoodNodeData; s
       data={{ ...data, id, type: 'palette' }}
       id={id}
     >
-      <div className="flex flex-col gap-4">
-        <div className="flex items-center gap-3 bg-card/50 border border-border/50 p-2 group/pal">
-          <div className="w-10 h-10 rounded-none shadow-2xl transition-transform group-hover/pal:scale-[1.05] duration-500" style={{ backgroundColor: data.color || '#fff' }} />
-          <div className="flex flex-col justify-center">
-            <span className="text-[12px] font-mono font-black tracking-tight text-foreground uppercase">{data.color}</span>
-            <div className="text-[6px] font-mono opacity-40 uppercase tracking-widest mt-0.5">HEX_CHROM_ID</div>
+      <div className="flex flex-col gap-5 p-4">
+        <div className="relative group/pal_preview">
+          <div className="flex items-center gap-4 bg-muted border border-border/20 p-3 relative overflow-hidden">
+            {/* Swatch Background Detail */}
+            <div className="absolute top-0 right-0 w-12 h-12 bg-primary/10 rotate-45 translate-x-6 -translate-y-6 border border-primary/10" />
+
+            <div className="w-14 h-14 rounded-none shadow-2xl transition-all duration-500 group-hover/pal_preview:rotate-3 group-hover/pal_preview:scale-110 relative z-10 border border-white/20" style={{ backgroundColor: data.color || '#fff' }} />
+            <div className="flex flex-col justify-center gap-1 z-10">
+              <span className="text-[14px] font-mono font-black tracking-tight text-foreground uppercase">{data.color}</span>
+              <div className="flex items-center gap-2">
+                <span className="text-[7px] font-mono font-bold bg-primary text-primary-foreground px-1 tracking-widest uppercase">ID::{data.color?.substring(1)}</span>
+                <span className="text-[7px] font-mono text-muted-foreground/40 uppercase tracking-tighter">{hexToRgbForDisplay(data.color || '#ffffff')}</span>
+              </div>
+            </div>
+          </div>
+          {/* Decorative Corner */}
+          <div className="absolute -bottom-1 -right-1 w-2 h-2 border-b-2 border-r-2 border-primary/40" />
+        </div>
+
+        <div className="space-y-3">
+          <div className="flex justify-between items-center opacity-40">
+            <span className="text-[7px] font-mono font-black uppercase tracking-[0.2em]">Brand_Matrix_Sync</span>
+            <div className="w-2 h-2 border border-primary/20 animate-spin" />
+          </div>
+          <div className="grid grid-cols-4 gap-2">
+            {brand.palette.map(c => (
+              <button
+                key={c.id}
+                onClick={() => data.onChange?.(id, { color: c.hex, label: c.label })}
+                className={`
+                  aspect-square border transition-all duration-200 relative
+                  ${data.color === c.hex
+                    ? 'border-primary ring-1 ring-primary/40 z-10 scale-105'
+                    : 'border-border/20 opacity-60 hover:opacity-100 hover:border-primary/40'}
+                `}
+                style={{ backgroundColor: c.hex }}
+                title={c.label}
+              >
+                {data.color === c.hex && (
+                  <div className="absolute inset-0 border-2 border-white/20 pointer-events-none" />
+                )}
+              </button>
+            ))}
           </div>
         </div>
 
-        <div className="grid grid-cols-4 gap-1.5 p-2 bg-muted/5 border border-border/20">
-          {brand.palette.map(c => (
-            <button
-              key={c.id}
-              onClick={() => data.onChange?.(id, { color: c.hex, label: c.label })}
-              className={`aspect-square rounded-none flex-shrink-0 border transition-all ${data.color === c.hex ? 'border-primary scale-110 z-10' : 'border-border/30 opacity-60 hover:opacity-100 hover:scale-105'}`}
-              style={{ backgroundColor: c.hex }}
-              title={c.label}
-            />
-          ))}
-        </div>
-
-        <div className="flex flex-col gap-1 px-1">
-          <div className="flex justify-between items-center text-[6px] font-mono opacity-30">
-            <span>RGB_SPEC</span>
-            <span>{data.color ? hexToRgbForDisplay(data.color) : '---'}</span>
+        <div className="mt-2 space-y-2">
+          <div className="h-[1px] bg-gradient-to-r from-transparent via-primary/20 to-transparent" />
+          <div className="grid grid-cols-2 gap-4 text-[7px] font-mono opacity-40 uppercase tracking-widest">
+            <div className="flex flex-col">
+              <span>CONTRAST_RATIO</span>
+              <span className="text-primary/70">PASSED::AA</span>
+            </div>
+            <div className="flex flex-col items-end">
+              <span>COLOR_ENGINE</span>
+              <span className="text-primary/70">MOOD_DNA_V3</span>
+            </div>
           </div>
-          <div className="w-full h-[1px] bg-pink-500/10" />
         </div>
       </div>
     </NodeContainer>
@@ -1019,22 +1175,22 @@ const TextureNode = ({ id, data, selected }: { id: string; data: MoodNodeData; s
       <div className="space-y-4 pt-1">
         <div className="space-y-1.5 px-1">
           <div className="flex items-center justify-between">
-            <span className="text-[8px] font-black uppercase tracking-[0.2em] opacity-40">Intensity</span>
+            <span className="text-[8px] font-black uppercase tracking-[0.2em] opacity-70">Intensity</span>
             <span className="text-[9px] font-mono text-primary/60">{data.intensity || 50}%</span>
           </div>
           <input
             type="range" min="0" max="100"
             value={data.intensity || 50}
             onChange={(e) => data.onChange?.(id, { intensity: parseInt(e.target.value) })}
-            className="w-full h-1 bg-muted/40 rounded-none appearance-none cursor-pointer accent-primary"
+            className="w-full h-1 bg-muted rounded-none appearance-none cursor-pointer accent-primary"
           />
         </div>
       </div>
 
-      <div className="aspect-[2/1] bg-muted/10 border border-border/20 rounded-none overflow-hidden relative group/material">
+      <div className="aspect-[2/1] bg-muted/30 border border-border/20 rounded-none overflow-hidden relative group/material">
         <div className={`absolute inset-0 transition-opacity duration-1000 ${data.variant === 'grainy' ? 'opacity-30' : 'opacity-10'}`} style={{ backgroundImage: 'url("https://www.transparenttextures.com/patterns/60-lines.png")' }} />
         <div className="absolute inset-0 flex items-center justify-center">
-          <span className="text-[7px] font-mono tracking-widest uppercase opacity-20 group-hover/material:opacity-60 transition-opacity underline decoration-primary/40 underline-offset-4">Physical_Preview</span>
+          <span className="text-[7px] font-mono tracking-widest uppercase opacity-30 group-hover/material:opacity-80 transition-opacity decoration-primary/40 underline-offset-4">Physical_Preview</span>
         </div>
       </div>
     </div>
@@ -1056,9 +1212,9 @@ const NegativeNode = ({ id, data, selected }: { id: string; data: MoodNodeData; 
         value={data.content}
         placeholder="FORBIDDEN_PROTOCOL"
         onChange={(e) => data.onChange?.(id, { content: e.target.value.toUpperCase() })}
-        className="h-10 text-[11px] font-black bg-muted/40 border-border/50 rounded-none font-mono tracking-widest shadow-inner placeholder:italic placeholder:opacity-20"
+        className="h-10 text-[11px] font-black bg-muted/30 border-border/50 rounded-none font-mono tracking-widest shadow-sm focus:border-rose-500/50 transition-colors placeholder:italic placeholder:opacity-20"
       />
-      <div className="p-3 bg-rose-500/5 border border-rose-500/20 rounded-none space-y-2 group/neg">
+      <div className="p-3 bg-rose-500/10 border border-rose-500/30 rounded-none space-y-2 group/neg">
         <div className="flex items-center gap-2">
           <div className="w-1.5 h-1.5 bg-rose-500 animate-pulse" />
           <span className="text-[8px] font-black tracking-widest text-rose-500 uppercase">Constraint_Active</span>
@@ -1071,19 +1227,277 @@ const NegativeNode = ({ id, data, selected }: { id: string; data: MoodNodeData; 
   </NodeContainer>
 );
 
-const MoodBoardViewContent = React.memo<MoodBoardViewProps>(({ brand, setHeaderActions }) => {
+const WeatherNode = ({ id, data, selected }: { id: string; data: MoodNodeData; selected: boolean }) => (
+  <NodeContainer
+    selected={selected}
+    title="Atmosphere"
+    icon={CloudRain}
+    typeColor="bg-cyan-500"
+    handles={<NodeHandles nodeColor="bg-cyan-500" />}
+    data={{ ...data, id, type: 'weather' }}
+    id={id}
+  >
+    <div className="flex flex-col gap-2 p-4 h-full">
+      <div className="flex justify-between items-start">
+        <div className="flex flex-col">
+          <span className="text-[32px] font-black tracking-tighter text-cyan-500 leading-none">18°</span>
+          <span className="text-[9px] font-mono uppercase tracking-widest opacity-60">London, UK</span>
+        </div>
+        <CloudRain size={24} className="text-cyan-500/80" />
+      </div>
+      <div className="mt-auto space-y-2 border-t border-border/10 pt-2">
+        <div className="flex justify-between text-[7px] font-mono uppercase opacity-40">
+          <span>Humidity</span>
+          <span>82%</span>
+        </div>
+        <div className="flex justify-between text-[7px] font-mono uppercase opacity-40">
+          <span>Wind</span>
+          <span>12km/h NW</span>
+        </div>
+        <div className="h-1 w-full bg-cyan-500/10 relative overflow-hidden">
+          <div className="absolute inset-0 bg-cyan-500/60 w-1/2 animate-pulse" />
+        </div>
+      </div>
+    </div>
+  </NodeContainer>
+);
+
+const SpotifyNode = ({ id, data, selected }: { id: string; data: MoodNodeData; selected: boolean }) => (
+  <NodeContainer
+    selected={selected}
+    title="Sonic_Stream"
+    icon={Music}
+    typeColor="bg-green-500"
+    handles={<NodeHandles nodeColor="bg-green-500" />}
+    data={{ ...data, id, type: 'spotify' }}
+    id={id}
+  >
+    <div className="flex flex-col h-full bg-black/20">
+      <div className="flex-1 flex items-center justify-center p-4 relative overflow-hidden group/art bg-black/40">
+        <div className="w-16 h-16 bg-green-500/10 border border-green-500/30 flex items-center justify-center relative">
+          <Music size={24} className="text-green-500/80 animate-pulse" />
+          <div className="absolute inset-0 border-[0.5px] border-green-500/20 m-1" />
+        </div>
+        <div className="absolute bottom-2 right-2 flex gap-0.5 items-end h-4 opacity-60">
+          {[1, 3, 2, 4, 2, 3, 1].map((h, i) => (
+            <div key={i} className="w-0.5 bg-green-500" style={{ height: `${h * 20}%`, animation: `pulse 1s infinite ${i * 0.1}s` }} />
+          ))}
+        </div>
+      </div>
+      <div className="p-3 bg-card border-t border-border/10 space-y-1">
+        <div className="h-1 bg-muted rounded-none w-full overflow-hidden">
+          <div className="h-full bg-green-500 w-1/3" />
+        </div>
+        <div className="flex justify-between items-center text-[7px] font-mono uppercase tracking-widest opacity-60">
+          <span>0:42</span>
+          <span>3:14</span>
+        </div>
+        <div className="text-[9px] font-bold text-foreground truncate mt-1">NOCTURNAL_RHYTHMS_V2</div>
+        <div className="text-[7px] font-mono text-muted-foreground uppercase opacity-60">Safe_Ty_Protocol</div>
+      </div>
+    </div>
+  </NodeContainer>
+);
+
+const WebRefNode = ({ id, data, selected }: { id: string; data: MoodNodeData; selected: boolean }) => (
+  <NodeContainer
+    selected={selected}
+    title="Web_Portal"
+    icon={Globe}
+    typeColor="bg-indigo-500"
+    handles={<NodeHandles nodeColor="bg-indigo-500" />}
+    data={{ ...data, id, type: 'web_ref' }}
+    id={id}
+  >
+    <div className="flex flex-col h-full bg-black/10">
+      <div className="flex items-center gap-2 p-2 border-b border-border/10 bg-black/20">
+        <div className="flex gap-1.5 opacity-40">
+          <div className="w-1 h-1 rounded-full bg-red-500" />
+          <div className="w-1 h-1 rounded-full bg-yellow-500" />
+          <div className="w-1 h-1 rounded-full bg-green-500" />
+        </div>
+        <div className="flex-1 bg-black/20 h-4 rounded-none border border-white/5 px-2 flex items-center text-[6px] font-mono text-muted-foreground/60 truncate">
+          https://source.design.sys/ref/8821
+        </div>
+      </div>
+      <div className="flex-1 relative group/iframe bg-black/20">
+        <div className="absolute inset-0 flex flex-col items-center justify-center p-6 text-center space-y-2 opacity-60 group-hover/iframe:opacity-100 transition-opacity">
+          <Globe size={24} className="text-indigo-500/60" />
+          <span className="text-[8px] font-mono uppercase tracking-widest opacity-40">Active_Link_Connection</span>
+        </div>
+        <div className="absolute inset-0 bg-[linear-gradient(45deg,transparent_25%,rgba(99,102,241,0.05)_50%,transparent_75%,transparent)] bg-[length:4px_4px]" />
+      </div>
+    </div>
+  </NodeContainer>
+);
+
+const MidjourneyNode = ({ id, data, selected }: { id: string; data: MoodNodeData; selected: boolean }) => (
+  <NodeContainer
+    selected={selected}
+    title="Generative_AI"
+    icon={Cpu}
+    typeColor="bg-fuchsia-600"
+    handles={<NodeHandles nodeColor="bg-fuchsia-600" />}
+    data={{ ...data, id, type: 'midjourney' }}
+    id={id}
+  >
+    <div className="flex flex-col gap-3 p-4">
+      <div className="space-y-1">
+        <div className="flex justify-between text-[7px] font-mono font-black uppercase tracking-[0.2em] text-fuchsia-500 opacity-80">
+          <span>Prompt_Injection</span>
+          <span>Mode::V6</span>
+        </div>
+        <textarea
+          className="w-full h-16 bg-black/20 border border-fuchsia-500/20 text-[9px] font-mono p-2 outline-none text-fuchsia-100 placeholder:text-fuchsia-900/40 resize-none focus:border-fuchsia-500/40 transition-colors"
+          placeholder="/imagine prompt: a futuristic interface..."
+          value={data.prompt as string || ''}
+          onChange={(e) => data.onChange?.(id, { prompt: e.target.value })}
+        />
+      </div>
+      <button className="w-full bg-fuchsia-600 hover:bg-fuchsia-500 text-white text-[9px] font-bold uppercase tracking-widest py-1.5 transition-colors flex items-center justify-center gap-2 group/btn">
+        <Sparkles size={10} className="group-hover/btn:animate-spin" />
+        <span>Execute_Generation</span>
+      </button>
+      <div className="text-[6px] font-mono text-center opacity-30 uppercase">
+        Est. Compute Cost: 0.02 Credit
+      </div>
+    </div>
+  </NodeContainer>
+);
+
+const CMSSyncNode = ({ id, data, selected }: { id: string; data: MoodNodeData; selected: boolean }) => (
+  <NodeContainer
+    selected={selected}
+    title="Data_Sync"
+    icon={Database}
+    typeColor="bg-orange-500"
+    handles={<NodeHandles nodeColor="bg-orange-500" />}
+    data={{ ...data, id, type: 'cms_sync' }}
+    id={id}
+  >
+    <div className="flex flex-col gap-4 p-4 items-center justify-center h-full">
+      <div className="relative">
+        <Database size={24} className="text-orange-500 opacity-80" />
+        <div className="absolute -bottom-1 -right-1 w-3 h-3 bg-background rounded-full border border-orange-500 flex items-center justify-center">
+          <div className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse" />
+        </div>
+      </div>
+      <div className="w-full space-y-2">
+        <div className="flex justify-between items-center text-[7px] font-mono uppercase opacity-60">
+          <span>Sync_Status</span>
+          <span className="text-green-500 font-bold">LIVE</span>
+        </div>
+        <div className="h-1 w-full bg-orange-500/20 overflow-hidden">
+          <div className="h-full bg-orange-500 w-full animate-[progress_2s_ease-in-out_infinite]" />
+        </div>
+        <div className="flex justify-between items-center text-[7px] font-mono uppercase opacity-40">
+          <span>Last_Packet</span>
+          <span>0.02s ago</span>
+        </div>
+      </div>
+    </div>
+  </NodeContainer>
+);
+
+
+
+const LabelNode = React.memo(({ id, data, selected }: { id: string; data: MoodNodeData; selected: boolean }) => {
+  const [isEditing, setIsEditing] = useState(false);
+  const [tempLabel, setTempLabel] = useState(data.label);
+
+  return (
+    <div className={`relative group/label transition-all ${selected ? 'z-50' : 'z-10'} ${data.isLocked ? 'cursor-default' : ''}`}>
+      <NodeResizer
+        isVisible={selected && !data.isLocked}
+        minWidth={40}
+        minHeight={20}
+        lineClassName="!border-primary/30"
+        handleClassName="!w-1.5 !h-1.5 !bg-primary/40 !border-background !rounded-none"
+      />
+      {isEditing ? (
+        <input
+          value={tempLabel}
+          onChange={(e) => setTempLabel(e.target.value)}
+          onBlur={() => { data.onChange?.(id, { label: tempLabel }); setIsEditing(false); }}
+          className="bg-transparent border-none outline-none text-[14px] font-black uppercase tracking-[0.2em] text-foreground font-mono w-full text-center"
+          autoFocus
+        />
+      ) : (
+        <div
+          className={`px-4 py-2 transition-colors text-center ${data.isLocked ? 'cursor-default' : 'cursor-text hover:bg-muted'}`}
+          onDoubleClick={() => !data.isLocked && setIsEditing(true)}
+        >
+          <span className={`text-[14px] font-black uppercase tracking-[0.2em] font-mono ${data.label ? 'text-foreground' : 'text-muted-foreground/20 italic'}`}>
+            {data.label || 'ADD_LABEL'}
+          </span>
+          {data.isLocked && <Lock size={10} className="inline-block ml-2 text-primary opacity-40" />}
+        </div>
+      )}
+    </div>
+  );
+});
+
+const SectionNode = React.memo(({ id, data, selected }: { id: string; data: MoodNodeData; selected: boolean }) => {
+  return (
+    <div className={`
+      w-full h-full border relative transition-all duration-500
+      ${selected ? 'border-primary/60 scale-[1.002]' : 'border-border/20'}
+      ${data.customColor || 'bg-card'}
+      ${data.isLocked ? 'cursor-default' : ''}
+    `}>
+      <NodeResizer
+        isVisible={selected && !data.isLocked}
+        minWidth={100}
+        minHeight={100}
+        lineClassName="!border-primary/40"
+        handleClassName="!w-2 !h-2 !bg-primary !border-background !rounded-none"
+      />
+
+      {/* Label for the section */}
+      <div className="absolute -top-6 left-0 flex items-center gap-2">
+        <div className={`w-1 h-3 ${(data.customColor as string)?.replace('bg-', 'bg-') || 'bg-primary/40'}`} />
+        <span className="text-[9px] font-mono font-black uppercase tracking-[0.2em] text-muted-foreground/60">{data.label || 'Group'}</span>
+      </div>
+
+      {/* Internal Grid or Texture for Sections */}
+      <div className="absolute inset-0 pointer-events-none opacity-[0.05] overflow-hidden">
+        <div className="w-full h-full bg-[radial-gradient(circle,rgba(var(--primary-rgb),0.2)_1px,transparent_1px)] bg-[length:20px_20px]" />
+      </div>
+
+      {/* Background handles (we allow moving by clicking the area) */}
+    </div>
+  );
+});
+
+const MoodBoardViewContent = React.memo<MoodBoardViewProps>(({ brand, setHeaderActions, setIsAppSidebarCollapsed }) => {
   const { presences, updateCursor } = usePresence(`moodboard:${brand.id}`);
   const { getInstalledNodes } = useNodeManager();
+  const { resolvedTheme } = useTheme();
+
   const [nodes, setNodes, onNodesChange] = useNodesState<Node<MoodNodeData>>([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
   const [connectionMode, setConnectionMode] = useState<ConnectionMode>('loose' as ConnectionMode);
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const [isSidebarMini, setIsSidebarMini] = useState(false);
   const [contextMenu, setContextMenu] = useState<{ id: string; x: number; y: number } | null>(null);
   const [quickAddMenu, setQuickAddMenu] = useState<{ x: number; y: number } | null>(null);
-  const [collapsedCategories, setCollapsedCategories] = useState<Set<string>>(new Set(['Orchestration', 'Generative', 'Utility', 'External']));
+  const [collapsedCategories, setCollapsedCategories] = useState<Set<string>>(new Set(['Generative', 'Utility', 'External']));
   const [isModulesManagerOpen, setIsModulesManagerOpen] = useState(false);
   const [isResetModalOpen, setIsResetModalOpen] = useState(false);
   const [resetConfirmName, setResetConfirmName] = useState('');
+
+  // Derived State
+  const selectedNode = useMemo(() => nodes.find(n => n.selected), [nodes]);
+  const isTextSelected = selectedNode && ['text', 'title', 'paragraph', 'label', 'typography'].includes(selectedNode.data.type);
+
+  // Tool System State
+  const [activeTool, setActiveTool] = useState<'pointer' | 'hand' | 'text' | 'section'>('pointer');
+  const [drawingState, setDrawingState] = useState<{ active: boolean; start: { x: number; y: number }; current: { x: number; y: number } }>({
+    active: false,
+    start: { x: 0, y: 0 },
+    current: { x: 0, y: 0 }
+  });
+  const [snapToGrid, setSnapToGrid] = useState(true);
 
 
   const updateNodeData = useCallback((id: string, newData: Partial<MoodNodeData>, newStyle?: React.CSSProperties) => {
@@ -1100,6 +1514,38 @@ const MoodBoardViewContent = React.memo<MoodBoardViewProps>(({ brand, setHeaderA
       })
     );
   }, [setNodes]);
+  // --- Handlers ---
+
+  // File Upload Handling
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const result = e.target?.result as string;
+        const center = screenToFlowPosition({ x: window.innerWidth / 2, y: window.innerHeight / 2 });
+        const newNode: Node<MoodNodeData> = {
+          id: generateId(),
+          type: 'image',
+          position: center,
+          data: {
+            label: file.name,
+            type: 'image',
+            imageUrl: result,
+            width: 300,
+            height: 200,
+            isLocked: false
+          } as MoodNodeData,
+        };
+        setNodes((nds) => nds.concat(newNode));
+      };
+      reader.readAsDataURL(file);
+    }
+  };
 
   const onNodesDelete = useCallback((nodesToDelete: Node[]) => {
     setNodes((nds) => nds.filter((node) => !nodesToDelete.some((deletedNode) => deletedNode.id === node.id)));
@@ -1199,6 +1645,46 @@ const MoodBoardViewContent = React.memo<MoodBoardViewProps>(({ brand, setHeaderA
   }, [canUndo, history, historyIndex, setNodes, setEdges, updateNodeData]);
 
   // Redo function
+  /* Drag and Drop Handlers for Asset Browser */
+  const onDragOver = useCallback((event: React.DragEvent) => {
+    event.preventDefault();
+    event.dataTransfer.dropEffect = 'copy';
+  }, []);
+
+  const onDrop = useCallback(
+    (event: React.DragEvent) => {
+      event.preventDefault();
+
+      const type = event.dataTransfer.getData('application/reactflow/type');
+      const url = event.dataTransfer.getData('application/reactflow/url');
+
+      if (typeof type === 'undefined' || !type) {
+        return;
+      }
+
+      const position = screenToFlowPosition({
+        x: event.clientX,
+        y: event.clientY,
+      });
+
+      const newNode: Node<MoodNodeData> = {
+        id: generateId(),
+        type,
+        position,
+        data: {
+          label: type === 'image' ? 'Dropped Asset' : `${type} node`,
+          type: type as any,
+          isActive: true,
+          imageUrl: url
+        },
+      };
+
+      setNodes((nds) => nds.concat(newNode));
+      toast.success('Asset added to canvas');
+    },
+    [screenToFlowPosition, setNodes],
+  );
+
   const redo = useCallback(() => {
     if (!canRedo) return;
 
@@ -1251,6 +1737,7 @@ const MoodBoardViewContent = React.memo<MoodBoardViewProps>(({ brand, setHeaderA
         updatedAt: Date.now(),
       });
 
+      lastSavedStateRef.current = JSON.stringify({ nodes: nodesToSave, edges: edgesToSave });
       setHasUnsavedChanges(false);
       toast.success('Moodboard saved!');
     } catch (error) {
@@ -1262,6 +1749,7 @@ const MoodBoardViewContent = React.memo<MoodBoardViewProps>(({ brand, setHeaderA
   }, [selectedMoodboard, hasUnsavedChanges, isSaving, nodes, edges, updateMoodboard]);
 
   const toggleCategory = (category: string) => {
+    if (category === 'Orchestration') return;
     setCollapsedCategories(prev => {
       const next = new Set(prev);
       if (next.has(category)) next.delete(category);
@@ -1273,6 +1761,7 @@ const MoodBoardViewContent = React.memo<MoodBoardViewProps>(({ brand, setHeaderA
 
 
   // Track the currently loaded moodboard ID to prevent overwriting local state on updates
+  const [canvasSettings, setCanvasSettings] = useState({ width: 1920, height: 1080, name: 'FHD (16:9)' });
   const [loadedMoodboardId, setLoadedMoodboardId] = useState<string | null>(null);
 
   // Load nodes/edges/history when a NEW moodboard is selected
@@ -1314,7 +1803,8 @@ const MoodBoardViewContent = React.memo<MoodBoardViewProps>(({ brand, setHeaderA
   useEffect(() => {
     if (!selectedMoodboard || isApplyingHistory) return;
 
-    if (nodes.length > 0 || edges.length > 0) {
+    const currentState = JSON.stringify({ nodes, edges });
+    if (currentState !== lastSavedStateRef.current) {
       setHasUnsavedChanges(true);
     }
   }, [nodes, edges, selectedMoodboard, isApplyingHistory]);
@@ -1393,36 +1883,7 @@ const MoodBoardViewContent = React.memo<MoodBoardViewProps>(({ brand, setHeaderA
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [nodes, onNodesDelete, setNodes]);
 
-  const onNodeContextMenu = useCallback(
-    (event: React.MouseEvent, node: Node) => {
-      event.preventDefault();
-      setContextMenu({
-        id: node.id,
-        x: event.clientX,
-        y: event.clientY,
-      });
-    },
-    [setContextMenu]
-  );
-
-  const onPaneClick = useCallback(() => {
-    setContextMenu(null);
-    setQuickAddMenu(null);
-  }, []);
-
-  const onPaneContextMenu = useCallback((event: any) => {
-    event.preventDefault();
-    setQuickAddMenu(null);
-  }, []);
-
-  const onPaneDoubleClick = useCallback((event: React.MouseEvent) => {
-    // We only want to trigger on the pane itself, not on nodes
-    if ((event.target as HTMLElement).classList.contains('react-flow__pane')) {
-      setQuickAddMenu({ x: event.clientX, y: event.clientY });
-    }
-  }, []);
-
-  const addNode = useCallback((type: MoodNodeData['type'], position?: { x: number, y: number }) => {
+  const addNode = useCallback((type: MoodNodeData['type'], position?: { x: number, y: number }, dimensions?: { width: number, height: number }) => {
     const defaults: Partial<MoodNodeData> = { isActive: true };
     if (type === 'preset') defaults.variant = 'cinematic';
     if (type === 'texture') { defaults.variant = 'grainy'; defaults.intensity = 50; }
@@ -1445,27 +1906,112 @@ const MoodBoardViewContent = React.memo<MoodBoardViewProps>(({ brand, setHeaderA
         case 'mood_gauge': return { width: 220, height: 240 };
         case 'logic': return { width: 240, height: 160 };
         case 'negative': return { width: 260, height: 160 };
+        case 'label': return { width: 200, height: 40 };
+        case 'section': return { width: 400, height: 300 };
+        // Missing types added below
+        case 'competitor': return { width: 260, height: 280 };
+        case 'reference': return { width: 260, height: 120 };
+        case 'icons': return { width: 260, height: 180 };
+        case 'texture': return { width: 260, height: 220 };
+        case 'preset': return { width: 240, height: 160 };
+        case 'tone': return { width: 260, height: 240 };
+        case 'midjourney': return { width: 300, height: 220 };
+        case 'weather': return { width: 220, height: 180 };
+        case 'spotify': return { width: 240, height: 260 };
+        case 'web_ref': return { width: 400, height: 300 };
+        case 'cms_sync': return { width: 240, height: 180 };
         default: return { width: 260, height: 180 };
       }
     };
 
-    const dims = getInitialDimensions(type);
+    const dims = dimensions || getInitialDimensions(type);
 
     const newNode: Node<MoodNodeData> = {
       id: generateId(),
       type,
       position: position || { x: Math.random() * 400, y: Math.random() * 300 },
       style: { width: dims.width, height: dims.height },
+      zIndex: type === 'section' ? 1 : 10,
+      draggable: true,
+      selectable: true,
       data: {
         label: `${type.charAt(0).toUpperCase() + type.slice(1)} Module`,
         type,
         ...defaults,
+        isLocked: false,
         onChange: updateNodeData,
       },
     };
     setNodes((nds) => [...nds, newNode]);
     toast.success(`${type} module initialized`);
   }, [setNodes, updateNodeData, brand.palette]);
+
+  const onNodeContextMenu = useCallback(
+    (event: React.MouseEvent, node: Node) => {
+      event.preventDefault();
+      setContextMenu({
+        id: node.id,
+        x: event.clientX,
+        y: event.clientY,
+      });
+    },
+    [setContextMenu]
+  );
+
+  const onPaneContextMenu = useCallback((event: any) => {
+    event.preventDefault();
+    setQuickAddMenu(null);
+  }, []);
+
+  const onPaneDoubleClick = useCallback((event: React.MouseEvent) => {
+    // We only want to trigger on the pane itself, not on nodes
+    if ((event.target as HTMLElement).classList.contains('react-flow__pane')) {
+      const flowPos = screenToFlowPosition({ x: event.clientX, y: event.clientY });
+      addNode('label', flowPos);
+    }
+  }, [screenToFlowPosition, addNode]);
+
+  const onPaneClick = useCallback((e: React.MouseEvent) => {
+    setContextMenu(null);
+    setQuickAddMenu(null);
+
+    if (activeTool === 'text') {
+      const flowPos = screenToFlowPosition({ x: e.clientX, y: e.clientY });
+      addNode('label', flowPos);
+      setActiveTool('pointer');
+    }
+  }, [activeTool, screenToFlowPosition, addNode]);
+
+  const onPaneMouseDown = useCallback((e: React.MouseEvent) => {
+    if (activeTool === 'section' && (e.target as HTMLElement).classList.contains('react-flow__pane')) {
+      const flowPos = screenToFlowPosition({ x: e.clientX, y: e.clientY });
+      setDrawingState({ active: true, start: flowPos, current: flowPos });
+    }
+  }, [activeTool, screenToFlowPosition]);
+
+  const onPaneMouseMove = useCallback((e: React.MouseEvent) => {
+    if (drawingState.active) {
+      const flowPos = screenToFlowPosition({ x: e.clientX, y: e.clientY });
+      setDrawingState(prev => ({ ...prev, current: flowPos }));
+    }
+  }, [drawingState.active, screenToFlowPosition]);
+
+  const onPaneMouseUp = useCallback(() => {
+    if (drawingState.active) {
+      const { start, current } = drawingState;
+      const x = Math.min(start.x, current.x);
+      const y = Math.min(start.y, current.y);
+      const width = Math.abs(current.x - start.x);
+      const height = Math.abs(current.y - start.y);
+
+      if (width > 20 && height > 20) {
+        addNode('section', { x, y }, { width, height });
+      }
+
+      setDrawingState({ active: false, start: { x: 0, y: 0 }, current: { x: 0, y: 0 } });
+      setActiveTool('pointer');
+    }
+  }, [drawingState, addNode]);
 
   // Node types configuration
   const nodeTypes = useMemo(() => ({
@@ -1486,6 +2032,13 @@ const MoodBoardViewContent = React.memo<MoodBoardViewProps>(({ brand, setHeaderA
     palette: PaletteNode,
     texture: TextureNode,
     negative: NegativeNode,
+    label: LabelNode,
+    section: SectionNode,
+    midjourney: MidjourneyNode,
+    weather: WeatherNode,
+    spotify: SpotifyNode,
+    web_ref: WebRefNode,
+    cms_sync: CMSSyncNode,
   }), []);
 
   const onNodesChangeCustom = useCallback((changes: any) => {
@@ -1604,8 +2157,8 @@ const MoodBoardViewContent = React.memo<MoodBoardViewProps>(({ brand, setHeaderA
 
     toPng(flowElement, {
       backgroundColor: getComputedStyle(document.documentElement).getPropertyValue('--background').trim() ? `hsl(${getComputedStyle(document.documentElement).getPropertyValue('--background')})` : '#background',
-      width: 1920,
-      height: 1080,
+      width: canvasSettings.width,
+      height: canvasSettings.height,
       style: {
         transform: 'scale(1)',
         transformOrigin: 'top left',
@@ -1630,74 +2183,41 @@ const MoodBoardViewContent = React.memo<MoodBoardViewProps>(({ brand, setHeaderA
     });
   }, []);
 
-  // Set header actions when moodboard is selected
+  // Header actions are now handled locally in the ActionToolbar
   useEffect(() => {
-    if (!selectedMoodboard) {
-      setHeaderActions(null);
-      return;
-    }
+    setHeaderActions(null);
+    return () => setHeaderActions(null);
+  }, [setHeaderActions]);
 
-    setHeaderActions(
-      <div className="flex items-center gap-2">
-        {/* Undo Button */}
-        <Button
-          variant="ghost"
-          onClick={undo}
-          disabled={!canUndo}
-          className="gap-2 text-[9px] font-bold tracking-widest h-8 px-3 disabled:opacity-30"
-          title="Undo (Ctrl+Z)"
-        >
-          <Undo2 size={12} /> UNDO
-        </Button>
-
-        {/* Redo Button */}
-        <Button
-          variant="ghost"
-          onClick={redo}
-          disabled={!canRedo}
-          className="gap-2 text-[9px] font-bold tracking-widest h-8 px-3 disabled:opacity-30"
-          title="Redo (Ctrl+Y)"
-        >
-          <Redo2 size={12} /> REDO
-        </Button>
-
-        {/* Save Button with Status */}
-        <Button
-          onClick={handleManualSave}
-          disabled={!hasUnsavedChanges || isSaving}
-          className="gap-2 text-[9px] font-bold tracking-widest h-8 px-4 disabled:opacity-50"
-          title="Save (Ctrl+S)"
-        >
-          {isSaving ? (
-            <>
-              <div className="w-3 h-3 border-2 border-primary-foreground border-t-transparent rounded-full animate-spin" />
-              SAVING
-            </>
-          ) : (
-            <>
-              <Save size={12} />
-              {hasUnsavedChanges && <CircleDot size={8} className="animate-pulse" />}
-              SAVE
-            </>
-          )}
-        </Button>
-
-        <div className="h-4 w-[1px] bg-border mx-1.5" />
-
-        <Button onClick={generateBrandPrompt} className="gap-2 text-[9px] font-bold tracking-widest h-8 px-6 shadow-[0_0_15px_rgba(15,98,254,0.25)]">
-          <Zap size={12} className="fill-current" /> SYNTHESIZE
-        </Button>
-      </div>
-    );
-  }, [selectedMoodboard, undo, redo, handleManualSave, canUndo, canRedo, hasUnsavedChanges, isSaving, generateBrandPrompt, setHeaderActions]);
-
-  // Separate cleanup effect to avoid render loops
+  // Header actions are now rendered locally in the canvas area
   useEffect(() => {
     return () => setHeaderActions(null);
   }, [setHeaderActions]);
 
+
+
   return (
     <div className="w-full h-full bg-background overflow-hidden font-mono relative">
+      <style>
+        {`
+          @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&family=IBM+Plex+Mono:wght@400;700&family=Space+Grotesk:wght@400;700&family=Roboto:wght@400;700&family=Playfair+Display:wght@400;900&family=Outfit:wght@400;700&display=swap');
+          
+          .custom-scrollbar::-webkit-scrollbar {
+            width: 4px;
+            height: 4px;
+          }
+          .custom-scrollbar::-webkit-scrollbar-track {
+            background: transparent;
+          }
+          .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: rgba(var(--primary-rgb), 0.1);
+            border-radius: 10px;
+          }
+          .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: rgba(var(--primary-rgb), 0.3);
+          }
+        `}
+      </style>
       {/* Show MoodboardSelector when no moodboard is selected */}
       {!selectedMoodboard ? (
         <MoodboardSelector
@@ -1709,22 +2229,173 @@ const MoodBoardViewContent = React.memo<MoodBoardViewProps>(({ brand, setHeaderA
           onDelete={deleteMoodboard}
         />
       ) : (
-        <>
-          {/* Moodboard Header - Carbon Design System */}
-          <div className="absolute top-3 left-3 z-50 flex items-center gap-2">
-            {/* Back Button - Carbon style */}
-            <button
-              onClick={() => selectMoodboard(null)}
-              className="flex items-center gap-2 h-8 px-3 bg-background/80 backdrop-blur-sm border border-border/60 hover:bg-card hover:border-border transition-all duration-150 text-[10px] font-mono font-medium tracking-wider uppercase"
-            >
-              <ChevronLeft size={12} className="opacity-60" />
-              <span>Back</span>
-            </button>
 
-            {/* Moodboard Name Badge - Carbon style */}
-            <div className="h-8 px-4 flex items-center bg-card/60 backdrop-blur-sm border border-border/40 text-[10px] font-mono font-bold tracking-[0.1em] uppercase text-foreground/80">
-              {selectedMoodboard.name}
+
+        <>
+
+
+
+
+          {/* Integrated Agency Top Bar - The "Unified Chrome" */}
+          <div className="absolute top-0 left-0 right-0 z-30 h-10 bg-card/80 backdrop-blur-xl border-b border-border/40 flex items-center justify-between px-4 transition-all duration-300 ease-out">
+            {/* Left: Navigation Core & Tooling */}
+            <div className="flex items-center gap-1">
+              {/* Back Button */}
+              <Button
+                variant="ghost"
+                onClick={() => selectMoodboard(null)}
+                className="h-8 gap-2 px-2 hover:bg-rose-500/10 hover:text-rose-500 text-muted-foreground/60 transition-colors"
+              >
+                <ChevronLeft size={14} />
+                <span className="text-[10px] font-black tracking-widest uppercase">BACK</span>
+              </Button>
+
+              <div className="w-[1px] h-4 bg-border/40 mx-2" />
+
+              {/* History Controls */}
+              <div className="flex items-center gap-0.5">
+                <Button variant="ghost" size="icon" onClick={undo} disabled={!canUndo} className="h-8 w-8 text-muted-foreground hover:text-foreground disabled:opacity-20 hover:bg-muted/20">
+                  <Undo2 size={14} />
+                </Button>
+                <Button variant="ghost" size="icon" onClick={redo} disabled={!canRedo} className="h-8 w-8 text-muted-foreground hover:text-foreground disabled:opacity-20 hover:bg-muted/20">
+                  <Redo2 size={14} />
+                </Button>
+              </div>
+
+              <div className="w-[1px] h-4 bg-border/40 mx-2" />
+
+              {/* Save Status */}
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={handleManualSave}
+                disabled={!hasUnsavedChanges || isSaving}
+                className={`h-8 gap-2 px-2 transition-all ${hasUnsavedChanges ? 'text-primary hover:text-primary hover:bg-primary/10' : 'text-muted-foreground/40 hover:text-foreground'}`}
+              >
+                {isSaving ? <Loader2 size={12} className="animate-spin" /> : <Save size={14} />}
+                <span className="text-[9px] font-mono uppercase tracking-widest opacity-80">
+                  {isSaving ? 'Saving...' : hasUnsavedChanges ? 'Unsaved' : 'Saved'}
+                </span>
+              </Button>
+
+              <div className="w-[1px] h-4 bg-border/40 mx-2" />
+
+              {/* Organization Tools - Left Aligned */}
+              <div className="flex items-center gap-0.5">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className={`h-8 w-8 rounded-none transition-all duration-300 ${activeTool === 'pointer' ? 'text-primary bg-primary/10' : 'text-muted-foreground/60 hover:text-primary hover:bg-primary/5'}`}
+                  title="Navigation Mode"
+                  onClick={() => setActiveTool('pointer')}
+                >
+                  <Navigation size={14} className="rotate-[270deg]" fill={activeTool === 'pointer' ? "currentColor" : "none"} />
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className={`h-8 w-8 rounded-none transition-all duration-300 ${activeTool === 'hand' ? 'text-primary bg-primary/10' : 'text-muted-foreground/60 hover:text-primary hover:bg-primary/5'}`}
+                  title="Move Tool"
+                  onClick={() => setActiveTool('hand')}
+                >
+                  <Move size={14} />
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className={`h-8 w-8 rounded-none transition-all duration-300 ${activeTool === 'text' ? 'text-primary bg-primary/10' : 'text-muted-foreground/60 hover:text-primary hover:bg-primary/5'}`}
+                  title="Text Injection"
+                  onClick={() => setActiveTool('text')}
+                >
+                  <Type size={14} />
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className={`h-8 w-8 rounded-none transition-all duration-300 ${activeTool === 'section' ? 'text-primary bg-primary/10' : 'text-muted-foreground/60 hover:text-primary hover:bg-primary/5'}`}
+                  title="Area Selection"
+                  onClick={() => setActiveTool('section')}
+                >
+                  <BoxSelect size={14} />
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className={`h-8 w-8 rounded-none transition-all duration-300 ${snapToGrid ? 'text-primary bg-primary/10' : 'text-muted-foreground/60 hover:text-primary hover:bg-primary/5'}`}
+                  title="Grid Alignment"
+                  onClick={() => setSnapToGrid(!snapToGrid)}
+                >
+                  <Hash size={14} />
+                </Button>
+
+                <div className="w-[1px] h-4 bg-border/40 mx-1" />
+
+                {/* Media & Stickers */}
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-8 w-8 rounded-none text-muted-foreground/60 hover:text-primary hover:bg-primary/5 transition-all duration-300"
+                  title="Import Image"
+                  onClick={() => fileInputRef.current?.click()}
+                >
+                  <ImageIcon size={14} />
+                  <input
+                    type="file"
+                    ref={fileInputRef}
+                    className="hidden"
+                    accept="image/png, image/jpeg, image/gif, image/svg+xml"
+                    onChange={handleImageUpload}
+                  />
+                </Button>
+
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-8 w-8 rounded-none text-muted-foreground/60 hover:text-primary hover:bg-primary/5 transition-all duration-300"
+                      title="Drop Sticker / Emoji"
+                    >
+                      <Smile size={14} />
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-64 p-2" sideOffset={8}>
+                    <div className="grid grid-cols-6 gap-1">
+                      {['👍', '👎', '🔥', '💡', '⚠️', '✅', '❌', '🚀', '🎨', '🖌️', '📝', '📊', '🔗', '📂', '❤️', '⭐', '🎉', '👀', '🧠', '⚡', '💣', '💎', '🚩', '🏁'].map(emoji => (
+                        <button
+                          key={emoji}
+                          className="aspect-square flex items-center justify-center text-lg hover:bg-muted rounded-sm transition-colors"
+                          onClick={() => {
+                            const center = screenToFlowPosition({ x: window.innerWidth / 2, y: window.innerHeight / 2 });
+                            const newNode: Node<MoodNodeData> = {
+                              id: generateId(),
+                              type: 'text',
+                              position: center,
+                              data: {
+                                label: emoji,
+                                content: emoji,
+                                fontSize: 64,
+                                color: '#ffffff',
+                                isLocked: false,
+                                type: 'text'
+                              } as MoodNodeData,
+                            };
+                            setNodes((nds) => nds.concat(newNode));
+                          }}
+                        >
+                          {emoji}
+                        </button>
+                      ))}
+                    </div>
+                  </PopoverContent>
+                </Popover>
+              </div>
             </div>
+
+            {/* Center: Contextual Tools (Floating) - REMOVED (Moved to Inspector) */}
+            <div className="absolute left-1/2 -translate-x-1/2 flex items-center h-full pointer-events-none">
+            </div>
+
           </div>
 
           {/* Quick Add Menu */}
@@ -1768,34 +2439,50 @@ const MoodBoardViewContent = React.memo<MoodBoardViewProps>(({ brand, setHeaderA
             </div>
           )}
 
-          {/* Modules Manager Modal */}
+          {/* Right-Side Settings Panel (Inspector) */}
+          <MoodBoardSettingsPanel
+            brand={brand}
+            canvasSettings={canvasSettings}
+            setCanvasSettings={setCanvasSettings}
+            snapToGrid={snapToGrid}
+            setSnapToGrid={setSnapToGrid}
+            onExport={onExport}
+            onGeneratePrompt={generateBrandPrompt}
+            updateNodeData={updateNodeData}
+            onDeleteNode={(id) => onNodesDelete([{ id } as any])}
+          />
+
+          {/* Modules Manager Window (Integrated SaaS Aesthetic) */}
           {isModulesManagerOpen && (
-            <div className="fixed inset-0 z-[200] flex items-center justify-center">
-              {/* Backdrop */}
+            <div className="fixed inset-0 z-[200] flex items-center justify-center p-4">
+              {/* Subtle Backdrop */}
               <div
-                className="absolute inset-0 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200"
+                className="absolute inset-0 bg-background/40 backdrop-blur-sm animate-in fade-in duration-300"
                 onClick={() => setIsModulesManagerOpen(false)}
               />
-              {/* Modal Content */}
-              <div className="relative w-[90vw] max-w-5xl h-[85vh] bg-card border border-border rounded-sm shadow-2xl flex flex-col animate-in zoom-in-95 fade-in duration-300">
-                {/* Modal Header */}
-                <div className="flex items-center justify-between px-6 py-4 border-b border-border">
+
+              {/* Window Frame */}
+              <div className="relative w-full max-w-5xl h-[80vh] bg-[var(--cds-layer-01)] border border-[var(--carbon-table-border)] shadow-2xl flex flex-col animate-in zoom-in-95 fade-in duration-300 overflow-hidden">
+                {/* Minimal Integrated Header (Gray Outside) */}
+                <div className="flex items-center justify-between h-12 bg-[var(--cds-layer-01)] border-b border-[var(--carbon-table-border)] px-6 select-none">
                   <div className="flex items-center gap-3">
-                    <div className="p-2 bg-primary/10 rounded-none">
-                      <Grid3X3 size={16} className="text-primary" />
-                    </div>
-                    <span className="text-sm font-black uppercase tracking-widest">Modules Manager</span>
+                    <Blocks size={16} className="text-primary" />
+                    <span className="text-xs font-bold uppercase tracking-widest text-foreground">Modules Manager</span>
                   </div>
+
                   <button
                     onClick={() => setIsModulesManagerOpen(false)}
-                    className="p-2 hover:bg-muted/40 transition-colors rounded-sm"
+                    className="p-1.5 hover:bg-[var(--cds-layer-hover)] transition-colors text-[var(--cds-text-secondary)] hover:text-[var(--cds-text-primary)]"
                   >
-                    <X size={16} />
+                    <X size={18} />
                   </button>
                 </div>
-                {/* Modal Body */}
-                <div className="flex-1 overflow-y-auto p-6 custom-scrollbar">
-                  <NodesMarketView />
+
+                {/* Window Body */}
+                <div className="flex-1 overflow-hidden flex flex-col">
+                  <div className="flex-1 overflow-y-auto p-0 custom-scrollbar">
+                    <NodesMarketView />
+                  </div>
                 </div>
               </div>
             </div>
@@ -1898,17 +2585,30 @@ const MoodBoardViewContent = React.memo<MoodBoardViewProps>(({ brand, setHeaderA
           ))}
 
           {/* Canvas Area (Removed internal header) */}
-          <div className="absolute inset-0" onPointerMove={handlePointerMove}>
+          <div className={`
+            absolute inset-0 
+            ${activeTool === 'hand' ? 'cursor-grab active:cursor-grabbing' : ''}
+            ${activeTool === 'text' ? 'cursor-text' : ''}
+            ${activeTool === 'section' ? 'cursor-crosshair' : ''}
+            ${activeTool === 'pointer' ? 'cursor-default' : ''}
+          `} onPointerMove={handlePointerMove}>
             {/* Floating Sidebar (Tools) - Carbon Design System */}
             <div className={`
-          absolute left-3 top-16 bottom-3 w-56 z-20 
+          absolute left-0 top-10 bottom-0 z-20 
           transition-all duration-300 ease-out
-          ${isSidebarOpen ? 'translate-x-0 opacity-100' : '-translate-x-64 opacity-0 pointer-events-none'}
+          ${isSidebarOpen ? 'translate-x-0 opacity-100' : '-translate-x-full opacity-0 pointer-events-none'}
+          ${isSidebarMini ? 'w-14' : 'w-56'}
         `}>
-              <div className="h-full bg-card/40 backdrop-blur-xl border border-border/60 flex flex-col">
+              <div className="h-full bg-card/80 backdrop-blur-xl border-r border-border/40 flex flex-col relative overflow-visible group/sidebar">
+                {/* Advanced Tactical Overlay */}
+                <div className="absolute inset-0 pointer-events-none opacity-[0.02] z-0">
+                  <div className="absolute inset-0 bg-[linear-gradient(rgba(18,16,16,0)_50%,rgba(0,0,0,0.1)_50%),linear-gradient(90deg,rgba(255,0,0,0.03),rgba(0,255,0,0.01),rgba(0,0,255,0.03))] bg-[length:100%_2px,3px_100%]" />
+                </div>
+
+
 
                 {/* Categories and Nodes - Carbon Design System */}
-                <div className="flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-white/10 p-3">
+                <div className="flex-1 overflow-y-auto custom-scrollbar p-3">
                   {['Foundation', 'Orchestration', 'Generative', 'Utility', 'External'].map(category => {
                     const categoryNodes = getInstalledNodes().filter(n => n.category.toLowerCase() === category.toLowerCase());
                     if (categoryNodes.length === 0) return null;
@@ -1918,13 +2618,15 @@ const MoodBoardViewContent = React.memo<MoodBoardViewProps>(({ brand, setHeaderA
                     return (
                       <div key={category} className="mb-2">
                         {/* Category Header - Carbon style */}
-                        <button
-                          onClick={() => toggleCategory(category)}
-                          className="w-full flex items-center justify-between h-8 px-3 text-[9px] font-mono font-bold tracking-[0.15em] uppercase text-muted-foreground/60 hover:text-foreground/80 border-b border-border/20 transition-colors duration-150"
-                        >
-                          <span>{category}</span>
-                          {isCollapsed ? <ChevronRight size={10} /> : <ChevronDown size={10} />}
-                        </button>
+                        {!isSidebarMini && (
+                          <button
+                            onClick={() => toggleCategory(category)}
+                            className="w-full flex items-center justify-between h-8 px-3 text-[9px] font-mono font-bold tracking-[0.15em] uppercase text-muted-foreground/60 hover:text-foreground/80 border-b border-border/20 transition-colors duration-150"
+                          >
+                            <span>{category}</span>
+                            {isCollapsed ? <ChevronRight size={10} /> : <ChevronDown size={10} />}
+                          </button>
+                        )}
 
                         {/* Node Buttons - Carbon style */}
                         {!isCollapsed && (
@@ -1933,12 +2635,20 @@ const MoodBoardViewContent = React.memo<MoodBoardViewProps>(({ brand, setHeaderA
                               <button
                                 key={tool.id}
                                 onClick={() => addNode(tool.id as any)}
-                                className="w-full flex items-center gap-3 h-9 px-3 text-muted-foreground/70 hover:text-foreground hover:bg-muted/20 border-l-2 border-transparent hover:border-primary/40 transition-all duration-150 group"
+                                className={`
+                                  w-full flex items-center h-10 border-l-2 border-transparent hover:border-primary/40 transition-all duration-200 group/tool
+                                  ${isSidebarMini ? 'justify-center px-0' : 'gap-3 px-3 hover:bg-primary/5 text-muted-foreground/60 hover:text-foreground'}
+                                `}
+                                title={isSidebarMini ? tool.label : undefined}
                               >
-                                <div className="w-7 h-7 flex items-center justify-center bg-background/60 border border-border/40 group-hover:border-primary/60 group-hover:bg-primary/5 transition-all duration-150">
-                                  <tool.icon size={12} className="group-hover:text-primary" />
+                                <div className={`
+                                  w-8 h-8 flex items-center justify-center bg-card border border-border/40 transition-all duration-300
+                                  group-hover/tool:border-primary/50 group-hover/tool:bg-primary/10 group-hover/tool:shadow-[0_0_10px_rgba(var(--primary-rgb),0.2)]
+                                  ${isSidebarMini ? 'shadow-inner' : ''}
+                                `}>
+                                  <tool.icon size={13} className="group-hover/tool:text-primary transition-colors" strokeWidth={isSidebarMini ? 2.5 : 2} />
                                 </div>
-                                <span className="text-[9px] font-mono font-medium tracking-[0.1em] uppercase">{tool.label}</span>
+                                {!isSidebarMini && <span className="text-[10px] font-mono font-bold tracking-[0.1em] uppercase">{tool.label}</span>}
                               </button>
                             ))}
                           </div>
@@ -1948,84 +2658,81 @@ const MoodBoardViewContent = React.memo<MoodBoardViewProps>(({ brand, setHeaderA
                   })}
                 </div>
 
+                <button
+                  onClick={() => {
+                    if (!isSidebarMini) {
+                      // Collapsing: Minimize Both
+                      setIsSidebarMini(true);
+                      setIsAppSidebarCollapsed?.(true);
+                    } else {
+                      // Expanding: Maximize Moodboard Only
+                      setIsSidebarMini(false);
+                      // We don't restore the app sidebar per user request
+                    }
+                  }}
+                  className={`
+                    absolute -right-3 bottom-12 z-50
+                    w-3 h-8 rounded-r-md
+                    bg-card border-y border-r border-border/40
+                    flex items-center justify-center
+                    transition-all duration-300
+                    hover:bg-primary hover:text-primary-foreground hover:border-primary hover:w-4
+                    group/toggle
+                  `}
+                  title={isSidebarMini ? "Expand Sidebar" : "Focus Mode (Minimize Everything)"}
+                >
+                  <ChevronRight size={10} className={`transition-transform duration-300 ${!isSidebarMini ? 'rotate-180' : ''}`} />
+                </button>
+
                 {/* Footer Section - Carbon Design System */}
                 <div className="mt-auto">
-                  {/* Color Palette */}
-                  <div className="p-3 border-t border-border/40">
-                    <h3 className="text-[8px] font-mono font-bold tracking-[0.2em] uppercase text-muted-foreground/60 mb-3">
-                      Color Palette
-                    </h3>
-                    <div className="grid grid-cols-4 gap-2 mb-4">
-                      {brand.palette.map(color => (
-                        <div
-                          key={color.id}
-                          className="w-full aspect-square border border-border/60 hover:border-primary/40 hover:scale-105 transition-all duration-150 cursor-pointer"
-                          style={{ backgroundColor: color.hex }}
-                          title={color.label}
-                        />
-                      ))}
-                    </div>
 
-                    {/* Secondary Actions - Icons only row */}
-                    <div className="flex items-center gap-2 pt-3 border-t border-border/20 px-1">
-                      <button
-                        onClick={onShare}
-                        className="flex-1 flex items-center justify-center h-8 bg-muted/20 hover:bg-muted/30 border border-border/40 hover:border-primary/40 transition-all text-muted-foreground/60 hover:text-primary"
-                        title="Share Moodboard"
-                      >
-                        <Share2 size={12} />
-                      </button>
-                      <button
-                        onClick={onExport}
-                        className="flex-1 flex items-center justify-center h-8 bg-muted/20 hover:bg-muted/30 border border-border/40 hover:border-primary/40 transition-all text-muted-foreground/60 hover:text-primary"
-                        title="Export Matrix"
-                      >
-                        <Download size={12} />
-                      </button>
-                      <button
-                        onClick={() => setIsResetModalOpen(true)}
-                        className="flex-1 flex items-center justify-center h-8 bg-rose-500/5 hover:bg-rose-500/10 border border-rose-500/20 hover:border-rose-500/40 transition-all text-rose-500/60 hover:text-rose-500"
-                        title="Reset Canvas"
-                      >
-                        <Trash2 size={12} />
-                      </button>
-                    </div>
-                  </div>
 
-                  {/* Modules Manager Button */}
-                  <button
-                    onClick={() => setIsModulesManagerOpen(true)}
-                    className="w-full flex items-center justify-between h-10 px-3 bg-muted/10 hover:bg-muted/20 border-t border-border/40 hover:border-primary/20 transition-all duration-150 group"
-                  >
-                    <div className="flex items-center gap-3">
-                      <div className="w-6 h-6 flex items-center justify-center bg-background/60 border border-border/40 group-hover:bg-primary/10 group-hover:border-primary/40 transition-all duration-150">
-                        <Grid3X3 size={10} className="group-hover:text-primary" />
+                  {!isSidebarMini && (
+                    <div className="p-2 border-t border-border/40 flex items-center justify-between gap-2">
+                      {/* Right: Actions */}
+                      <div className="flex w-full items-center gap-1">
+                        <button
+                          onClick={onShare}
+                          className="flex items-center justify-center flex-1 h-8 rounded-sm bg-muted/20 hover:bg-muted/30 border border-border/40 hover:border-primary/40 transition-all text-muted-foreground/60 hover:text-primary"
+                          title="Share Moodboard"
+                        >
+                          <Share2 size={12} />
+                        </button>
+                        <button
+                          onClick={onExport}
+                          className="flex items-center justify-center flex-1 h-8 rounded-sm bg-muted/20 hover:bg-muted/30 border border-border/40 hover:border-primary/40 transition-all text-muted-foreground/60 hover:text-primary"
+                          title="Export Matrix"
+                        >
+                          <Download size={12} />
+                        </button>
+                        <button
+                          onClick={() => setIsModulesManagerOpen(true)}
+                          className="flex items-center justify-center flex-1 h-8 rounded-sm bg-primary/5 hover:bg-primary/10 border border-transparent hover:border-primary/40 transition-all text-primary/60 hover:text-primary"
+                          title="Modules_Vault"
+                        >
+                          <Blocks size={12} />
+                        </button>
                       </div>
-                      <span className="text-[9px] font-mono font-bold tracking-[0.15em] uppercase">Modules Manager</span>
                     </div>
-                    <Maximize2 size={10} className="opacity-40 group-hover:opacity-100" />
-                  </button>
+                  )}
+
+                  {/* Minimized Modules Manager (Only visible in Mini Mode) */}
+                  {isSidebarMini && (
+                    <button
+                      onClick={() => setIsModulesManagerOpen(true)}
+                      className="w-full flex items-center justify-center h-12 hover:bg-primary/10 transition-colors border-t border-transparent hover:border-primary/20"
+                      title="Modules_Vault"
+                    >
+                      <Blocks size={12} className="text-primary/60 hover:text-primary" />
+                    </button>
+                  )}
+
                 </div>
+
+
               </div>
             </div>
-
-
-            {/* Floating Sidebar Toggle - Carbon Design System */}
-            <button
-              onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-              className={`
-            absolute left-3 top-1/2 -translate-y-1/2 z-30
-            w-6 h-10
-            bg-card/60 backdrop-blur-md
-            border border-border/60
-            flex items-center justify-center
-            transition-all duration-300
-            hover:bg-card hover:border-primary/40
-            ${isSidebarOpen ? 'translate-x-[224px]' : 'translate-x-0'}
-          `}
-            >
-              {isSidebarOpen ? <Minimize2 size={10} /> : <Maximize2 size={10} />}
-            </button>
 
             {/* Flow Canvas */}
             <div className="absolute inset-0 cursor-crosshair">
@@ -2039,59 +2746,62 @@ const MoodBoardViewContent = React.memo<MoodBoardViewProps>(({ brand, setHeaderA
                 onEdgesDelete={onEdgesDelete}
                 onNodeContextMenu={onNodeContextMenu}
                 onPaneClick={onPaneClick}
+                onMouseDown={onPaneMouseDown}
+                onMouseMove={onPaneMouseMove}
+                onMouseUp={onPaneMouseUp}
                 onPaneContextMenu={onPaneContextMenu}
                 onDoubleClick={onPaneDoubleClick}
+                onDragOver={onDragOver}
+                onDrop={onDrop}
                 onEdgeDoubleClick={(_, edge) => onEdgesDelete([edge])}
                 nodeTypes={nodeTypes}
                 connectionMode={connectionMode as ConnectionMode}
+                selectionOnDrag={activeTool === 'pointer'}
+                panOnDrag={activeTool === 'hand' ? [0, 1, 2] : false}
+                selectionMode={SelectionMode.Full}
                 defaultViewport={{ x: 0, y: 0, zoom: 0.92 }}
-                snapToGrid
+                snapToGrid={snapToGrid}
                 snapGrid={[16, 16]}
-                attributionPosition="bottom-right"
+                proOptions={{ hideAttribution: true }}
                 defaultEdgeOptions={{
                   type: 'smoothstep',
                   animated: true,
                   style: { stroke: 'hsl(var(--primary))', strokeWidth: 2, opacity: 0.8 },
                 }}
               >
-                <Background color="#111" gap={20} size={1} />
-                <Controls className="!bg-card/80 !backdrop-blur-md !border-border !shadow-2xl opacity-40 hover:opacity-100 transition-opacity" />
-                <MiniMap
-                  className="!bg-card/40 !backdrop-blur-md !border-border !rounded-none !opacity-20 hover:!opacity-100 transition-opacity overflow-hidden"
-                  nodeColor={(node) => {
-                    switch (node.data.type) {
-                      // Foundation
-                      case 'image':
-                      case 'text':
-                      case 'title':
-                      case 'paragraph':
-                      case 'typography':
-                      case 'grid':
-                      case 'icons':
-                      case 'preset':
-                      case 'palette': return '#2563eb';
-                      // Orchestration
-                      case 'attribute':
-                      case 'texture':
-                      case 'logic':
-                      case 'tone':
-                      case 'negative': return '#f59e0b';
-                      // External
-                      case 'competitor':
-                      case 'reference': return '#059669';
-                      // Generative
-                      case 'mood_gauge': return '#c026d3';
-                      default: return '#6b7280';
-                    }
-                  }}
-                  maskColor="rgba(0,0,0,0.5)"
+                <Background
+                  color={resolvedTheme === 'dark' ? '#525252' : '#8d8d8d'}
+                  gap={20}
+                  size={1}
                 />
+                <Controls className="!bg-card/80 !backdrop-blur-md !border-border !shadow-2xl opacity-40 hover:opacity-100 transition-opacity" />
 
+                {/* Drawing Preview Overlay */}
+                {drawingState.active && (
+                  <Panel position="top-left" style={{ pointerEvents: 'none', width: '100%', height: '100%', zIndex: 1000, margin: 0 }}>
+                    <div
+                      style={{
+                        position: 'absolute',
+                        left: Math.min(drawingState.start.x, drawingState.current.x),
+                        top: Math.min(drawingState.start.y, drawingState.current.y),
+                        width: Math.abs(drawingState.current.x - drawingState.start.x),
+                        height: Math.abs(drawingState.current.y - drawingState.start.y),
+                        border: '1px solid var(--cds-link-01)',
+                        backgroundColor: 'rgba(15, 98, 254, 0.1)',
+                        pointerEvents: 'none',
+                        boxShadow: '0 0 20px rgba(15, 98, 254, 0.2)',
+                        backdropFilter: 'blur(1px)',
+                      }}
+                    />
+                  </Panel>
+                )}
               </ReactFlow>
             </div>
+          </div>
 
-            {/* Context Menu */}
-            {contextMenu && (
+          {/* Context Menu */}
+          {
+            contextMenu && (
               <div
                 className="fixed z-[1000] bg-secondary border border-border rounded-sm p-1 min-w-[140px] animate-in fade-in duration-200"
                 style={{ top: contextMenu.y, left: contextMenu.x }}
@@ -2117,6 +2827,97 @@ const MoodBoardViewContent = React.memo<MoodBoardViewProps>(({ brand, setHeaderA
                   ))}
                 </div>
 
+                <div className="px-3 py-1 text-[8px] font-bold text-muted-foreground/40 uppercase tracking-widest border-t border-border/20 mt-1 pt-1">Layering</div>
+                <button
+                  onClick={() => {
+                    setNodes((nds) => {
+                      const maxZ = Math.max(...nds.map((n) => n.zIndex || 0));
+                      return nds.map((node) => {
+                        if (node.id === contextMenu.id) {
+                          return { ...node, zIndex: maxZ + 1 };
+                        }
+                        return node;
+                      });
+                    });
+                    setContextMenu(null);
+                  }}
+                  className="w-full flex items-center gap-3 px-3 py-2 rounded-none text-muted-foreground hover:bg-foreground/10 hover:text-foreground transition-colors text-[11px] font-normal"
+                >
+                  <Maximize2 size={12} /> Bring to Front
+                </button>
+                <button
+                  onClick={() => {
+                    setNodes((nds) => {
+                      const minZ = Math.min(...nds.map((n) => n.zIndex || 0));
+                      return nds.map((node) => {
+                        if (node.id === contextMenu.id) {
+                          return { ...node, zIndex: minZ - 1 };
+                        }
+                        return node;
+                      });
+                    });
+                    setContextMenu(null);
+                  }}
+                  className="w-full flex items-center gap-3 px-3 py-2 rounded-none text-muted-foreground hover:bg-foreground/10 hover:text-foreground transition-colors text-[11px] font-normal"
+                >
+                  <Minimize2 size={12} /> Send to Back
+                </button>
+
+                <button
+                  onClick={() => {
+                    const node = nodes.find(n => n.id === contextMenu.id);
+                    if (node) {
+                      const newLocked = !node.data.isLocked;
+                      setNodes((nds) =>
+                        nds.map((n) => {
+                          if (n.id === contextMenu.id) {
+                            return {
+                              ...n,
+                              draggable: !newLocked,
+                              selectable: true, // Always selectable so we can unlock it
+                              data: { ...n.data, isLocked: newLocked }
+                            };
+                          }
+                          return n;
+                        })
+                      );
+                      toast.info(newLocked ? 'Layer Locked' : 'Layer Unlocked');
+                    }
+                    setContextMenu(null);
+                  }}
+                  className="w-full flex items-center gap-3 px-3 py-2 rounded-none text-muted-foreground hover:bg-foreground/10 hover:text-foreground transition-colors text-[11px] font-normal"
+                >
+                  {nodes.find(n => n.id === contextMenu.id)?.data.isLocked ? <Unlock size={12} /> : <Lock size={12} />}
+                  {nodes.find(n => n.id === contextMenu.id)?.data.isLocked ? "Unlock Layer" : "Lock Layer"}
+                </button>
+                <div className="px-3 py-1 text-[8px] font-bold text-muted-foreground/40 uppercase tracking-widest border-t border-border/20 mt-1 pt-1">Operations</div>
+
+                <button
+                  onClick={() => {
+                    const node = nodes.find(n => n.id === contextMenu.id);
+                    if (node) {
+                      const newName = prompt("Rename Module Logic:", node.data.label);
+                      if (newName) updateNodeData(node.id, { label: newName });
+                    }
+                    setContextMenu(null);
+                  }}
+                  className="w-full flex items-center gap-3 px-3 py-2 rounded-none text-muted-foreground hover:bg-foreground/10 hover:text-foreground transition-colors text-[11px] font-normal"
+                >
+                  <Edit3 size={12} /> Rename
+                </button>
+                <button
+                  onClick={() => {
+                    const node = nodes.find(n => n.id === contextMenu.id);
+                    if (node) {
+                      updateNodeData(node.id, { isActive: node.data.isActive === false ? true : false });
+                    }
+                    setContextMenu(null);
+                  }}
+                  className="w-full flex items-center gap-3 px-3 py-2 rounded-none text-muted-foreground hover:bg-foreground/10 hover:text-foreground transition-colors text-[11px] font-normal"
+                >
+                  <Power size={12} className={nodes.find(n => n.id === contextMenu.id)?.data.isActive === false ? "text-rose-500" : "text-emerald-500"} />
+                  {nodes.find(n => n.id === contextMenu.id)?.data.isActive === false ? "Enable System" : "Disable System"}
+                </button>
                 <button
                   onClick={() => {
                     const node = nodes.find(n => n.id === contextMenu.id);
@@ -2128,7 +2929,7 @@ const MoodBoardViewContent = React.memo<MoodBoardViewProps>(({ brand, setHeaderA
                         selected: true,
                       };
                       setNodes((nds) => [...nds.map(n => ({ ...n, selected: false })), newNode]);
-                      toast.success('Moodboard duplicated');
+                      toast.success('System module duplicated');
                     }
                     setContextMenu(null);
                   }}
@@ -2147,13 +2948,16 @@ const MoodBoardViewContent = React.memo<MoodBoardViewProps>(({ brand, setHeaderA
                   <Trash2 size={12} /> Delete
                 </button>
               </div>
-            )}
-          </div>
+            )
+          }
         </>
-      )}
-    </div>
+      )
+      }
+    </div >
   );
 });
+
+
 
 const MoodBoardView = React.memo<MoodBoardViewProps>((props) => {
   return (

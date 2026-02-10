@@ -86,7 +86,7 @@ export const MoodboardSelector: React.FC<MoodboardSelectorProps> = ({
                             className="gap-3 h-11 px-6 text-[10px] font-black tracking-[0.15em] uppercase shadow-[0_0_20px_rgba(var(--primary-rgb),0.2)]"
                         >
                             <Plus size={16} />
-                            New Moodboard
+                            New
                         </Button>
                     )
                 }

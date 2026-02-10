@@ -11,9 +11,12 @@ export const useSupabaseBrands = () => {
 
   const addBrand = useCallback(async (brand: Omit<BrandProfile, 'id'>) => {
     try {
+      console.log('DEBUG: useSupabaseBrands.addBrand starting', { brandName: brand.name, activeWorkspaceId: activeWorkspace?.id });
       setLoading(true);
       const newBrand = await brandService.createBrand(brand, activeWorkspace?.id);
+      console.log('DEBUG: useSupabaseBrands.addBrand brand created, refreshing data...', newBrand);
       await refreshData();
+      console.log('DEBUG: useSupabaseBrands.addBrand data refresh complete');
       toast.success('Brand created successfully!');
       return newBrand;
     } catch (error) {

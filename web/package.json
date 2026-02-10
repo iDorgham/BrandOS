@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "@google/genai": "^1.38.0",
+    "@radix-ui/react-popover": "^1.1.15",
     "@supabase/supabase-js": "^2.94.0",
     "@xyflow/react": "^12.10.0",
     "framer-motion": "^12.33.0",

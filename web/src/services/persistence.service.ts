@@ -15,47 +15,23 @@ export const brandService = {
       let query = supabase
         .from('brands')
         .select('*')
-        .eq('user_id', user.id)
         .order('created_at', { ascending: false });
 
-      // Filter by workspace if column exists and orgId provided
       if (orgId) {
-        // Try with workspace_id and is_active (both may not exist in older schemas)
-        const withWorkspace = query.eq('workspace_id', orgId);
-        const { data: dataWithWs, error: errorWithWs } = await withWorkspace;
-        if (!errorWithWs) {
-          // Filter is_active in memory if column exists
-          let rows = dataWithWs || [];
-          try {
-            rows = rows.filter((r: any) => r.is_active !== false);
-          } catch {
-            // ignore if is_active doesn't exist
-          }
-          return rows.map(this.mapDbBrandToApp);
-        }
-        // Column workspace_id may not exist yet; fall back to user-only and filter in memory
-        if (errorWithWs.message?.includes('workspace_id') || errorWithWs.message?.includes('does not exist') || errorWithWs.code === '42703') {
-          const { data: dataUser, error: errorUser } = await supabase
-            .from('brands')
-            .select('*')
-            .eq('user_id', user.id)
-            .order('created_at', { ascending: false });
-          if (errorUser) {
-            // If fallback query also fails, return empty array
-            console.warn('Fallback brands query failed:', errorUser.message);
-            return [];
-          }
-          const mapped = (dataUser || []).map(dbBrand => brandService.mapDbBrandToApp(dbBrand));
-          return mapped.filter((b: BrandProfile) => b.workspaceId === orgId);
-        }
-        // If error is not about missing column, let it fall through to catch block
-        throw errorWithWs;
+        query = query.eq('workspace_id', orgId);
+      } else {
+        // PERSONAL MODE: Strictly fetch where workspace_id is null
+        query = query.is('workspace_id', null);
       }
 
-      // NO ORGID PROVIDED - This is the "Personal" workspace
-      // We must explicitly fetch where workspace_id is null to isolate Personal data
-      const { data, error } = await query.is('workspace_id', null);
-      if (error) throw error;
+      console.log(`[BrandService] Fetching brands for orgId: ${orgId || 'Personal'}`);
+      const { data, error } = await query;
+      if (error) {
+        console.error('[BrandService] Query error:', error);
+        throw error;
+      }
+
+      console.log(`[BrandService] Found ${data?.length || 0} brands in DB`);
 
       // is_active may not exist in older schema
       let rows = data || [];
@@ -92,8 +68,12 @@ export const brandService = {
 
   // Create a new brand
   async createBrand(brand: Omit<BrandProfile, 'id'>, orgId?: string): Promise<BrandProfile> {
+    console.log('DEBUG: brandService.createBrand starting', { orgId, brandName: brand.name });
     const user = await getCurrentUser();
-    if (!user) throw new Error('User not authenticated');
+    if (!user) {
+      console.error('DEBUG: No user found in createBrand');
+      throw new Error('User not authenticated');
+    }
     const { data, error } = await supabase
       .from('brands')
       .insert({
@@ -114,7 +94,16 @@ export const brandService = {
       .select()
       .single();
 
-    if (error) throw error;
+    if (error) {
+      console.error('DEBUG: [brandService.createBrand] Supabase insertion failed:', {
+        message: error.message,
+        code: error.code,
+        details: error.details,
+        hint: error.hint
+      });
+      throw error;
+    }
+    console.log('DEBUG: Supabase brand insertion success:', data);
 
     const newBrand = this.mapDbBrandToApp(data);
 
@@ -672,14 +661,42 @@ export const auditService = {
     }
   },
 
-  // Get audit logs for a workspace
-  async getAuditLogs(workspaceId: string): Promise<AuditLog[]> {
+  // Get audit logs for a workspace with filtering
+  async getAuditLogs(
+    workspaceId: string,
+    filters?: {
+      action?: string;
+      entityType?: string;
+      userId?: string;
+      limit?: number;
+      offset?: number;
+    }
+  ): Promise<AuditLog[]> {
     try {
-      const { data, error } = await supabase
+      let query = supabase
         .from('audit_logs')
         .select('*')
         .eq('workspace_id', workspaceId)
         .order('created_at', { ascending: false });
+
+      if (filters?.action) {
+        query = query.eq('action', filters.action);
+      }
+      if (filters?.entityType) {
+        query = query.eq('entity_type', filters.entityType);
+      }
+      if (filters?.userId) {
+        query = query.eq('user_id', filters.userId);
+      }
+      if (filters?.limit) {
+        query = query.limit(filters.limit);
+      }
+      if (filters?.offset) {
+        const limit = filters.limit || 50;
+        query = query.range(filters.offset, filters.offset + limit - 1);
+      }
+
+      const { data, error } = await query;
 
       if (error) throw error;
       return (data || []).map(this.mapDbLogToApp);
@@ -709,11 +726,18 @@ export const organizationService = {
   // Get all workspaces the user belongs to
   async getWorkspaces(): Promise<Workspace[]> {
     try {
+      console.log('DEBUG: Fetching workspaces from Supabase...');
       const { data, error } = await supabase
         .from('workspaces')
         .select('*');
 
       if (error) {
+        console.error('DEBUG: [organizationService.getWorkspaces] Supabase error:', {
+          message: error.message,
+          code: error.code,
+          details: error.details
+        });
+
         // If table doesn't exist, log it and return empty for mock fallback
         if (error.code === 'PGRST116' || error.message?.includes('schema cache')) {
           console.warn('Workspaces table not found in schema cache. Falling back to mock data.');
@@ -722,9 +746,14 @@ export const organizationService = {
         throw error;
       }
 
+      console.log('DEBUG: RAW Workspaces data:', data);
+
       return data.map(this.mapDbOrgToApp);
-    } catch (err) {
-      console.error('Error fetching workspaces:', err);
+    } catch (err: any) {
+      console.error('DEBUG: [organizationService.getWorkspaces] Critical error:', {
+        message: err.message,
+        stack: err.stack
+      });
       return []; // Return empty to trigger mock fallback in AuthContext
     }
   },

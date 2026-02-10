@@ -140,22 +140,35 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     try {
       if (!user) return;
 
+      console.log('DEBUG: AuthContext loadInitialData starting...');
+      console.log('DEBUG: localStorage active workspace:', localStorage.getItem(CACHE_KEYS.ACTIVE_WORKSPACE));
+
       // Note: Removed blocking migration check for performance. 
       // Ensure migration runs only when explicitly needed or in background.
 
       // Load organizations 
       // We don't block UI here if we have cached workspaces
       organizationService.getWorkspaces().then(orgs => {
-        if (orgs.length === 0) {
-          orgs = MOCK_WORKSPACES;
-        }
-        setWorkspaces(orgs);
+        const hasRealWorkspaces = orgs.length > 0;
 
-        // If no active workspace but we have orgs, set first one
-        if (orgs.length > 0 && !activeWorkspace) {
-          setActiveWorkspace(orgs[0]);
-        } else if (orgs.length > 0 && activeWorkspace) {
-          // Verify active workspace still exists
+        // Save for UI display only
+        const allOrgs = hasRealWorkspaces ? orgs : MOCK_WORKSPACES;
+        setWorkspaces(allOrgs);
+
+        // Active Workspace Logic: 
+        // We MUST use 'hasRealWorkspaces' to decide if we should be in a Workspace context or Personal context.
+        // Mock workspaces should NEVER be the activeWorkspace if we want to see real Brands.
+        if (!activeWorkspace || !hasRealWorkspaces) {
+          if (hasRealWorkspaces) {
+            // If we have real ones but none active, set first real one
+            setActiveWorkspace(orgs[0]);
+          } else {
+            // If no real ones, FORCE active workspace to null (Personal space)
+            // Even if we have mock ones for the UI switcher, the "active" filter must be null.
+            setActiveWorkspace(null);
+          }
+        } else {
+          // If we have an active workspace and it's real, verify it still exists
           const exists = orgs.find(w => w.id === activeWorkspace.id);
           if (!exists) setActiveWorkspace(orgs[0]);
         }
@@ -210,17 +223,13 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       try {
         const currentUser = await getCurrentUser();
         setUser(currentUser);
-        // If no user, we can clear cache or keep it for "offline" view? 
-        // For now, let's keep it to allow instant UI, but maybe flag it?
-        // Actually best to clear if we confirm no user to avoid showing stale data from previous user
+        // If no user, resolve loading immediately
         if (!currentUser) {
-          setBrands([]);
-          setAssets([]);
-          // etc.. or rely on the other useEffect
+          setLoading(false);
         }
+        // If there is a user, loadWorkspaceData (tripped by the user useEffect or manually) will resolve loading
       } catch (error) {
         console.error('Auth check failed:', error);
-      } finally {
         setLoading(false);
       }
     };
@@ -241,11 +250,18 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           setUserProfile(null);
           setUserRole('designer'); // Reset to lowest role
           localStorage.clear(); // Clear all cache on sign out
-        } else if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED' || (event === 'INITIAL_SESSION' && currentUser)) {
-          // Re-validate everything on re-auth
+        } else if (event === 'SIGNED_IN') {
+          // Explicit sign-in: show loader and fetch fresh data
+          setLoading(true);
           loadInitialData();
+        } else if (event === 'INITIAL_SESSION') {
+          // Background session resolution (e.g. on window focus)
+          // loadInitialData already calls loadWorkspaceData which has internal smart loading
+          loadInitialData();
+        } else if (event === 'TOKEN_REFRESHED' && currentUser) {
+          // Silent refresh on token update
+          loadInitialData(); // Load data without setting loading=true
         }
-        setLoading(false);
       }
     );
 

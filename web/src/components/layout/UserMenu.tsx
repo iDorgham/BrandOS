@@ -59,84 +59,99 @@ export const UserMenu: React.FC<UserMenuProps> = ({ onNavigate }) => {
                         {/* Profile Header */}
                         <div className="p-5 border-b border-white/5 bg-gradient-to-br from-primary/5 to-transparent">
                             <div className="flex items-center gap-4">
-                                <div className="w-12 h-12 rounded-2xl brand-gradient flex items-center justify-center text-sm font-black text-primary-foreground shadow-2xl overflow-hidden">
+                                <div className="w-12 h-12 rounded-2xl brand-gradient flex items-center justify-center text-sm font-black text-primary-foreground shadow-2xl overflow-hidden relative group/avatar">
                                     {avatarUrl ? (
-                                        <img src={avatarUrl} alt={userName} className="w-full h-full object-cover rounded-2xl" />
+                                        <img src={avatarUrl} alt={userName} className="w-full h-full object-cover rounded-2xl transition-transform duration-500 group-hover/avatar:scale-110" />
                                     ) : (
                                         userInitial
                                     )}
+                                    <div className="absolute inset-0 bg-primary/20 opacity-0 group-hover/avatar:opacity-100 transition-opacity" />
                                 </div>
                                 <div className="flex-1 min-w-0">
-                                    <p className="text-sm font-black uppercase tracking-tight truncate">{userName}</p>
-                                    <p className="text-[10px] text-muted-foreground truncate opacity-60">{user?.email}</p>
+                                    <p className="text-sm font-black uppercase tracking-tight truncate group-hover:text-primary transition-colors">{userName}</p>
+                                    <p className="text-[10px] text-muted-foreground truncate opacity-60 tracking-wider font-medium">{user?.email}</p>
                                 </div>
                             </div>
                             <div className="mt-4 flex items-center gap-2 px-2 py-1.5 rounded-xl bg-primary/10 border border-primary/20">
                                 <Shield size={10} className="text-primary" />
-                                <span className="text-[9px] font-medium tracking-normal text-primary">Art Director Protocol</span>
+                                <span className="text-[9px] font-bold tracking-[0.05em] uppercase text-primary">Art Director Protocol</span>
                             </div>
                         </div>
 
                         {/* Menu Items */}
-                        <div className="p-2 space-y-1">
-                            <button
-                                onClick={() => menuSelection('profile')}
-                                className="w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-[11px] font-bold text-muted-foreground hover:bg-white/5 hover:text-foreground transition-all group"
-                            >
-                                <div className="flex items-center gap-3">
-                                    <User size={16} className="group-hover:text-primary transition-colors" />
-                                    <span className="tracking-normal text-[10px]">Identity Profile</span>
-                                </div>
-                                <ChevronRight size={12} className="opacity-20 group-hover:opacity-100 transition-opacity" />
-                            </button>
+                        <div className="p-2.5 space-y-1">
+                            <div className="mb-2">
+                                <button
+                                    onClick={() => menuSelection('profile')}
+                                    className="w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-[11px] font-bold text-muted-foreground hover:bg-white/5 hover:text-foreground transition-all group"
+                                >
+                                    <div className="flex items-center gap-3">
+                                        <div className="w-7 h-7 rounded-lg bg-white/5 flex items-center justify-center group-hover:bg-primary/10 transition-colors">
+                                            <User size={15} className="group-hover:text-primary transition-colors" />
+                                        </div>
+                                        <span className="tracking-tight text-[11px] font-medium">Profile</span>
+                                    </div>
+                                    <ChevronRight size={12} className="opacity-20 group-hover:opacity-100 transition-opacity group-hover:translate-x-0.5 transition-transform" />
+                                </button>
 
-                            <button
-                                onClick={() => menuSelection('settings')}
-                                className="w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-[11px] font-bold text-muted-foreground hover:bg-white/5 hover:text-foreground transition-all group"
-                            >
-                                <div className="flex items-center gap-3">
-                                    <Settings size={16} className="group-hover:text-primary transition-colors" />
-                                    <span className="tracking-normal text-[10px]">System Settings</span>
-                                </div>
-                                <ChevronRight size={12} className="opacity-20 group-hover:opacity-100 transition-opacity" />
-                            </button>
+                                <button
+                                    onClick={() => menuSelection('settings')}
+                                    className="w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-[11px] font-bold text-muted-foreground hover:bg-white/5 hover:text-foreground transition-all group"
+                                >
+                                    <div className="flex items-center gap-3">
+                                        <div className="w-7 h-7 rounded-lg bg-white/5 flex items-center justify-center group-hover:bg-primary/10 transition-colors">
+                                            <Settings size={15} className="group-hover:text-primary transition-colors" />
+                                        </div>
+                                        <span className="tracking-tight text-[11px] font-medium">Settings</span>
+                                    </div>
+                                    <ChevronRight size={12} className="opacity-20 group-hover:opacity-100 transition-opacity group-hover:translate-x-0.5 transition-transform" />
+                                </button>
+                            </div>
 
-                            <button
-                                onClick={() => menuSelection('billing')}
-                                className="w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-[11px] font-bold text-muted-foreground hover:bg-white/5 hover:text-foreground transition-all group"
-                            >
-                                <div className="flex items-center gap-3">
-                                    <CreditCard size={16} className="group-hover:text-primary transition-colors" />
-                                    <span className="tracking-normal text-[10px]">Brand OS Subscription</span>
-                                </div>
-                                <div className="px-2 py-0.5 rounded-full bg-primary/20 text-primary text-[8px] font-medium">Pro</div>
-                            </button>
+                            <div className="pt-2 border-t border-white/5 space-y-1">
+                                <button
+                                    onClick={() => menuSelection('billing')}
+                                    className="w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-[11px] font-bold text-muted-foreground hover:bg-white/5 hover:text-foreground transition-all group"
+                                >
+                                    <div className="flex items-center gap-3">
+                                        <div className="w-7 h-7 rounded-lg bg-white/5 flex items-center justify-center group-hover:bg-primary/10 transition-colors">
+                                            <CreditCard size={15} className="group-hover:text-primary transition-colors" />
+                                        </div>
+                                        <span className="tracking-tight text-[11px] font-medium">Subscription</span>
+                                    </div>
+                                    <div className="px-2 py-0.5 rounded-md bg-primary/20 text-primary text-[8px] font-black uppercase tracking-tighter">Pro</div>
+                                </button>
 
-                            <button
-                                onClick={() => menuSelection('notifications')}
-                                className="w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-[11px] font-bold text-muted-foreground hover:bg-white/5 hover:text-foreground transition-all group"
-                            >
-                                <div className="flex items-center gap-3">
-                                    <Bell size={16} className="group-hover:text-primary transition-colors" />
-                                    <span className="tracking-normal text-[10px]">Neural Alerts</span>
-                                </div>
-                                <div className="w-1.5 h-1.5 rounded-full bg-primary" />
-                            </button>
+                                <button
+                                    onClick={() => menuSelection('notifications')}
+                                    className="w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-[11px] font-bold text-muted-foreground hover:bg-white/5 hover:text-foreground transition-all group"
+                                >
+                                    <div className="flex items-center gap-3">
+                                        <div className="w-7 h-7 rounded-lg bg-white/5 flex items-center justify-center group-hover:bg-primary/10 transition-colors">
+                                            <Bell size={15} className="group-hover:text-primary transition-colors" />
+                                        </div>
+                                        <span className="tracking-tight text-[11px] font-medium">Notifications</span>
+                                    </div>
+                                    <div className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
+                                </button>
+                            </div>
                         </div>
 
                         {/* Footer Action */}
-                        <div className="p-2 border-t border-white/5 bg-white/[0.01]">
+                        <div className="p-2.5 border-t border-white/5 bg-white/[0.01]">
                             <button
                                 onClick={() => menuSelection('logout')}
                                 className="w-full flex items-center gap-3 px-3 py-3 rounded-xl text-[10px] font-black uppercase tracking-[0.2em] text-rose-500 hover:bg-rose-500/10 transition-all group"
                             >
-                                <LogOut size={16} />
-                                Logout
+                                <div className="w-7 h-7 rounded-lg bg-rose-500/5 flex items-center justify-center group-hover:bg-rose-500/10 transition-colors">
+                                    <LogOut size={15} />
+                                </div>
+                                logout
                             </button>
                         </div>
 
                         {/* DNA Badge Decoration */}
-                        <div className="absolute top-0 right-0 p-4 opacity-[0.03] pointer-events-none">
+                        <div className="absolute top-0 right-0 p-4 opacity-[0.03] pointer-events-none text-primary">
                             <Sparkles size={80} />
                         </div>
                     </Card>

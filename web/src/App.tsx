@@ -224,7 +224,7 @@ const AppContent: React.FC = () => {
             setCaseStudiesView(false);
             setPricingView(false);
         }
-    }, [user]);
+    }, [user?.id]);
 
     const handleNavigate = (view: 'landing' | 'products' | 'industries' | 'results' | 'pricing' | 'company' | 'resources' | 'calculator' | 'auth', params?: any) => {
         // Reset all views first
@@ -252,7 +252,9 @@ const AppContent: React.FC = () => {
         }
     };
 
-    if (loading) {
+    // Only block UI if we have absolutely no data (initial load)
+    // If we have brands but loading=true, it's just a background refresh
+    if (loading && brands.length === 0) {
         return <ViewLoader />;
     }
 
@@ -410,7 +412,11 @@ const AppContent: React.FC = () => {
                             )}
 
                             {activeTab === 'moodboard' && (
-                                <MoodBoardView brand={selectedBrand} setHeaderActions={setHeaderActions} />
+                                <MoodBoardView
+                                    brand={selectedBrand}
+                                    setHeaderActions={setHeaderActions}
+                                    setIsAppSidebarCollapsed={setIsSidebarCollapsed}
+                                />
                             )}
 
                             {activeTab === 'creative' && (
