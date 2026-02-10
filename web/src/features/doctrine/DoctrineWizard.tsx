@@ -15,20 +15,20 @@ export const DoctrineWizard: React.FC<DoctrineWizardProps> = ({ brand, onUpdateB
         brandName: brand.name || '',
         mission: '',
         vision: '',
-        
+
         // Step 2: Emotional Intent
         emotionalIntent: 'SOPHISTICATED' as 'EUPHORIC' | 'MYSTERIOUS' | 'SOPHISTICATED' | 'MINIMALIST' | 'ENERGIZED' | 'WARM',
-        
+
         // Step 3: Target Audience
         audienceAge: '25-40',
         audienceType: 'professionals',
         audienceValues: 'innovation',
-        
+
         // Step 4: Visual Style
         visualStyle: 'minimalist',
         colorPhilosophy: 'monochromatic',
         typography: 'sans-serif',
-        
+
         // Step 5: Communication Tone
         voice: 'professional',
         keyValues: [] as string[],
@@ -92,7 +92,7 @@ When we succeed, our audience feels ${intents[data.emotionalIntent]}`;
                     <input
                         type="text"
                         value={formData.brandName}
-                        onChange={(e) => setFormData({...formData, brandName: e.target.value})}
+                        onChange={(e) => setFormData({ ...formData, brandName: e.target.value })}
                         className="w-full px-4 py-3 rounded-lg border border-border bg-background"
                         placeholder="Enter your brand name"
                     />
@@ -102,7 +102,7 @@ When we succeed, our audience feels ${intents[data.emotionalIntent]}`;
                     <label className="block text-sm font-medium mb-2">Brand Mission</label>
                     <textarea
                         value={formData.mission}
-                        onChange={(e) => setFormData({...formData, mission: e.target.value})}
+                        onChange={(e) => setFormData({ ...formData, mission: e.target.value })}
                         className="w-full px-4 py-3 rounded-lg border border-border bg-background"
                         rows={3}
                         placeholder="What problem does your brand solve?"
@@ -113,7 +113,7 @@ When we succeed, our audience feels ${intents[data.emotionalIntent]}`;
                     <label className="block text-sm font-medium mb-2">Vision Statement</label>
                     <textarea
                         value={formData.vision}
-                        onChange={(e) => setFormData({...formData, vision: e.target.value})}
+                        onChange={(e) => setFormData({ ...formData, vision: e.target.value })}
                         className="w-full px-4 py-3 rounded-lg border border-border bg-background"
                         rows={3}
                         placeholder="Where do you want to take your brand?"
@@ -136,7 +136,7 @@ When we succeed, our audience feels ${intents[data.emotionalIntent]}`;
                     <label className="block text-sm font-medium mb-2">Brand Vibe</label>
                     <select
                         value={formData.emotionalIntent}
-                        onChange={(e) => setFormData({...formData, emotionalIntent: e.target.value as any})}
+                        onChange={(e) => setFormData({ ...formData, emotionalIntent: e.target.value as any })}
                         className="w-full px-4 py-3 rounded-lg border border-border bg-background"
                     >
                         <option value="EUPHORIC">🎉 Euphoric - Joyful, uplifting, energizing</option>
@@ -176,7 +176,7 @@ When we succeed, our audience feels ${intents[data.emotionalIntent]}`;
                     <label className="block text-sm font-medium mb-2">Primary Age Group</label>
                     <select
                         value={formData.audienceAge}
-                        onChange={(e) => setFormData({...formData, audienceAge: e.target.value})}
+                        onChange={(e) => setFormData({ ...formData, audienceAge: e.target.value })}
                         className="w-full px-4 py-3 rounded-lg border border-border bg-background"
                     >
                         <option value="18-25">🎓 Gen Z (18-25)</option>
@@ -190,7 +190,7 @@ When we succeed, our audience feels ${intents[data.emotionalIntent]}`;
                     <label className="block text-sm font-medium mb-2">Audience Type</label>
                     <select
                         value={formData.audienceType}
-                        onChange={(e) => setFormData({...formData, audienceType: e.target.value})}
+                        onChange={(e) => setFormData({ ...formData, audienceType: e.target.value })}
                         className="w-full px-4 py-3 rounded-lg border border-border bg-background"
                     >
                         <option value="professionals">👔 Professionals & Business</option>
@@ -205,7 +205,7 @@ When we succeed, our audience feels ${intents[data.emotionalIntent]}`;
                     <label className="block text-sm font-medium mb-2">Core Values</label>
                     <select
                         value={formData.audienceValues}
-                        onChange={(e) => setFormData({...formData, audienceValues: e.target.value})}
+                        onChange={(e) => setFormData({ ...formData, audienceValues: e.target.value })}
                         className="w-full px-4 py-3 rounded-lg border border-border bg-background"
                     >
                         <option value="innovation">💡 Innovation & Progress</option>
@@ -233,7 +233,7 @@ When we succeed, our audience feels ${intents[data.emotionalIntent]}`;
                     <label className="block text-sm font-medium mb-2">Visual Style</label>
                     <select
                         value={formData.visualStyle}
-                        onChange={(e) => setFormData({...formData, visualStyle: e.target.value})}
+                        onChange={(e) => setFormData({ ...formData, visualStyle: e.target.value })}
                         className="w-full px-4 py-3 rounded-lg border border-border bg-background"
                     >
                         <option value="minimalist">✨ Minimalist - Clean, focused, intentional</option>
@@ -249,7 +249,7 @@ When we succeed, our audience feels ${intents[data.emotionalIntent]}`;
                     <label className="block text-sm font-medium mb-2">Color Philosophy</label>
                     <select
                         value={formData.colorPhilosophy}
-                        onChange={(e) => setFormData({...formData, colorPhilosophy: e.target.value})}
+                        onChange={(e) => setFormData({ ...formData, colorPhilosophy: e.target.value })}
                         className="w-full px-4 py-3 rounded-lg border border-border bg-background"
                     >
                         <option value="monochromatic">⚫ Monochromatic - Single color shades</option>
@@ -265,7 +265,7 @@ When we succeed, our audience feels ${intents[data.emotionalIntent]}`;
                     <label className="block text-sm font-medium mb-2">Typography</label>
                     <select
                         value={formData.typography}
-                        onChange={(e) => setFormData({...formData, typography: e.target.value})}
+                        onChange={(e) => setFormData({ ...formData, typography: e.target.value })}
                         className="w-full px-4 py-3 rounded-lg border border-border bg-background"
                     >
                         <option value="sans-serif">🔤 Sans-serif - Modern, clean, accessible</option>
@@ -292,7 +292,7 @@ When we succeed, our audience feels ${intents[data.emotionalIntent]}`;
                     <label className="block text-sm font-medium mb-2">Brand Voice</label>
                     <select
                         value={formData.voice}
-                        onChange={(e) => setFormData({...formData, voice: e.target.value})}
+                        onChange={(e) => setFormData({ ...formData, voice: e.target.value })}
                         className="w-full px-4 py-3 rounded-lg border border-border bg-background"
                     >
                         <option value="professional">👔 Professional - Knowledgeable, authoritative, trustworthy</option>
@@ -307,7 +307,7 @@ When we succeed, our audience feels ${intents[data.emotionalIntent]}`;
                     <label className="block text-sm font-medium mb-2">Language Style</label>
                     <select
                         value={formData.language}
-                        onChange={(e) => setFormData({...formData, language: e.target.value})}
+                        onChange={(e) => setFormData({ ...formData, language: e.target.value })}
                         className="w-full px-4 py-3 rounded-lg border border-border bg-background"
                     >
                         <option value="inspiring">💫 Inspiring - Motivational, uplifting, visionary</option>
@@ -382,7 +382,7 @@ When we succeed, our audience feels ${intents[data.emotionalIntent]}`;
                     <span className="text-sm text-muted-foreground">Step {currentStep + 1} of {totalSteps}</span>
                 </div>
                 <div className="w-full bg-muted rounded-full h-2">
-                    <div 
+                    <div
                         className="h-full bg-primary rounded-full transition-all duration-500"
                         style={{ width: `${progress}%` }}
                     />
@@ -397,7 +397,7 @@ When we succeed, our audience feels ${intents[data.emotionalIntent]}`;
             {/* Navigation */}
             <div className="flex justify-between items-center">
                 <Button
-                    variant="outline"
+                    variant="secondary"
                     onClick={handlePrevious}
                     disabled={currentStep === 0}
                     className="gap-2"

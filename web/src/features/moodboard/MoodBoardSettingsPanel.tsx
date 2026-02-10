@@ -1,5 +1,6 @@
 
 import React, { useMemo, useState } from 'react';
+import { useTheme } from '@/contexts/ThemeContext';
 import { MiniMap, Node, useNodes, useReactFlow } from '@xyflow/react';
 import {
     Settings,
@@ -17,6 +18,8 @@ import {
     Lock,
     Unlock,
     Trash2,
+    Link,
+    Unlink,
     Monitor,
     ChevronRight,
     ChevronLeft,
@@ -40,7 +43,7 @@ interface MoodBoardSettingsPanelProps {
     onDeleteNode: (id: string) => void;
 }
 
-export const MoodBoardSettingsPanel = ({
+export const MoodBoardSettingsPanel = React.memo(({
     brand,
     canvasSettings,
     setCanvasSettings,
@@ -53,6 +56,8 @@ export const MoodBoardSettingsPanel = ({
 }: MoodBoardSettingsPanelProps) => {
     const [activeTab, setActiveTab] = useState<'assets' | 'guide' | 'settings'>('settings');
     const { assets } = useAuth();
+    const { resolvedTheme } = useTheme();
+    const isDark = resolvedTheme === 'dark';
     const nodes = useNodes();
     // We can use the store or just filter nodes passed implicitly? 
     // Ideally useNodes() from ReactFlowProvider gives us latest state if updated correctly.
@@ -315,6 +320,58 @@ export const MoodBoardSettingsPanel = ({
                                             </div>
                                         </div>
 
+                                        <div className="grid grid-cols-[1fr_auto_1fr] gap-2 items-end">
+                                            <div className="bg-muted/20 border border-border/40 p-2">
+                                                <span className="text-[8px] uppercase tracking-widest text-muted-foreground/40 block mb-1">Width (px)</span>
+                                                <Input
+                                                    type="number"
+                                                    value={Math.round((selectedNode as any).measured?.width ?? (selectedNode as any).width ?? parseInt(selectedNode.style?.width as string) ?? 0)}
+                                                    onChange={(e) => {
+                                                        const val = parseInt(e.target.value);
+                                                        if (isNaN(val)) return;
+                                                        if (selectedNode.data.isRatioLocked) {
+                                                            const currentWidth = (selectedNode as any).measured?.width ?? (selectedNode as any).width ?? parseInt(selectedNode.style?.width as string) ?? 1;
+                                                            const currentHeight = (selectedNode as any).measured?.height ?? (selectedNode as any).height ?? parseInt(selectedNode.style?.height as string) ?? 1;
+                                                            const ratio = currentHeight / currentWidth;
+                                                            updateNodeData(selectedNode.id, {}, { width: val, height: Math.round(val * ratio) });
+                                                        } else {
+                                                            updateNodeData(selectedNode.id, {}, { width: val });
+                                                        }
+                                                    }}
+                                                    className="h-6 text-[10px] font-mono bg-transparent border-none p-0 focus-visible:ring-0"
+                                                />
+                                            </div>
+                                            <Button
+                                                variant="ghost"
+                                                size="icon"
+                                                onClick={() => updateNodeData(selectedNode.id, { isRatioLocked: !selectedNode.data.isRatioLocked })}
+                                                className={`h-10 w-8 border border-border/40 hover:bg-primary/5 mb-0.5 ${selectedNode.data.isRatioLocked ? 'text-primary bg-primary/10 border-primary/20' : 'text-muted-foreground/40'}`}
+                                                title="Lock Aspect Ratio"
+                                            >
+                                                {selectedNode.data.isRatioLocked ? <Link size={12} /> : <Unlink size={12} />}
+                                            </Button>
+                                            <div className="bg-muted/20 border border-border/40 p-2">
+                                                <span className="text-[8px] uppercase tracking-widest text-muted-foreground/40 block mb-1">Height (px)</span>
+                                                <Input
+                                                    type="number"
+                                                    value={Math.round((selectedNode as any).measured?.height ?? (selectedNode as any).height ?? parseInt(selectedNode.style?.height as string) ?? 0)}
+                                                    onChange={(e) => {
+                                                        const val = parseInt(e.target.value);
+                                                        if (isNaN(val)) return;
+                                                        if (selectedNode.data.isRatioLocked) {
+                                                            const currentWidth = (selectedNode as any).measured?.width ?? (selectedNode as any).width ?? parseInt(selectedNode.style?.width as string) ?? 1;
+                                                            const currentHeight = (selectedNode as any).measured?.height ?? (selectedNode as any).height ?? parseInt(selectedNode.style?.height as string) ?? 1;
+                                                            const ratio = currentWidth / currentHeight;
+                                                            updateNodeData(selectedNode.id, {}, { height: val, width: Math.round(val * ratio) });
+                                                        } else {
+                                                            updateNodeData(selectedNode.id, {}, { height: val });
+                                                        }
+                                                    }}
+                                                    className="h-6 text-[10px] font-mono bg-transparent border-none p-0 focus-visible:ring-0"
+                                                />
+                                            </div>
+                                        </div>
+
                                         <div className="flex gap-2">
                                             <Button
                                                 variant="secondary"
@@ -520,30 +577,16 @@ export const MoodBoardSettingsPanel = ({
                 </div>
 
                 {/* MiniMap Container - Fixed Bottom */}
-                <div className="h-36 border-t border-border/40 relative bg-muted/5 overflow-hidden group/minimap">
-                    <div className="absolute top-2 left-2 z-10 px-1.5 py-0.5 bg-background/80 backdrop-blur-md border border-border/20 text-[6px] font-mono text-muted-foreground uppercase tracking-widest pointer-events-none">
-                        NAV_LIDAR
-                    </div>
+                <div className="h-36 border-t border-border/40 relative bg-muted/20 overflow-hidden group/minimap">
+
                     <MiniMap
                         style={{ height: '100%', width: '100%', margin: 0 }}
-                        maskColor="rgba(0,0,0,0.8)"
-                        maskStrokeColor="rgba(15,98,254,0.5)"
+                        maskColor={isDark ? "rgba(0,0,0,0.6)" : "rgba(0,0,0,0.1)"}
+                        maskStrokeColor={isDark ? "rgba(15,98,254,1)" : "rgba(15,98,254,0.8)"}
                         maskStrokeWidth={2}
                         className="!bg-transparent"
-                        nodeColor={(node) => {
-                            switch (node.data.type) {
-                                case 'image':
-                                case 'text':
-                                case 'title': return '#0f62fe';
-                                case 'attribute':
-                                case 'texture': return '#f59e0b';
-                                case 'competitor':
-                                case 'reference': return '#10b981';
-                                case 'mood_gauge': return '#d946ef';
-                                default: return '#3f3f46';
-                            }
-                        }}
-                        nodeStrokeWidth={3}
+                        nodeColor="#0f62fe"
+                        nodeStrokeColor="transparent"
                         zoomable
                         pannable
                     />
@@ -564,4 +607,4 @@ export const MoodBoardSettingsPanel = ({
             </button>
         </>
     );
-};
+});

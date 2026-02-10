@@ -28,6 +28,7 @@ interface AuthContextType {
   assets: GeneratedAsset[];
   promptHistory: PromptHistoryItem[];
   workspaces: Workspace[];
+  isAuthInitialized: boolean;
   activeWorkspace: Workspace | null;
   userRole: UserRole;
   userProfile: UserProfile | null;
@@ -53,6 +54,8 @@ interface AuthProviderProps {
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+
+  const [isAuthInitialized, setIsAuthInitialized] = useState(false);
 
   // Initialize state from local storage to prevent pop-in
   const [brands, setBrands] = useState<BrandProfile[]>(() => {
@@ -124,27 +127,21 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   useEffect(() => {
     if (user) {
       loadInitialData();
-    } else if (!loading) { // Only clear if we're done loading auth and there's no user
-      // Don't clear immediately on mount to avoid flash if session exists
+    } else if (!loading) {
+      setIsAuthInitialized(true);
     }
   }, [user]);
 
   // Reload data when active workspace changes
   useEffect(() => {
-    if (user) {
+    if (user && isAuthInitialized) {
       loadWorkspaceData();
     }
-  }, [activeWorkspace?.id]); // Only trigger if ID changes, deep comparison fallback
+  }, [activeWorkspace?.id, isAuthInitialized]);
 
   const loadInitialData = async () => {
     try {
       if (!user) return;
-
-      console.log('DEBUG: AuthContext loadInitialData starting...');
-      console.log('DEBUG: localStorage active workspace:', localStorage.getItem(CACHE_KEYS.ACTIVE_WORKSPACE));
-
-      // Note: Removed blocking migration check for performance. 
-      // Ensure migration runs only when explicitly needed or in background.
 
       // Load organizations 
       // We don't block UI here if we have cached workspaces
@@ -156,15 +153,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         setWorkspaces(allOrgs);
 
         // Active Workspace Logic: 
-        // We MUST use 'hasRealWorkspaces' to decide if we should be in a Workspace context or Personal context.
-        // Mock workspaces should NEVER be the activeWorkspace if we want to see real Brands.
         if (!activeWorkspace || !hasRealWorkspaces) {
           if (hasRealWorkspaces) {
-            // If we have real ones but none active, set first real one
             setActiveWorkspace(orgs[0]);
           } else {
-            // If no real ones, FORCE active workspace to null (Personal space)
-            // Even if we have mock ones for the UI switcher, the "active" filter must be null.
             setActiveWorkspace(null);
           }
         } else {
@@ -175,10 +167,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       }).catch(console.error);
 
       // Trigger workspace data load in parallel
-      loadWorkspaceData();
+      await loadWorkspaceData();
+      setIsAuthInitialized(true);
 
     } catch (error) {
       console.error('Failed to load initial data:', error);
+      setIsAuthInitialized(true); // Ensure we don't block forever
     }
   };
 
@@ -361,6 +355,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     setActiveWorkspace,
     updateProfile,
     refreshData,
+    isAuthInitialized,
   }), [
     user,
     loading,

@@ -1,0 +1,460 @@
+{
+  "brand": "Dorgham",
+  "exportedAt": "2026-02-10T08:11:27.533Z",
+  "canvas": {
+    "width": 1920,
+    "height": 1080
+  },
+  "workflow": {
+    "nodes": [
+      {
+        "id": "b1qzkyann",
+        "type": "text",
+        "position": {
+          "x": 384,
+          "y": 144
+        },
+        "data": {
+          "type": "text",
+          "label": "Text Module",
+          "content": "",
+          "isActive": true
+        },
+        "width": 260,
+        "height": 180
+      },
+      {
+        "id": "kkccy4gmc",
+        "type": "title",
+        "position": {
+          "x": 768,
+          "y": 144
+        },
+        "data": {
+          "type": "title",
+          "label": "Title Module",
+          "content": "",
+          "isActive": true,
+          "isLocked": false
+        },
+        "width": 236,
+        "height": 180,
+        "zIndex": 10
+      },
+      {
+        "id": "72x6ppctb",
+        "type": "negative",
+        "position": {
+          "x": 1072,
+          "y": 144
+        },
+        "data": {
+          "type": "negative",
+          "label": "Negative Module",
+          "content": "",
+          "isActive": true,
+          "isLocked": false
+        },
+        "width": 244,
+        "height": 192,
+        "zIndex": 10
+      },
+      {
+        "id": "jmh7f3qo4",
+        "type": "reference",
+        "position": {
+          "x": 384,
+          "y": 368
+        },
+        "data": {
+          "type": "reference",
+          "label": "Reference Module",
+          "isActive": true,
+          "isLocked": false
+        },
+        "width": 260,
+        "height": 200,
+        "zIndex": 10
+      },
+      {
+        "id": "y773k4wa8",
+        "type": "competitor",
+        "position": {
+          "x": 768,
+          "y": 384
+        },
+        "data": {
+          "type": "competitor",
+          "label": "Competitor Module",
+          "isActive": true,
+          "isLocked": false
+        },
+        "width": 260,
+        "height": 248,
+        "zIndex": 10
+      },
+      {
+        "id": "gkubqc9nj",
+        "type": "spotify",
+        "position": {
+          "x": 57.80795029642513,
+          "y": 179.75900784962784
+        },
+        "data": {
+          "type": "spotify",
+          "label": "Spotify Module",
+          "isActive": true,
+          "isLocked": false
+        },
+        "width": 240,
+        "height": 260,
+        "zIndex": 10
+      },
+      {
+        "id": "6bx8pfe3z",
+        "type": "weather",
+        "position": {
+          "x": 1088,
+          "y": 384
+        },
+        "data": {
+          "type": "weather",
+          "label": "Weather Module",
+          "isActive": true,
+          "isLocked": false
+        },
+        "width": 220,
+        "height": 196,
+        "zIndex": 10
+      },
+      {
+        "id": "m8hmtzx1u",
+        "type": "cms_sync",
+        "position": {
+          "x": 384,
+          "y": 592
+        },
+        "data": {
+          "type": "cms_sync",
+          "label": "Cms_sync Module",
+          "isActive": true,
+          "isLocked": false
+        },
+        "width": 240,
+        "height": 180,
+        "zIndex": 10
+      },
+      {
+        "id": "co215mupc",
+        "type": "web_ref",
+        "position": {
+          "x": 2560,
+          "y": 912
+        },
+        "data": {
+          "type": "web_ref",
+          "label": "Web_ref Module",
+          "isActive": true,
+          "isLocked": false
+        },
+        "width": 282,
+        "height": 252,
+        "zIndex": 10
+      },
+      {
+        "id": "fpwveyolw",
+        "type": "mood_gauge",
+        "position": {
+          "x": 1360,
+          "y": 272
+        },
+        "data": {
+          "type": "mood_gauge",
+          "label": "Mood_gauge Module",
+          "isActive": true,
+          "isLocked": false
+        },
+        "width": 220,
+        "height": 240,
+        "zIndex": 10
+      },
+      {
+        "id": "8qcnbjy6x",
+        "type": "midjourney",
+        "position": {
+          "x": 1616,
+          "y": 320
+        },
+        "data": {
+          "type": "midjourney",
+          "label": "Midjourney Module",
+          "isActive": true,
+          "isLocked": false
+        },
+        "width": 300,
+        "height": 236,
+        "zIndex": 10
+      },
+      {
+        "id": "91cjy58gr",
+        "type": "tone",
+        "position": {
+          "x": 1616,
+          "y": 48
+        },
+        "data": {
+          "type": "tone",
+          "label": "Tone Module",
+          "isActive": true,
+          "isLocked": false
+        },
+        "width": 260,
+        "height": 256,
+        "zIndex": 10
+      },
+      {
+        "id": "j6uyltkcx",
+        "type": "negative",
+        "position": {
+          "x": 64,
+          "y": 736
+        },
+        "data": {
+          "type": "negative",
+          "label": "Negative Module",
+          "content": "",
+          "isActive": true,
+          "isLocked": false
+        },
+        "width": 260,
+        "height": 176,
+        "zIndex": 10
+      },
+      {
+        "id": "k61ouslyr",
+        "type": "logic",
+        "position": {
+          "x": 384,
+          "y": 800
+        },
+        "data": {
+          "type": "logic",
+          "label": "Logic Module",
+          "isActive": true,
+          "isLocked": false
+        },
+        "width": 240,
+        "height": 160,
+        "zIndex": 10
+      },
+      {
+        "id": "uwywr7o8o",
+        "type": "texture",
+        "position": {
+          "x": 672,
+          "y": 800
+        },
+        "data": {
+          "type": "texture",
+          "label": "Texture Module",
+          "variant": "grainy",
+          "isActive": true,
+          "isLocked": false,
+          "intensity": 50
+        },
+        "width": 260,
+        "height": 300,
+        "zIndex": 10
+      },
+      {
+        "id": "z6sslxlq6",
+        "type": "attribute",
+        "position": {
+          "x": 1088,
+          "y": 608
+        },
+        "data": {
+          "type": "attribute",
+          "label": "Attribute Module",
+          "isActive": true,
+          "isLocked": false
+        },
+        "width": 220,
+        "height": 120,
+        "zIndex": 10
+      },
+      {
+        "id": "6iahsth68",
+        "type": "icons",
+        "position": {
+          "x": 1616,
+          "y": 592
+        },
+        "data": {
+          "type": "icons",
+          "label": "Icons Module",
+          "isActive": true,
+          "isLocked": false
+        },
+        "width": 260,
+        "height": 292,
+        "zIndex": 10
+      },
+      {
+        "id": "uijl3yuy4",
+        "type": "grid",
+        "position": {
+          "x": 1920,
+          "y": 608
+        },
+        "data": {
+          "type": "grid",
+          "label": "Grid Module",
+          "isActive": true,
+          "isLocked": false
+        },
+        "width": 240,
+        "height": 360,
+        "zIndex": 10
+      },
+      {
+        "id": "a3r9cz5o5",
+        "type": "typography",
+        "position": {
+          "x": 2048,
+          "y": 64
+        },
+        "data": {
+          "type": "typography",
+          "label": "Typography Module",
+          "isActive": true,
+          "isLocked": false
+        },
+        "width": 260,
+        "height": 388,
+        "zIndex": 10
+      },
+      {
+        "id": "x9ss9nstq",
+        "type": "palette",
+        "position": {
+          "x": 2224,
+          "y": 560
+        },
+        "data": {
+          "type": "palette",
+          "color": "#d33417",
+          "label": "Primary",
+          "isActive": true,
+          "isLocked": false
+        },
+        "width": 240,
+        "height": 312,
+        "zIndex": 10
+      },
+      {
+        "id": "yxga752xa",
+        "type": "preset",
+        "position": {
+          "x": 2224,
+          "y": 896
+        },
+        "data": {
+          "type": "preset",
+          "label": "Preset Module",
+          "variant": "cinematic",
+          "isActive": true,
+          "isLocked": false
+        },
+        "width": 240,
+        "height": 176,
+        "zIndex": 10
+      },
+      {
+        "id": "n19k6vj85",
+        "type": "paragraph",
+        "position": {
+          "x": 2528,
+          "y": 208
+        },
+        "data": {
+          "type": "paragraph",
+          "label": "Paragraph Module",
+          "isActive": true,
+          "isLocked": false
+        },
+        "width": 300,
+        "height": 220,
+        "zIndex": 10
+      },
+      {
+        "id": "0ktufl0os",
+        "type": "title",
+        "position": {
+          "x": 2528,
+          "y": 448
+        },
+        "data": {
+          "type": "title",
+          "label": "Title Module",
+          "content": "",
+          "isActive": true,
+          "isLocked": false
+        },
+        "width": 300,
+        "height": 164,
+        "zIndex": 10
+      },
+      {
+        "id": "qb263j0o6",
+        "type": "text",
+        "position": {
+          "x": 2528,
+          "y": -16
+        },
+        "data": {
+          "type": "text",
+          "label": "Text Module",
+          "isActive": true,
+          "isLocked": false
+        },
+        "width": 292,
+        "height": 200,
+        "zIndex": 10
+      },
+      {
+        "id": "txlpmtkw8",
+        "type": "image",
+        "position": {
+          "x": 2544,
+          "y": 640
+        },
+        "data": {
+          "type": "image",
+          "label": "Image Module",
+          "isActive": true,
+          "isLocked": false
+        },
+        "width": 292,
+        "height": 240,
+        "zIndex": 10
+      }
+    ],
+    "edges": [
+      {
+        "id": "xy-edge__b1qzkyannr-kkccy4gmcl",
+        "source": "b1qzkyann",
+        "target": "kkccy4gmc",
+        "type": "smoothstep",
+        "animated": true
+      },
+      {
+        "id": "xy-edge__kkccy4gmct-b1qzkyannt",
+        "source": "kkccy4gmc",
+        "target": "b1qzkyann",
+        "type": "smoothstep",
+        "animated": true
+      }
+    ]
+  }
+}

@@ -14,7 +14,7 @@ import {
     Key
 } from 'lucide-react';
 import { ApiKeysView } from './ApiKeysView';
-import { NodesMarketView } from './NodesMarketView';
+import { ModulesMarketView } from '../moodboard/components/ModulesMarketView';
 import { GeneralSettings } from './GeneralSettings';
 import { AppearanceSettings } from './AppearanceSettings';
 import { ProfileSettings } from './ProfileSettings';
@@ -91,7 +91,7 @@ export const SettingsLayout: React.FC<SettingsLayoutProps> = ({ onAuth }) => {
                             {activeSection === 'team' && <TeamView />}
                             {activeSection === 'compliance' && <AuditLogDashboard />}
                             {activeSection === 'api' && <ApiKeysView />}
-                            {activeSection === 'market' && <NodesMarketView />}
+                            {activeSection === 'market' && <ModulesMarketView />}
                         </motion.div>
                     </AnimatePresence>
                 </div>

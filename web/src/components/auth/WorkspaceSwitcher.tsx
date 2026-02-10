@@ -6,8 +6,8 @@ import { organizationService } from '@/services/persistence.service';
 import { toast } from 'sonner';
 
 export const WorkspaceSwitcher: React.FC = () => {
+
     const { workspaces, activeWorkspace, setActiveWorkspace, refreshData } = useAuth();
-    console.log('DEBUG: WorkspaceSwitcher rendering with:', { workspaces, activeWorkspace });
     const [isOpen, setIsOpen] = useState(false);
     const [isCreating, setIsCreating] = useState(false);
     const [newOrgName, setNewOrgName] = useState('');
@@ -94,6 +94,8 @@ export const WorkspaceSwitcher: React.FC = () => {
                         ) : (
                             <div className="p-2 space-y-2">
                                 <input
+                                    name="orgName"
+                                    id="orgName"
                                     autoFocus
                                     type="text"
                                     placeholder="Org Name"

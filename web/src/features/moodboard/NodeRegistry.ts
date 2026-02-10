@@ -41,7 +41,7 @@ export const NODE_REGISTRY: MoodNodeDefinition[] = [
     // --- Foundation (Core) ---
     {
         id: 'image',
-        label: 'Visual Ref',
+        label: 'Ref',
         description: 'Upload or paste images as visual anchors.',
         icon: ImageIcon,
         category: 'Foundation',
@@ -77,7 +77,7 @@ export const NODE_REGISTRY: MoodNodeDefinition[] = [
     },
     {
         id: 'preset',
-        label: 'Style Preset',
+        label: 'Preset',
         description: 'Quickly apply a cohesive aesthetic style.',
         icon: Zap,
         category: 'Foundation',
@@ -86,7 +86,7 @@ export const NODE_REGISTRY: MoodNodeDefinition[] = [
     },
     {
         id: 'palette',
-        label: 'Color Anchor',
+        label: 'Palette',
         description: 'Define primary and secondary color swatches.',
         icon: Palette,
         category: 'Foundation',
@@ -97,7 +97,7 @@ export const NODE_REGISTRY: MoodNodeDefinition[] = [
     // --- Orchestration (Core) ---
     {
         id: 'attribute',
-        label: 'DNA Trait',
+        label: 'Trait',
         description: 'Specific brand attributes and keywords.',
         icon: Sparkles,
         category: 'Orchestration',
@@ -106,7 +106,7 @@ export const NODE_REGISTRY: MoodNodeDefinition[] = [
     },
     {
         id: 'texture',
-        label: 'Surface Qual',
+        label: 'Texture',
         description: 'Define material properties and finish.',
         icon: Layers,
         category: 'Orchestration',
@@ -115,7 +115,7 @@ export const NODE_REGISTRY: MoodNodeDefinition[] = [
     },
     {
         id: 'logic',
-        label: 'Logic Gate',
+        label: 'Logic',
         description: 'Conditional branching for brand rules.',
         icon: GitBranch,
         category: 'Orchestration',
@@ -124,7 +124,7 @@ export const NODE_REGISTRY: MoodNodeDefinition[] = [
     },
     {
         id: 'negative',
-        label: 'Negative DNA',
+        label: 'Negative',
         description: 'Explicitly forbidden elements.',
         icon: X,
         category: 'Orchestration',
@@ -135,7 +135,7 @@ export const NODE_REGISTRY: MoodNodeDefinition[] = [
     // --- External / Advanced (Marketplace) ---
     {
         id: 'weather',
-        label: 'Live Weather',
+        label: 'Weather',
         description: 'Dynamic ambience based on location weather data.',
         icon: CloudRain,
         category: 'External',
@@ -144,7 +144,7 @@ export const NODE_REGISTRY: MoodNodeDefinition[] = [
     },
     {
         id: 'spotify',
-        label: 'Sonic Ambience',
+        label: 'Sonic',
         description: 'Link Spotify playlists to set the mood.',
         icon: Music,
         category: 'External',
@@ -153,7 +153,7 @@ export const NODE_REGISTRY: MoodNodeDefinition[] = [
     },
     {
         id: 'web_ref',
-        label: 'Live Web Ref',
+        label: 'Web',
         description: 'Embed a live website iframe as reference.',
         icon: Globe,
         category: 'Utility',
@@ -163,7 +163,7 @@ export const NODE_REGISTRY: MoodNodeDefinition[] = [
     },
     {
         id: 'midjourney',
-        label: 'Midjourney Link',
+        label: 'MJ Link',
         description: 'Direct prompt injection to Midjourney.',
         icon: Cpu,
         category: 'Generative',
@@ -183,7 +183,7 @@ export const NODE_REGISTRY: MoodNodeDefinition[] = [
     // --- Advanced / Pro-Lab (Added) ---
     {
         id: 'typography',
-        label: 'Type Specimen',
+        label: 'Type',
         description: 'Define font families and hierarchy.',
         icon: CaseUpper,
         category: 'Foundation',
@@ -192,7 +192,7 @@ export const NODE_REGISTRY: MoodNodeDefinition[] = [
     },
     {
         id: 'grid',
-        label: 'Layout Grid',
+        label: 'Grid',
         description: 'Structural systems and grid settings.',
         icon: Grid3X3,
         category: 'Foundation',
@@ -201,7 +201,7 @@ export const NODE_REGISTRY: MoodNodeDefinition[] = [
     },
     {
         id: 'tone',
-        label: 'Brand Tone',
+        label: 'Tone',
         description: 'Define communication vibration.',
         icon: SlidersHorizontal,
         category: 'Orchestration',
@@ -210,7 +210,7 @@ export const NODE_REGISTRY: MoodNodeDefinition[] = [
     },
     {
         id: 'competitor',
-        label: 'Market Comp',
+        label: 'Market',
         description: 'Competitive landscape analysis.',
         icon: Swords,
         category: 'External',
@@ -219,7 +219,7 @@ export const NODE_REGISTRY: MoodNodeDefinition[] = [
     },
     {
         id: 'mood_gauge',
-        label: 'Mood Energy',
+        label: 'Gauge',
         description: 'Aesthetic vibration intensity.',
         icon: Gauge,
         category: 'Generative',
@@ -228,7 +228,7 @@ export const NODE_REGISTRY: MoodNodeDefinition[] = [
     },
     {
         id: 'icons',
-        label: 'Icon Set',
+        label: 'Icons',
         description: 'Visual language symbols.',
         icon: Shapes,
         category: 'Foundation',
@@ -237,7 +237,7 @@ export const NODE_REGISTRY: MoodNodeDefinition[] = [
     },
     {
         id: 'reference',
-        label: 'Deep Link',
+        label: 'Link',
         description: 'Rich metadata link preview.',
         icon: Link2,
         category: 'External',
