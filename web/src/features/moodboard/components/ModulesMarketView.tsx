@@ -1,6 +1,6 @@
 import React, { useState, useMemo, useCallback } from 'react';
 import { Card, Button, Input, EmptyState } from '@/components/ui';
-import { Sparkles, Download, Check, ExternalLink, Box, Search, Filter, Trash2 } from 'lucide-react';
+import { Sparkles, Download, Check, ExternalLink, Box, Search, Filter, Trash2, Loader2 } from 'lucide-react';
 import { useNodeManager } from '@/hooks/useNodeManager';
 import { NodeCategory } from '@/features/moodboard/NodeRegistry';
 import { useDebounce } from '@/hooks/useDebounce';
@@ -17,7 +17,7 @@ export const ModulesMarketView = () => {
     // Debounce search query to optimize filtering
     const debouncedSearchQuery = useDebounce(searchQuery, 300);
 
-    const categories: NodeCategory[] = ['Foundation', 'Orchestration', 'Generative', 'Utility', 'External'];
+    const categories: NodeCategory[] = ['CORE', 'AI_GEN', 'SIGNAL', 'SYSTEM', 'REFINEMENT', 'EXTRAS'];
 
     const handleNodeAction = useCallback(async (nodeId: string, action: 'install' | 'uninstall') => {
         setLoadingNodes(prev => ({ ...prev, [nodeId]: true }));
@@ -64,6 +64,9 @@ export const ModulesMarketView = () => {
         });
         return groups;
     }, [filteredNodes]);
+
+    // Flatten for empty check
+    const sortedNodes = filteredNodes;
 
     return (
         <div className="flex h-full animate-in fade-in duration-500 overflow-hidden bg-background">
@@ -165,22 +168,26 @@ export const ModulesMarketView = () => {
             </div>
 
             {/* Content: Carbon Grid */}
-            <div className="flex-1 overflow-y-auto custom-scrollbar bg-background relative">
+            <div className="flex-1 overflow-y-auto custom-scrollbar bg-background relative selection:bg-primary/20">
                 {/* Refined Carbon Progress Indicator */}
                 <div className={`absolute top-0 left-0 right-0 h-[2px] z-50 overflow-hidden transition-opacity duration-300 ${isAnyActionLoading ? 'opacity-100' : 'opacity-0'}`}>
                     <div className="h-full bg-primary animate-progress-indeterminate origin-left" />
                 </div>
 
-                <div className="p-10 max-w-[1600px] mx-auto">
+                {/* Technical Grid Background */}
+                <div className="absolute inset-0 pointer-events-none opacity-[0.03] dark:opacity-[0.05]"
+                    style={{ backgroundImage: 'radial-gradient(circle, currentColor 1px, transparent 1px)', backgroundSize: '24px 24px' }} />
+
+                <div className="p-10 max-w-[1600px] mx-auto relative z-10">
                     {filteredNodes.length === 0 ? (
-                        <div className="h-[60vh] flex flex-col items-center justify-center border border-border/20 border-dashed bg-muted/5">
+                        <div className="h-[60vh] flex flex-col items-center justify-center border border-border/20 border-dashed bg-muted/5 backdrop-blur-sm">
                             <Search size={48} className="text-muted-foreground/20 mb-6" />
                             <h3 className="text-sm font-black uppercase tracking-[0.4em] text-muted-foreground/60 mb-2">Null_Result_Set</h3>
                             <p className="text-[11px] text-muted-foreground/30 uppercase tracking-widest font-mono">No logical modules matched the current trajectory.</p>
                             <Button
                                 variant="ghost"
                                 onClick={() => { setSearchQuery(''); setStatusFilter('All'); setActiveFilter('All'); }}
-                                className="mt-8 text-[10px] uppercase tracking-widest border border-border/40 text-muted-foreground/60 hover:text-foreground"
+                                className="mt-8 text-[10px] uppercase tracking-widest border border-border/40 text-muted-foreground/60 hover:text-foreground rounded-none"
                             >
                                 Reset_Query
                             </Button>
@@ -188,95 +195,98 @@ export const ModulesMarketView = () => {
                     ) : (
                         <div className="space-y-16">
                             {Object.entries(groupedNodes).map(([category, nodes]) => (
-                                <section key={category} className="space-y-8">
+                                <section key={category} className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
                                     <div className="flex items-center gap-6">
-                                        <div className="w-2 h-6 bg-primary" />
+                                        <div className="w-2 h-6 bg-primary shadow-[0_0_15px_rgba(var(--primary-rgb),0.5)]" />
                                         <h3 className="text-[13px] font-black uppercase tracking-[0.35em] text-foreground">
                                             {category}
                                         </h3>
-                                        <div className="h-[1px] flex-1 bg-border/20" />
-                                        <div className="px-3 py-1 border border-border/20 text-[10px] font-mono text-muted-foreground/40 font-bold bg-muted/5">
-                                            CNT::{nodes.length.toString().padStart(2, '0')}
+                                        <div className="h-[1px] flex-1 bg-border/20 translate-y-0.5" />
+                                        <div className="px-3 py-1 border border-border/20 text-[10px] font-mono text-muted-foreground/40 font-bold bg-muted/5 backdrop-blur-xs">
+                                            SEC::{category.substring(0, 3).toUpperCase()} // CNT::{nodes.length.toString().padStart(2, '0')}
                                         </div>
                                     </div>
 
-                                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4">
+                                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-6">
                                         {nodes.map((node) => {
                                             const installed = isInstalled(node.id);
                                             const isLoading = loadingNodes[node.id];
                                             return (
                                                 <div
                                                     key={node.id}
-                                                    className="group relative flex flex-col bg-card border border-border/40 transition-all duration-300 hover:border-primary/40 hover:shadow-[0_8px_30px_rgb(0,0,0,0.12)] dark:hover:shadow-[0_8px_30px_rgb(0,0,0,0.3)] overflow-hidden"
+                                                    className="group relative flex flex-col bg-card/40 backdrop-blur-md border border-border/40 transition-all duration-500 hover:border-primary/60 hover:shadow-[0_20px_50px_rgba(0,0,0,0.2)] dark:hover:shadow-[0_20px_50px_rgba(0,0,0,0.4)] overflow-hidden scale-100 hover:scale-[1.02] active:scale-[0.98]"
                                                 >
-                                                    {/* Color Bar */}
-                                                    <div className={`h-[4px] w-full ${node.defaultColor} opacity-70 group-hover:opacity-100 transition-opacity`} />
+                                                    {/* Color Bar with Glow */}
+                                                    <div className={`h-[5px] w-full ${node.defaultColor} opacity-50 group-hover:opacity-100 transition-all duration-500 group-hover:shadow-[0_0_15px_rgba(var(--primary-rgb),0.3)]`} />
 
-                                                    {/* Corner Accents */}
-                                                    <div className="absolute top-[4px] left-0 w-3 h-3 border-t border-l border-primary/0 group-hover:border-primary/40 transition-all duration-300" />
-                                                    <div className="absolute top-[4px] right-0 w-3 h-3 border-t border-r border-primary/0 group-hover:border-primary/40 transition-all duration-300" />
-                                                    <div className="absolute bottom-0 left-0 w-3 h-3 border-b border-l border-primary/0 group-hover:border-primary/40 transition-all duration-300" />
-                                                    <div className="absolute bottom-0 right-0 w-3 h-3 border-b border-r border-primary/0 group-hover:border-primary/40 transition-all duration-300" />
+                                                    {/* Corner Tech Accents */}
+                                                    <div className="absolute top-[5px] left-0 w-4 h-4 border-t-2 border-l-2 border-primary/0 group-hover:border-primary/60 transition-all duration-500 -translate-x-1 -translate-y-1 group-hover:translate-x-0 group-hover:translate-y-0" />
+                                                    <div className="absolute top-[5px] right-0 w-4 h-4 border-t-2 border-r-2 border-primary/0 group-hover:border-primary/60 transition-all duration-500 translate-x-1 -translate-y-1 group-hover:translate-x-0 group-hover:translate-y-0" />
 
-                                                    <div className="p-6 flex-1 flex flex-col">
-                                                        <div className="flex justify-between items-start mb-8">
-                                                            <div className={`w-12 h-12 flex items-center justify-center bg-muted/20 border border-border/20 text-foreground group-hover:border-primary/40 group-hover:text-primary transition-all duration-300 shadow-inner`}>
-                                                                <node.icon size={22} strokeWidth={1.5} />
+                                                    <div className="p-7 flex-1 flex flex-col relative">
+                                                        {/* Ghost Label Background */}
+                                                        <div className="absolute top-10 right-[-10px] text-[40px] font-black text-foreground/[0.02] uppercase select-none pointer-events-none group-hover:text-primary/[0.03] transition-colors leading-none tracking-tighter">
+                                                            {node.label}
+                                                        </div>
+
+                                                        <div className="flex justify-between items-start mb-10 relative z-10">
+                                                            <div className={`w-14 h-14 flex items-center justify-center bg-muted/20 border border-border/20 text-foreground group-hover:border-primary/60 group-hover:text-primary group-hover:bg-primary/5 transition-all duration-500 shadow-inner group-hover:rotate-[360deg]`}>
+                                                                <node.icon size={26} strokeWidth={1} />
                                                             </div>
-                                                            <div className="flex flex-col items-end gap-1.5 pt-1">
+                                                            <div className="flex flex-col items-end gap-2 pt-1">
                                                                 {node.isCore ? (
-                                                                    <span className="text-[8px] font-black uppercase tracking-widest text-emerald-500 bg-emerald-500/5 px-2 py-0.5 border border-emerald-500/20">System_Core</span>
+                                                                    <span className="text-[8px] font-black uppercase tracking-[0.2em] text-emerald-500 bg-emerald-500/10 px-2 py-1 border border-emerald-500/30 shadow-[0_0_10px_rgba(16,185,129,0.1)]">Core_Module</span>
                                                                 ) : (
-                                                                    <span className="text-[8px] font-mono text-muted-foreground/40 uppercase tracking-widest border border-border/20 px-2 py-0.5 bg-muted/5">
-                                                                        {node.cost ? `CR::${node.cost}` : 'STD::00'}
+                                                                    <span className="text-[8px] font-mono text-muted-foreground/40 uppercase tracking-[0.2em] border border-border/20 px-2 py-1 bg-muted/5">
+                                                                        Ver::1.2.0
                                                                     </span>
                                                                 )}
                                                                 {installed && (
-                                                                    <div className="flex items-center gap-1.5 text-[7px] font-black uppercase tracking-[0.25em] text-primary mt-1.5 px-2 py-0.5 bg-primary/10 border border-primary/20">
-                                                                        <div className="w-1.5 h-1.5 bg-primary animate-pulse rounded-full shadow-[0_0_8px_rgba(var(--primary-rgb),0.5)]" />
-                                                                        Online
+                                                                    <div className="flex items-center gap-2 text-[7px] font-black uppercase tracking-[0.3em] text-primary mt-1 px-2 py-1 bg-primary/10 border border-primary/30 animate-in fade-in duration-500">
+                                                                        <div className="w-1.5 h-1.5 bg-primary animate-pulse rounded-full shadow-[0_0_10px_rgba(var(--primary-rgb),0.8)]" />
+                                                                        Registered
                                                                     </div>
                                                                 )}
                                                             </div>
                                                         </div>
 
-                                                        <div className="space-y-3 mb-8 flex-1">
+                                                        <div className="space-y-4 mb-10 flex-1 relative z-10">
                                                             <div className="flex items-center gap-3">
-                                                                <h4 className="font-bold text-[12px] uppercase tracking-wider text-foreground group-hover:text-primary transition-colors">{node.label}</h4>
-                                                                <div className="h-[1px] flex-1 bg-border/10 group-hover:bg-primary/10 transition-colors" />
+                                                                <h4 className="font-black text-[14px] uppercase tracking-[0.1em] text-foreground group-hover:text-primary transition-colors duration-300">{node.label}</h4>
+                                                                <div className="h-[2px] flex-1 bg-border/10 group-hover:bg-primary/20 transition-all duration-500" />
                                                             </div>
-                                                            <p className="text-[11px] text-muted-foreground leading-relaxed font-normal tracking-tight line-clamp-3 group-hover:text-foreground transition-colors opacity-60 group-hover:opacity-100">
+                                                            <p className="text-[11px] text-muted-foreground leading-relaxed font-medium tracking-wide line-clamp-3 group-hover:text-foreground/90 transition-colors opacity-70 group-hover:opacity-100">
                                                                 {node.description}
                                                             </p>
                                                         </div>
 
-                                                        <div className="mt-auto pt-5 border-t border-border/10 group-hover:border-primary/10 transition-colors flex flex-col gap-4">
+                                                        <div className="mt-auto pt-6 border-t border-border/10 group-hover:border-primary/20 transition-all duration-500 flex flex-col gap-5 relative z-10">
                                                             {/* Technical Footer Metas */}
-                                                            <div className="flex items-center justify-between opacity-30 group-hover:opacity-60 transition-opacity">
-                                                                <span className="text-[7px] font-mono uppercase tracking-widest text-muted-foreground">
-                                                                    ID::{node.id.substring(0, 8).toUpperCase()}
+                                                            <div className="flex items-center justify-between opacity-20 group-hover:opacity-50 transition-all duration-500">
+                                                                <span className="text-[7px] font-mono uppercase tracking-[0.3em] text-muted-foreground group-hover:text-primary">
+                                                                    HEX_ID::{node.id.substring(0, 8).toUpperCase()}
                                                                 </span>
-                                                                <span className="text-[7px] font-mono uppercase tracking-widest text-muted-foreground">
-                                                                    VER::1.0.42
+                                                                <span className="text-[7px] font-mono uppercase tracking-[0.3em] text-muted-foreground">
+                                                                    SGN::QUANTUM.VAL
                                                                 </span>
                                                             </div>
 
                                                             {installed ? (
                                                                 node.isCore ? (
-                                                                    <div className="w-full flex items-center justify-between px-4 h-10 bg-muted/20 border border-transparent opacity-40 cursor-not-allowed">
-                                                                        <span className="text-[9px] font-bold uppercase tracking-widest text-foreground">Immutable</span>
-                                                                        <Check size={12} className="text-foreground" />
+                                                                    <div className="w-full flex items-center justify-between px-5 h-11 bg-muted/10 border border-border/5 opacity-50 cursor-not-allowed">
+                                                                        <span className="text-[9px] font-black uppercase tracking-[0.25em] text-foreground/40">Immutable_Block</span>
+                                                                        <Check size={14} className="text-foreground/20" />
                                                                     </div>
                                                                 ) : (
                                                                     <Button
                                                                         variant="ghost"
                                                                         onClick={() => handleNodeAction(node.id, 'uninstall')}
                                                                         disabled={isLoading}
-                                                                        className="w-full h-10 text-[10px] font-black uppercase tracking-widest bg-transparent border border-border/40 text-muted-foreground/60 hover:bg-rose-500/10 hover:text-rose-500 hover:border-rose-500/40 transition-all rounded-none disabled:opacity-50"
+                                                                        className="w-full h-11 text-[10px] font-black uppercase tracking-[0.25em] bg-transparent border border-border/40 text-muted-foreground/60 hover:bg-rose-500/10 hover:text-rose-500 hover:border-rose-500/60 transition-all rounded-none disabled:opacity-50 group/un"
                                                                     >
                                                                         {isLoading ? 'DEPROVISIONING...' : (
                                                                             <span className="flex items-center gap-2">
-                                                                                <Trash2 size={12} /> Remove
+                                                                                <Trash2 size={13} className="group-hover/un:scale-110 transition-transform" /> Uninstall_Module
                                                                             </span>
                                                                         )}
                                                                     </Button>
@@ -285,14 +295,17 @@ export const ModulesMarketView = () => {
                                                                 <Button
                                                                     onClick={() => handleNodeAction(node.id, 'install')}
                                                                     disabled={isLoading}
-                                                                    className="w-full h-10 text-[10px] font-black uppercase tracking-widest bg-primary hover:bg-primary/90 text-primary-foreground rounded-none border-transparent transition-all shadow-md active:scale-[0.98] disabled:opacity-80 group/btn"
+                                                                    className="w-full h-11 text-[10px] font-black uppercase tracking-[0.25em] bg-primary hover:bg-primary/90 text-primary-foreground rounded-none border-none transition-all shadow-[0_4px_15px_rgba(var(--primary-rgb),0.3)] active:scale-[0.97] disabled:opacity-80 group/btn relative overflow-hidden"
                                                                 >
+                                                                    <div className="absolute inset-0 bg-white/10 translate-x-[-100%] group-hover/btn:translate-x-[100%] transition-transform duration-1000 ease-in-out" />
                                                                     {isLoading ? (
-                                                                        <>PROVISIONING...</>
+                                                                        <span className="flex items-center gap-2">
+                                                                            <Loader2 size={13} className="animate-spin" /> Provisioning...
+                                                                        </span>
                                                                     ) : (
-                                                                        <>
-                                                                            <Download size={14} className="mr-2 group-hover/btn:-translate-y-0.5 transition-transform" /> Install
-                                                                        </>
+                                                                        <span className="flex items-center gap-2 relative z-10">
+                                                                            <Download size={14} className="group-hover/btn:-translate-y-0.5 transition-transform" /> Deploy_Module
+                                                                        </span>
                                                                     )}
                                                                 </Button>
                                                             )}

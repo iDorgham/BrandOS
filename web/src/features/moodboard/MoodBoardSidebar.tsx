@@ -1,5 +1,5 @@
 import React from 'react';
-import { ChevronRight, ChevronDown, Share2, Download, Blocks } from 'lucide-react';
+import { ChevronRight, ChevronDown, Share2, FileOutput, Package } from 'lucide-react';
 import { useNodeManager } from '@/hooks/useNodeManager';
 
 interface MoodBoardSidebarProps {
@@ -13,6 +13,7 @@ interface MoodBoardSidebarProps {
     setIsModulesManagerOpen: (isOpen: boolean) => void;
     onShare?: () => void;
     onExport: () => void;
+    isZenMode?: boolean;
 }
 
 export const MoodBoardSidebar: React.FC<MoodBoardSidebarProps> = ({
@@ -26,6 +27,7 @@ export const MoodBoardSidebar: React.FC<MoodBoardSidebarProps> = ({
     setIsModulesManagerOpen,
     onShare,
     onExport,
+    isZenMode = false,
 }) => {
     const { getInstalledNodes } = useNodeManager();
 
@@ -44,7 +46,7 @@ export const MoodBoardSidebar: React.FC<MoodBoardSidebarProps> = ({
 
                 {/* Categories and Nodes - Carbon Design System */}
                 <div className="flex-1 overflow-y-auto custom-scrollbar p-3">
-                    {['Foundation', 'Orchestration', 'Generative', 'Utility', 'External'].map(category => {
+                    {['CORE', 'REFINEMENT', 'AI_GEN', 'SIGNAL', 'SYSTEM', 'EXTRAS'].map(category => {
                         const categoryNodes = getInstalledNodes().filter((n: any) => n.category.toLowerCase() === category.toLowerCase());
                         if (categoryNodes.length === 0) return null;
 
@@ -137,14 +139,14 @@ export const MoodBoardSidebar: React.FC<MoodBoardSidebarProps> = ({
                                     className="flex items-center justify-center flex-1 h-8 rounded-sm bg-muted/20 hover:bg-muted/30 border border-border/40 hover:border-primary/40 transition-all text-muted-foreground/60 hover:text-primary"
                                     title="Export Matrix"
                                 >
-                                    <Download size={12} />
+                                    <FileOutput size={12} />
                                 </button>
                                 <button
                                     onClick={() => setIsModulesManagerOpen(true)}
                                     className="flex items-center justify-center flex-1 h-8 rounded-sm bg-primary/5 hover:bg-primary/10 border border-transparent hover:border-primary/40 transition-all text-primary/60 hover:text-primary"
                                     title="Modules_Vault"
                                 >
-                                    <Blocks size={12} />
+                                    <Package size={12} />
                                 </button>
                             </div>
                         </div>
@@ -157,7 +159,7 @@ export const MoodBoardSidebar: React.FC<MoodBoardSidebarProps> = ({
                             className="w-full flex items-center justify-center h-12 hover:bg-primary/10 transition-colors border-t border-transparent hover:border-primary/20"
                             title="Modules_Vault"
                         >
-                            <Blocks size={12} className="text-primary/60 hover:text-primary" />
+                            <Package size={12} className="text-primary/60 hover:text-primary" />
                         </button>
                     )}
                 </div>

@@ -12,9 +12,10 @@ interface HeaderProps {
     activeBrand?: BrandProfile;
     onNavigate?: (tab: string) => void;
     actions?: React.ReactNode;
+    isZenMode?: boolean;
 }
 
-export const Header: React.FC<HeaderProps> = React.memo(({ activeTab, activeBrand, onNavigate, actions }) => {
+export const Header: React.FC<HeaderProps> = React.memo(({ activeTab, activeBrand, onNavigate, actions, isZenMode = false }) => {
     const tabLabels: Record<string, string> = {
         dashboard: 'Dashboard',
         identity: 'Identity',
@@ -31,7 +32,10 @@ export const Header: React.FC<HeaderProps> = React.memo(({ activeTab, activeBran
     };
 
     return (
-        <header className="h-14 flex items-center px-6 border-b border-border sticky top-0 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 z-40 transition-all duration-300">
+        <header className={`
+            h-14 flex items-center px-6 border-b border-border sticky top-0 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 z-40 transition-all duration-500 ease-in-out
+            ${isZenMode ? '-translate-y-full mb-[-56px]' : 'translate-y-0'}
+        `}>
             {/* Title Section */}
             <div className="flex items-center gap-4 min-w-[200px] lg:min-w-[300px]">
                 <h2 className="text-sm font-display font-black tracking-tighter uppercase flex items-center gap-3">

@@ -1,29 +1,41 @@
 import {
-    Image as ImageIcon,
-    Type,
+    Image,
+    StickyNote,
     Sparkles,
-    GitBranch,
+    Shapes,
+    Link2,
     Zap,
+    Cpu,
+    Split,
+    Terminal,
+    User,
+    Clock,
     Palette,
     Layers,
     X,
     CloudRain,
     Music,
     Globe,
-    Cpu,
-    Database,
+    HardDrive,
     Heading1,
     AlignLeft,
-    CaseUpper,
+    Baseline,
     Grid3X3,
     SlidersHorizontal,
     Swords,
     Gauge,
-    Shapes,
-    Link2
+    Radio,
+    Layout,
+    Activity,
+    BrainCircuit,
+    FileCheck2,
+    Workflow,
+    LayoutGrid,
+    Type,
+    Box
 } from 'lucide-react';
 
-export type NodeCategory = 'Foundation' | 'Orchestration' | 'Utility' | 'External' | 'Generative';
+export type NodeCategory = 'CORE' | 'AI_GEN' | 'SIGNAL' | 'SYSTEM' | 'REFINEMENT' | 'EXTRAS';
 
 export interface MoodNodeDefinition {
     id: string;
@@ -32,216 +44,273 @@ export interface MoodNodeDefinition {
     icon: any;
     category: NodeCategory;
     defaultColor: string;
-    isCore: boolean; // Cannot be uninstalled
+    isCore: boolean;
     isBeta?: boolean;
-    cost?: number; // For future marketplace credits
 }
 
 export const NODE_REGISTRY: MoodNodeDefinition[] = [
-    // --- Foundation (Core) ---
+    // --- CORE (Essential Foundation) ---
     {
         id: 'image',
         label: 'Ref',
-        description: 'Upload or paste images as visual anchors.',
-        icon: ImageIcon,
-        category: 'Foundation',
+        description: 'Visual anchors and mood images.',
+        icon: Image,
+        category: 'CORE',
         defaultColor: 'bg-emerald-500',
         isCore: true
     },
     {
         id: 'text',
-        label: 'Narrative',
-        description: 'Text blocks for brand story and doctrine.',
-        icon: Type,
-        category: 'Foundation',
+        label: 'Note',
+        description: 'Quick thoughts and narrative blocks.',
+        icon: StickyNote,
+        category: 'CORE',
         defaultColor: 'bg-blue-500',
         isCore: true
     },
     {
         id: 'title',
-        label: 'Title',
-        description: 'Large heading for board sections.',
-        icon: Heading1,
-        category: 'Foundation',
+        label: 'Heading',
+        description: 'Large labels for board sections.',
+        icon: Type,
+        category: 'CORE',
         defaultColor: 'bg-indigo-600',
         isCore: true
     },
     {
-        id: 'paragraph',
-        label: 'Paragraph',
-        description: 'Body text for detailed descriptions.',
-        icon: AlignLeft,
-        category: 'Foundation',
-        defaultColor: 'bg-slate-600',
-        isCore: true
-    },
-    {
-        id: 'preset',
-        label: 'Preset',
-        description: 'Quickly apply a cohesive aesthetic style.',
-        icon: Zap,
-        category: 'Foundation',
-        defaultColor: 'bg-sky-400',
-        isCore: true
-    },
-    {
         id: 'palette',
-        label: 'Palette',
-        description: 'Define primary and secondary color swatches.',
+        label: 'Colors',
+        description: 'Brand color swatches and codes.',
         icon: Palette,
-        category: 'Foundation',
+        category: 'CORE',
         defaultColor: 'bg-pink-500',
         isCore: true
     },
+    {
+        id: 'typography',
+        label: 'Fonts',
+        description: 'Typeface and hierarchy definitions.',
+        icon: Baseline,
+        category: 'CORE',
+        defaultColor: 'bg-violet-600',
+        isCore: true
+    },
 
-    // --- Orchestration (Core) ---
+    // --- REFINEMENT (Brand Details) ---
     {
         id: 'attribute',
         label: 'Trait',
-        description: 'Specific brand attributes and keywords.',
+        description: 'Key brand keywords and DNA.',
         icon: Sparkles,
-        category: 'Orchestration',
+        category: 'REFINEMENT',
         defaultColor: 'bg-amber-500',
         isCore: true
     },
     {
         id: 'texture',
-        label: 'Texture',
-        description: 'Define material properties and finish.',
+        label: 'Surface',
+        description: 'Material feel and finish details.',
         icon: Layers,
-        category: 'Orchestration',
+        category: 'REFINEMENT',
         defaultColor: 'bg-slate-400',
         isCore: true
     },
     {
-        id: 'logic',
-        label: 'Logic',
-        description: 'Conditional branching for brand rules.',
-        icon: GitBranch,
-        category: 'Orchestration',
-        defaultColor: 'bg-violet-500',
+        id: 'tone',
+        label: 'Vibe',
+        description: 'Communication and energy levels.',
+        icon: SlidersHorizontal,
+        category: 'REFINEMENT',
+        defaultColor: 'bg-orange-600',
         isCore: true
     },
     {
         id: 'negative',
-        label: 'Negative',
-        description: 'Explicitly forbidden elements.',
+        label: 'Void',
+        description: 'Items strictly forbidden for brand.',
         icon: X,
-        category: 'Orchestration',
+        category: 'REFINEMENT',
         defaultColor: 'bg-rose-600',
         isCore: true
     },
 
-    // --- External / Advanced (Marketplace) ---
+    // --- AI GEN (Generative Engine) ---
     {
-        id: 'weather',
-        label: 'Weather',
-        description: 'Dynamic ambience based on location weather data.',
-        icon: CloudRain,
-        category: 'External',
-        defaultColor: 'bg-cyan-500',
+        id: 'midjourney',
+        label: 'MJ Prompt',
+        description: 'Inject prompts to Midjourney bot.',
+        icon: Sparkles,
+        category: 'AI_GEN',
+        defaultColor: 'bg-fuchsia-600',
         isCore: false
     },
     {
+        id: 'checkpoint',
+        label: 'Model',
+        description: 'Load AI Checkpoints (SDXL, Flux).',
+        icon: HardDrive,
+        category: 'AI_GEN',
+        defaultColor: 'bg-blue-600',
+        isCore: true
+    },
+    {
+        id: 'ksampler',
+        label: 'Sampler',
+        description: 'The core generative engine.',
+        icon: Cpu,
+        category: 'AI_GEN',
+        defaultColor: 'bg-purple-600',
+        isCore: true
+    },
+    {
+        id: 'vae',
+        label: 'Decoder',
+        description: 'Convert latent data to pixels.',
+        icon: Layers,
+        category: 'AI_GEN',
+        defaultColor: 'bg-red-500',
+        isCore: true
+    },
+    {
+        id: 'mood_gauge',
+        label: 'Intensity',
+        description: 'Measure aesthetic vibration levels.',
+        icon: Gauge,
+        category: 'AI_GEN',
+        defaultColor: 'bg-lime-500',
+        isCore: false
+    },
+
+    // --- SIGNAL (Logic & Routing) ---
+    {
+        id: 'trigger',
+        label: 'Start',
+        description: 'Initiate workflow via event.',
+        icon: Zap,
+        category: 'SIGNAL',
+        defaultColor: 'bg-yellow-500',
+        isCore: false
+    },
+    {
+        id: 'engine',
+        label: 'Brain',
+        description: 'Apply AI logic to brand data.',
+        icon: BrainCircuit,
+        category: 'SIGNAL',
+        defaultColor: 'bg-violet-600',
+        isCore: false
+    },
+    {
+        id: 'switch',
+        label: 'Router',
+        description: 'Multiplex and branch signals.',
+        icon: Split,
+        category: 'SIGNAL',
+        defaultColor: 'bg-blue-600',
+        isCore: false
+    },
+    {
+        id: 'receiver',
+        label: 'Validator',
+        description: 'Verify and organize final data.',
+        icon: FileCheck2,
+        category: 'SIGNAL',
+        defaultColor: 'bg-emerald-600',
+        isCore: false
+    },
+    {
+        id: 'encoder',
+        label: 'Export',
+        description: 'Process and render final assets.',
+        icon: Workflow,
+        category: 'SIGNAL',
+        defaultColor: 'bg-slate-700',
+        isCore: false
+    },
+    {
+        id: 'emitter',
+        label: 'Distro',
+        description: 'Send assets to external channels.',
+        icon: Radio,
+        category: 'SIGNAL',
+        defaultColor: 'bg-indigo-500',
+        isCore: false
+    },
+
+    // --- SYSTEM (Layout) ---
+    {
+        id: 'section',
+        label: 'Group',
+        description: 'Container for related nodes.',
+        icon: Box,
+        category: 'SYSTEM',
+        defaultColor: 'bg-slate-800',
+        isCore: true
+    },
+    {
+        id: 'label',
+        label: 'Tag',
+        description: 'Sticky note for organization.',
+        icon: StickyNote,
+        category: 'SYSTEM',
+        defaultColor: 'bg-amber-400',
+        isCore: true
+    },
+    {
+        id: 'grid',
+        label: 'System',
+        description: 'Structural grid and guidelines.',
+        icon: LayoutGrid,
+        category: 'SYSTEM',
+        defaultColor: 'bg-slate-700',
+        isCore: false
+    },
+
+    // --- EXTRAS (Connected) ---
+    {
         id: 'spotify',
-        label: 'Sonic',
-        description: 'Link Spotify playlists to set the mood.',
+        label: 'Audio',
+        description: 'Link playlists to set the mood.',
         icon: Music,
-        category: 'External',
+        category: 'EXTRAS',
         defaultColor: 'bg-green-500',
         isCore: false
     },
     {
+        id: 'weather',
+        label: 'Ambience',
+        description: 'Dynamic local weather data.',
+        icon: CloudRain,
+        category: 'EXTRAS',
+        defaultColor: 'bg-cyan-500',
+        isCore: false
+    },
+    {
         id: 'web_ref',
-        label: 'Web',
-        description: 'Embed a live website iframe as reference.',
+        label: 'IFrame',
+        description: 'Embed live website previews.',
         icon: Globe,
-        category: 'Utility',
+        category: 'EXTRAS',
         defaultColor: 'bg-indigo-500',
         isCore: false,
         isBeta: true
     },
     {
-        id: 'midjourney',
-        label: 'MJ Link',
-        description: 'Direct prompt injection to Midjourney.',
-        icon: Cpu,
-        category: 'Generative',
-        defaultColor: 'bg-fuchsia-600',
-        isCore: false,
-        cost: 500
-    },
-    {
-        id: 'cms_sync',
-        label: 'CMS Sync',
-        description: 'Pull content directly from Headless CMS.',
-        icon: Database,
-        category: 'Utility',
-        defaultColor: 'bg-orange-500',
-        isCore: false
-    },
-    // --- Advanced / Pro-Lab (Added) ---
-    {
-        id: 'typography',
-        label: 'Type',
-        description: 'Define font families and hierarchy.',
-        icon: CaseUpper,
-        category: 'Foundation',
-        defaultColor: 'bg-violet-600',
-        isCore: true
-    },
-    {
-        id: 'grid',
-        label: 'Grid',
-        description: 'Structural systems and grid settings.',
-        icon: Grid3X3,
-        category: 'Foundation',
-        defaultColor: 'bg-slate-700',
-        isCore: false
-    },
-    {
-        id: 'tone',
-        label: 'Tone',
-        description: 'Define communication vibration.',
-        icon: SlidersHorizontal,
-        category: 'Orchestration',
-        defaultColor: 'bg-orange-600',
-        isCore: true
-    },
-    {
         id: 'competitor',
-        label: 'Market',
+        label: 'Rivals',
         description: 'Competitive landscape analysis.',
         icon: Swords,
-        category: 'External',
+        category: 'EXTRAS',
         defaultColor: 'bg-stone-600',
         isCore: false
     },
     {
-        id: 'mood_gauge',
-        label: 'Gauge',
-        description: 'Aesthetic vibration intensity.',
-        icon: Gauge,
-        category: 'Generative',
-        defaultColor: 'bg-lime-500',
-        isCore: false
-    },
-    {
-        id: 'icons',
-        label: 'Icons',
-        description: 'Visual language symbols.',
-        icon: Shapes,
-        category: 'Foundation',
-        defaultColor: 'bg-sky-500',
-        isCore: false
-    },
-    {
-        id: 'reference',
-        label: 'Link',
-        description: 'Rich metadata link preview.',
-        icon: Link2,
-        category: 'External',
-        defaultColor: 'bg-blue-600',
+        id: 'cms_sync',
+        label: 'Sync',
+        description: 'Connect with Headless CMS data.',
+        icon: HardDrive,
+        category: 'EXTRAS',
+        defaultColor: 'bg-orange-500',
         isCore: false
     }
 ];

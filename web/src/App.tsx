@@ -118,10 +118,12 @@ const AppContent: React.FC = () => {
     const [industriesView, setIndustriesView] = useState(false);
     const [caseStudiesView, setCaseStudiesView] = useState(false);
     const [pricingView, setPricingView] = useState(false);
+    const [isZenMode, setIsZenMode] = useState(false);
 
-    // Reset header actions when tab changes
+    // Reset header actions and Zen Mode when tab changes
     useEffect(() => {
         setHeaderActions(null);
+        setIsZenMode(false);
     }, [activeTab]);
 
     // Persist selected brand ID to localStorage
@@ -353,16 +355,18 @@ const AppContent: React.FC = () => {
                 onTabChange={setActiveTab}
                 isCollapsed={isSidebarCollapsed}
                 onToggle={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
+                isZenMode={isZenMode}
             />
 
             <main
-                className={`flex-1 min-w-0 flex flex-col transition-all duration-500 ease-in-out ${isSidebarCollapsed ? 'ml-[48px]' : 'ml-0 md:ml-[48px] lg:ml-[240px]'}`}
+                className={`flex-1 min-w-0 flex flex-col transition-all duration-500 ease-in-out ${isSidebarCollapsed ? 'ml-[48px]' : 'ml-0 md:ml-[48px] lg:ml-[240px]'} ${isZenMode ? '!ml-0' : ''}`}
             >
                 <Header
                     activeTab={activeTab}
                     activeBrand={selectedBrand}
                     onNavigate={setActiveTab}
                     actions={headerActions}
+                    isZenMode={isZenMode}
                 />
 
                 <div className={`
@@ -416,6 +420,8 @@ const AppContent: React.FC = () => {
                                     brand={selectedBrand}
                                     setHeaderActions={setHeaderActions}
                                     setIsAppSidebarCollapsed={setIsSidebarCollapsed}
+                                    isZenMode={isZenMode}
+                                    onToggleZenMode={() => setIsZenMode(prev => !prev)}
                                 />
                             )}
 

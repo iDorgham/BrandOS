@@ -8,6 +8,7 @@ interface SidebarProps {
     onTabChange: (tab: string) => void;
     isCollapsed: boolean;
     onToggle: () => void;
+    isZenMode?: boolean;
 }
 
 interface SidebarTab {
@@ -31,7 +32,7 @@ export const SIDEBAR_TABS: SidebarTab[] = [
     { id: 'deployment', icon: Rocket, label: 'Deployment', category: 'MANAGEMENT' },
 ];
 
-export const Sidebar: React.FC<SidebarProps> = React.memo(({ activeTab, onTabChange, isCollapsed, onToggle }) => {
+export const Sidebar: React.FC<SidebarProps> = React.memo(({ activeTab, onTabChange, isCollapsed, onToggle, isZenMode = false }) => {
     const { userRole } = useAuth();
     const { visibleTabs, tabOrder } = useSettings();
 
@@ -52,8 +53,9 @@ export const Sidebar: React.FC<SidebarProps> = React.memo(({ activeTab, onTabCha
     return (
         <aside
             className={`
-                h-screen border-r border-border flex flex-col fixed left-0 top-0 z-50 bg-background transition-all duration-300 ease-in-out hidden md:flex
+                h-screen border-r border-border flex flex-col fixed left-0 top-0 z-50 bg-background transition-all duration-500 ease-in-out hidden md:flex
                 ${isCollapsed ? 'w-[48px]' : 'w-[240px]'}
+                ${isZenMode ? '-translate-x-full' : 'translate-x-0'}
             `}
         >
             <div className={`flex items-center gap-3 h-14 mb-6 ${isCollapsed ? 'justify-center px-0' : 'px-4'}`}>

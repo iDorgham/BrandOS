@@ -37,6 +37,20 @@ export interface MoodNodeData extends Record<string, unknown> {
     lineHeight?: string;
 
     onChange?: (id: string, newData: Partial<MoodNodeData>, newStyle?: CSSProperties) => void;
+
+    // Generative Engine Types (ComfyUI Bridge)
+    model?: string; // Model Loader Output
+    vae?: string;   // VAE Loader Output
+    clip?: string;  // CLIP Loader Output
+    latent?: any;   // Latent Image Data
+    positive?: string; // Positive Conditioning
+    negative?: string; // Negative Conditioning
+    seed?: number;  // KSampler Seed
+    steps?: number; // KSampler Steps
+    cfg?: number;   // KSampler CFG Scale
+    samplerName?: string; // KSampler Scheduler
+    scheduler?: string; // KSampler Scheduler Type
+    denoise?: number; // KSampler Denoise
 }
 
 import { BrandProfile } from '@/types';
@@ -45,4 +59,6 @@ export interface MoodBoardViewProps {
     brand: BrandProfile;
     setHeaderActions: (actions: React.ReactNode) => void;
     setIsAppSidebarCollapsed?: (collapsed: boolean) => void;
+    isZenMode?: boolean;
+    onToggleZenMode?: () => void;
 }
