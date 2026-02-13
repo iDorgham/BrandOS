@@ -9,8 +9,8 @@ export const ToneNode = ({ id, data, selected }: { id: string; data: MoodNodeDat
         selected={selected}
         title="Frequency"
         icon={SlidersHorizontal}
-        typeColor="bg-amber-500"
-        handles={<NodeHandles nodeColor="bg-amber-500" />}
+        typeColor="bg-orange-600"
+        handles={<NodeHandles nodeColor="bg-orange-600" />}
         data={{ ...data, id, type: 'tone' }}
         id={id}
         resizer={

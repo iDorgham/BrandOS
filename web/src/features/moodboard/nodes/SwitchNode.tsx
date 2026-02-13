@@ -48,6 +48,11 @@ export const SwitchNode = ({ id, data, selected }: { id: string; data: MoodNodeD
     // 3 Modes: 'Aggregator' (10:1), 'Broadcaster' (1:10), 'Matrix' (10:10)
     const mode = (data.mode as 'Aggregator' | 'Broadcaster' | 'Matrix') || 'Matrix';
 
+    // Stable grid pattern (deterministic, no Math.random in render)
+    const gridPattern = useMemo(() =>
+        Array.from({ length: 25 }).map((_, i) => i % 3 === 0 || i % 7 === 0),
+    []);
+
     const handleConfig = useMemo(() => {
         switch (mode) {
             case 'Aggregator': return { inputs: 10, outputs: 1 };
@@ -98,8 +103,8 @@ export const SwitchNode = ({ id, data, selected }: { id: string; data: MoodNodeD
                     {/* Signal Matrix Visualization */}
                     <div className="aspect-square bg-zinc-950/80 border border-zinc-800 p-4 relative overflow-hidden group">
                         <div className="grid grid-cols-5 grid-rows-5 gap-2 h-full opacity-20 group-hover:opacity-40 transition-opacity">
-                            {Array.from({ length: 25 }).map((_, i) => (
-                                <div key={i} className={`w-full h-full border border-blue-500/20 rounded-xs ${Math.random() > 0.8 ? 'bg-blue-500/20' : ''}`} />
+                            {gridPattern.map((active, i) => (
+                                <div key={i} className={`w-full h-full border border-blue-500/20 ${active ? 'bg-blue-500/20' : ''}`} />
                             ))}
                         </div>
                         <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
@@ -107,13 +112,14 @@ export const SwitchNode = ({ id, data, selected }: { id: string; data: MoodNodeD
                         </div>
                     </div>
 
-                    {/* Mode Toggles (Simulation) */}
+                    {/* Mode Toggles */}
                     <div className="space-y-2">
                         <div className="text-[8px] font-black text-zinc-500 uppercase tracking-widest px-2">Routing_Protocol</div>
                         <div className="grid grid-cols-1 gap-1">
                             {['Aggregator', 'Broadcaster', 'Matrix'].map(m => (
                                 <div
                                     key={m}
+                                    onClick={() => data.onChange?.(id, { mode: m })}
                                     className={`
                                         px-3 py-2 text-[10px] uppercase font-bold tracking-wider transition-all cursor-pointer
                                         ${mode === m ? 'bg-blue-600 text-white' : 'bg-zinc-900 text-zinc-500 hover:text-white hover:bg-zinc-800'}

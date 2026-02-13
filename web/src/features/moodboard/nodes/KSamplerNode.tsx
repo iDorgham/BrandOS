@@ -1,121 +1,104 @@
 import React, { memo } from 'react';
-import { Handle, Position } from '@xyflow/react';
+import { Handle, Position, NodeResizer } from '@xyflow/react';
 import { MoodNodeData } from '../types';
-import { Layers, Activity, Play, Zap } from 'lucide-react';
+import { Activity } from 'lucide-react';
+import { NodeContainer } from '../components/NodeComponents';
 
-export const KSamplerNode = memo(({ data, isConnectable, selected }: { data: MoodNodeData; isConnectable: boolean; selected: boolean }) => {
+export const KSamplerNode = memo(({ id, data, selected, isConnectable }: { id: string; data: MoodNodeData; isConnectable?: boolean; selected: boolean }) => {
     return (
-        <div className={`
-      group relative flex flex-col w-[320px] bg-card/95 backdrop-blur-xl 
-      border-2 transition-all duration-300 rounded-lg overflow-hidden
-      ${selected
-                ? 'border-primary shadow-[0_0_30px_rgba(var(--primary-rgb),0.3)] scale-[1.02]'
-                : 'border-border/50 hover:border-primary/50 hover:shadow-lg'}
-    `}>
-            {/* Header */}
-            <div className="h-10 bg-muted/40 border-b border-border/50 flex items-center justify-between px-3">
-                <div className="flex items-center gap-2">
-                    <div className="w-6 h-6 rounded flex items-center justify-center bg-primary/10 text-primary">
-                        <Activity size={14} />
-                    </div>
-                    <span className="text-xs font-bold uppercase tracking-widest text-foreground/90">
-                        K_Sampler_Engine
-                    </span>
-                </div>
-                <div className="flex items-center gap-2">
-                    <div className="px-1.5 py-0.5 rounded bg-background border border-border/50 text-[9px] font-mono text-muted-foreground">
-                        ID: {data.seed || 'RANDOM'}
-                    </div>
-                </div>
-            </div>
-
-            {/* Inputs (Left Side) */}
-            <div className="relative p-4 space-y-6">
-                {/* Model Input */}
-                <div className="relative flex items-center">
-                    <Handle
-                        type="target"
-                        position={Position.Left}
-                        id="model"
-                        isConnectable={isConnectable}
-                        className="!w-3 !h-3 !-left-[19px] !bg-blue-500 !border-2 !border-background transition-all hover:scale-125"
-                    />
-                    <span className="text-[9px] font-bold uppercase tracking-wider text-muted-foreground ml-1">Model</span>
-                </div>
-
-                {/* Positive Conditioning */}
-                <div className="relative flex items-center">
-                    <Handle
-                        type="target"
-                        position={Position.Left}
-                        id="positive"
-                        isConnectable={isConnectable}
-                        className="!w-3 !h-3 !-left-[19px] !bg-green-500 !border-2 !border-background transition-all hover:scale-125"
-                    />
-                    <span className="text-[9px] font-bold uppercase tracking-wider text-muted-foreground ml-1">Positive</span>
-                </div>
-
-                {/* Negative Conditioning */}
-                <div className="relative flex items-center">
-                    <Handle
-                        type="target"
-                        position={Position.Left}
-                        id="negative"
-                        isConnectable={isConnectable}
-                        className="!w-3 !h-3 !-left-[19px] !bg-red-500 !border-2 !border-background transition-all hover:scale-125"
-                    />
-                    <span className="text-[9px] font-bold uppercase tracking-wider text-muted-foreground ml-1">Negative</span>
-                </div>
-
-                {/* Latent Input */}
-                <div className="relative flex items-center">
-                    <Handle
-                        type="target"
-                        position={Position.Left}
-                        id="latent_image"
-                        isConnectable={isConnectable}
-                        className="!w-3 !h-3 !-left-[19px] !bg-pink-500 !border-2 !border-background transition-all hover:scale-125"
-                    />
-                    <span className="text-[9px] font-bold uppercase tracking-wider text-muted-foreground ml-1">Latent</span>
-                </div>
-            </div>
-
-            {/* Controls Area */}
-            <div className="px-4 pb-4 space-y-3">
-                {/* Progress Bar (Visual only for now) */}
-                <div className="h-1 w-full bg-muted/50 rounded-full overflow-hidden">
-                    <div className="h-full bg-primary w-0 transition-all duration-300 group-hover:w-full opacity-0 group-hover:opacity-20" />
-                </div>
-
-                <div className="grid grid-cols-2 gap-2">
-                    <div className="p-2 bg-muted/20 rounded border border-border/50">
-                        <span className="block text-[8px] uppercase tracking-widest text-muted-foreground mb-1">Steps</span>
-                        <div className="text-xs font-mono font-bold text-foreground">{data.steps || 20}</div>
-                    </div>
-                    <div className="p-2 bg-muted/20 rounded border border-border/50">
-                        <span className="block text-[8px] uppercase tracking-widest text-muted-foreground mb-1">CFG</span>
-                        <div className="text-xs font-mono font-bold text-foreground">{data.cfg || 7.0}</div>
-                    </div>
-                </div>
-            </div>
-
-            {/* Outputs (Right Side) */}
-            <div className="absolute right-0 top-1/2 -translate-y-1/2">
-                <Handle
-                    type="source"
-                    position={Position.Right}
-                    id="latent_output"
-                    isConnectable={isConnectable}
-                    className="!w-3 !h-3 !-right-[7px] !bg-pink-500 !border-2 !border-background transition-all hover:scale-125"
+        <NodeContainer
+            selected={selected}
+            title="K_Sampler"
+            icon={Activity}
+            typeColor="bg-purple-600"
+            data={{ ...data, id, type: 'ksampler' }}
+            id={id}
+            resizer={
+                <NodeResizer
+                    minWidth={280}
+                    minHeight={260}
+                    isVisible={selected}
+                    lineClassName="!border-purple-600/60"
+                    handleClassName="!w-3 !h-3 !bg-purple-600 !border-background !rounded-full shadow-sm hover:scale-150 transition-transform"
                 />
-                <span className="absolute right-4 top-1/2 -translate-y-1/2 text-[9px] font-bold uppercase tracking-wider text-muted-foreground">Latent</span>
-            </div>
+            }
+            handles={
+                <>
+                    {/* Left inputs (targets) - color-coded */}
+                    <Handle type="target" position={Position.Left} id="model" isConnectable={isConnectable}
+                        className="!w-3 !h-3 !-left-[7px] !bg-blue-500 !border-2 !border-background transition-all hover:scale-150 z-50 shadow-md rounded-full"
+                        style={{ top: '28%' }} />
+                    <Handle type="target" position={Position.Left} id="positive" isConnectable={isConnectable}
+                        className="!w-3 !h-3 !-left-[7px] !bg-green-500 !border-2 !border-background transition-all hover:scale-150 z-50 shadow-md rounded-full"
+                        style={{ top: '40%' }} />
+                    <Handle type="target" position={Position.Left} id="negative" isConnectable={isConnectable}
+                        className="!w-3 !h-3 !-left-[7px] !bg-red-500 !border-2 !border-background transition-all hover:scale-150 z-50 shadow-md rounded-full"
+                        style={{ top: '52%' }} />
+                    <Handle type="target" position={Position.Left} id="latent_image" isConnectable={isConnectable}
+                        className="!w-3 !h-3 !-left-[7px] !bg-pink-500 !border-2 !border-background transition-all hover:scale-150 z-50 shadow-md rounded-full"
+                        style={{ top: '64%' }} />
+                    {/* Right output (source) */}
+                    <Handle type="source" position={Position.Right} id="latent_output" isConnectable={isConnectable}
+                        className="!w-3 !h-3 !-right-[7px] !bg-pink-500 !border-2 !border-background transition-all hover:scale-150 z-50 shadow-md rounded-full"
+                        style={{ top: '50%' }} />
+                </>
+            }
+        >
+            <div className="flex flex-col p-4 h-full gap-4">
+                {/* Input Labels */}
+                <div className="space-y-2">
+                    <div className="flex items-center gap-2 text-[7px] font-mono font-bold uppercase tracking-widest text-zinc-400 border-b border-zinc-100 dark:border-zinc-800 pb-2">
+                        <span>Inputs</span>
+                        <div className="flex-1" />
+                        <span className="text-[8px] font-mono text-zinc-500">ID: {data.seed || 'RANDOM'}</span>
+                    </div>
+                    <div className="space-y-1.5 pl-1">
+                        <div className="flex items-center gap-2">
+                            <div className="w-2 h-2 bg-blue-500" />
+                            <span className="text-[8px] font-mono font-bold text-zinc-500 uppercase">Model</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                            <div className="w-2 h-2 bg-green-500" />
+                            <span className="text-[8px] font-mono font-bold text-zinc-500 uppercase">Positive</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                            <div className="w-2 h-2 bg-red-500" />
+                            <span className="text-[8px] font-mono font-bold text-zinc-500 uppercase">Negative</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                            <div className="w-2 h-2 bg-pink-500" />
+                            <span className="text-[8px] font-mono font-bold text-zinc-500 uppercase">Latent</span>
+                        </div>
+                    </div>
+                </div>
 
-            {/* Execution Indicator */}
-            <div className="absolute top-2 right-2">
-                <div className={`w-2 h-2 rounded-full ${data.isActive ? 'bg-green-500 animate-pulse' : 'bg-muted-foreground/30'}`} />
-            </div>
+                {/* Controls */}
+                <div className="space-y-3">
+                    <div className="h-1 w-full bg-zinc-100 dark:bg-zinc-800 overflow-hidden">
+                        <div className="h-full bg-primary w-0 transition-all duration-300 group-hover:w-full opacity-0 group-hover:opacity-20" />
+                    </div>
 
-        </div>
+                    <div className="grid grid-cols-2 gap-2">
+                        <div className="p-2 bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800">
+                            <span className="block text-[7px] font-mono uppercase tracking-widest text-zinc-400 mb-1">Steps</span>
+                            <div className="text-[11px] font-mono font-bold text-zinc-900 dark:text-zinc-100">{data.steps || 20}</div>
+                        </div>
+                        <div className="p-2 bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800">
+                            <span className="block text-[7px] font-mono uppercase tracking-widest text-zinc-400 mb-1">CFG</span>
+                            <div className="text-[11px] font-mono font-bold text-zinc-900 dark:text-zinc-100">{data.cfg || 7.0}</div>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Status */}
+                <div className="mt-auto flex items-center justify-between pt-2 border-t border-zinc-100 dark:border-zinc-800 opacity-40">
+                    <div className="flex items-center gap-2">
+                        <div className={`w-1.5 h-1.5 ${data.isActive ? 'bg-emerald-500 animate-pulse' : 'bg-zinc-400'}`} />
+                        <span className="text-[6px] font-mono uppercase tracking-widest text-zinc-500">{data.isActive ? 'PROCESSING' : 'IDLE'}</span>
+                    </div>
+                    <span className="text-[6px] font-mono uppercase tracking-widest text-zinc-500">OUTPUT::LATENT</span>
+                </div>
+            </div>
+        </NodeContainer>
     );
 });

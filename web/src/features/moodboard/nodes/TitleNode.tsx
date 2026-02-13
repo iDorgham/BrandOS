@@ -16,10 +16,10 @@ export const TitleNode = React.memo(({ id, data, selected }: { id: string; data:
             selected={selected}
             title="Section"
             icon={Heading1}
-            typeColor="bg-blue-600"
+            typeColor="bg-indigo-600"
             onEdit={() => setIsEditing(!isEditing)}
             isEditing={isEditing}
-            handles={<NodeHandles nodeColor="bg-blue-600" />}
+            handles={<NodeHandles nodeColor="bg-indigo-600" />}
             data={{ ...data, id, type: 'title' }}
             id={id}
             resizer={

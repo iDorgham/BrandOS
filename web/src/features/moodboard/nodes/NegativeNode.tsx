@@ -10,8 +10,8 @@ export const NegativeNode = ({ id, data, selected }: { id: string; data: MoodNod
         selected={selected}
         title="Anti_DNA"
         icon={X}
-        typeColor="bg-amber-500"
-        handles={<NodeHandles nodeColor="bg-amber-500" />}
+        typeColor="bg-rose-600"
+        handles={<NodeHandles nodeColor="bg-rose-600" />}
         data={{ ...data, id, type: 'negative' }}
         id={id}
         resizer={

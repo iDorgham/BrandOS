@@ -5,7 +5,7 @@ import { MoodNodeData } from '../types';
 import { NodeContainer, NodeHandles, hexToRgbForDisplay } from '../components/NodeComponents';
 import { useMoodBoard } from '../MoodBoardContext';
 
-export const PaletteNode = ({ id, data, selected }: { id: string; data: MoodNodeData; selected: boolean }) => {
+export const PaletteNode = React.memo(({ id, data, selected }: { id: string; data: MoodNodeData; selected: boolean }) => {
     const { brand } = useMoodBoard();
     return (
         <NodeContainer
@@ -89,4 +89,4 @@ export const PaletteNode = ({ id, data, selected }: { id: string; data: MoodNode
             </div>
         </NodeContainer>
     );
-};
+});

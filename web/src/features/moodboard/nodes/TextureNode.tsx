@@ -9,8 +9,8 @@ export const TextureNode = ({ id, data, selected }: { id: string; data: MoodNode
         selected={selected}
         title="Material"
         icon={Layers}
-        typeColor="bg-amber-500"
-        handles={<NodeHandles nodeColor="bg-amber-500" />}
+        typeColor="bg-slate-400"
+        handles={<NodeHandles nodeColor="bg-slate-400" />}
         data={{ ...data, id, type: 'texture' }}
         id={id}
         resizer={
