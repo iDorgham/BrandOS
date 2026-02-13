@@ -87,7 +87,7 @@ const NAV_GROUPS: NavGroup[] = [
     },
 ];
 
-const LAYOUT_KEY = 'brandos_settings_layout_v1';
+const LAYOUT_KEY = 'brandos_settings_layout_v2';
 
 const SettingsContent: React.FC<{ activeSection: SettingsSection }> = ({ activeSection }) => (
     <AnimatePresence mode="wait">
