@@ -1,88 +1,106 @@
 import React, { memo } from 'react';
-import { Handle, Position } from '@xyflow/react';
+import { Handle, Position, NodeResizer } from '@xyflow/react';
 import { MoodNodeData } from '../types';
-import { HardDrive, Layers, Cpu } from 'lucide-react';
+import { HardDrive, Layers } from 'lucide-react';
+import { NodeContainer } from '../components/NodeComponents';
 
-export const CheckpointNode = memo(({ data, isConnectable, selected }: { data: MoodNodeData; isConnectable: boolean; selected: boolean }) => {
+export const CheckpointNode = memo(({ id, data, selected, isConnectable }: { id: string; data: MoodNodeData; isConnectable?: boolean; selected: boolean }) => {
     return (
-        <div className={`
-      group relative flex flex-col w-[260px] bg-card/95 backdrop-blur-xl 
-      border-2 transition-all duration-300 rounded-lg overflow-hidden
-      ${selected
-                ? 'border-primary shadow-[0_0_30px_rgba(var(--primary-rgb),0.3)] scale-[1.02]'
-                : 'border-border/50 hover:border-primary/50 hover:shadow-lg'}
-    `}>
-            {/* Header */}
-            <div className="h-10 bg-muted/40 border-b border-border/50 flex items-center justify-between px-3">
-                <div className="flex items-center gap-2">
-                    <div className="w-6 h-6 rounded flex items-center justify-center bg-primary/10 text-primary">
-                        <HardDrive size={14} />
-                    </div>
-                    <span className="text-xs font-bold uppercase tracking-widest text-foreground/90">
-                        Model_Loader
-                    </span>
-                </div>
-            </div>
-
-            {/* Content Area */}
-            <div className="p-4 space-y-3">
-                <div className="relative aspect-video rounded bg-muted/30 border border-border/50 overflow-hidden group-hover:border-primary/30 transition-colors">
-                    {data.imageUrl ? (
-                        <img src={data.imageUrl} alt="Model Cover" className="w-full h-full object-cover" />
-                    ) : (
-                        <div className="w-full h-full flex flex-col items-center justify-center text-muted-foreground/30">
-                            <Layers size={24} className="mb-2" />
-                            <span className="text-[9px] font-bold uppercase tracking-widest">No Preview</span>
-                        </div>
-                    )}
-                    {/* Model Name Overlay */}
-                    <div className="absolute inset-x-0 bottom-0 bg-black/60 backdrop-blur-sm p-2">
-                        <div className="text-[10px] font-bold text-white truncate">
-                            {data.model || 'SDXL_Turbo_v1.0.safetensors'}
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            {/* Outputs (Right Side) */}
-            <div className="absolute -right-[1px] top-[60px] flex flex-col gap-6 items-end">
-                {/* MODEL Output */}
-                <div className="relative flex items-center group/handle">
-                    <span className="mr-2 text-[9px] font-bold uppercase tracking-wider text-muted-foreground opacity-0 group-hover/handle:opacity-100 transition-opacity">Model</span>
+        <NodeContainer
+            selected={selected}
+            title="Model_Loader"
+            icon={HardDrive}
+            typeColor="bg-blue-600"
+            data={{ ...data, id, type: 'checkpoint' }}
+            id={id}
+            resizer={
+                <NodeResizer
+                    minWidth={220}
+                    minHeight={140}
+                    isVisible={selected}
+                    lineClassName="!border-blue-600/60"
+                    handleClassName="!w-3 !h-3 !bg-blue-600 !border-background !rounded-full shadow-sm hover:scale-150 transition-transform"
+                />
+            }
+            handles={
+                <>
+                    {/* Left input handle */}
+                    <Handle
+                        type="target"
+                        position={Position.Left}
+                        id="l"
+                        isConnectable={isConnectable}
+                        className="!w-3 !h-3 !-left-[7px] !bg-orange-500 !border-transparent transition-all hover:scale-150 z-50 shadow-md rounded-full top-1/2 -translate-y-1/2"
+                    />
+                    {/* MODEL Output */}
                     <Handle
                         type="source"
                         position={Position.Right}
                         id="model_output"
                         isConnectable={isConnectable}
-                        className="!w-3 !h-3 !-right-[6px] !bg-blue-500 !border-2 !border-background transition-all hover:scale-125"
+                        className="!w-3 !h-3 !-right-[7px] !bg-blue-500 !border-2 !border-background transition-all hover:scale-150 z-50 shadow-md rounded-full"
+                        style={{ top: '35%' }}
                     />
-                </div>
-
-                {/* CLIP Output */}
-                <div className="relative flex items-center group/handle">
-                    <span className="mr-2 text-[9px] font-bold uppercase tracking-wider text-muted-foreground opacity-0 group-hover/handle:opacity-100 transition-opacity">CLIP</span>
+                    {/* CLIP Output */}
                     <Handle
                         type="source"
                         position={Position.Right}
                         id="clip_output"
                         isConnectable={isConnectable}
-                        className="!w-3 !h-3 !-right-[6px] !bg-yellow-500 !border-2 !border-background transition-all hover:scale-125"
+                        className="!w-3 !h-3 !-right-[7px] !bg-yellow-500 !border-2 !border-background transition-all hover:scale-150 z-50 shadow-md rounded-full"
+                        style={{ top: '55%' }}
                     />
-                </div>
-
-                {/* VAE Output */}
-                <div className="relative flex items-center group/handle">
-                    <span className="mr-2 text-[9px] font-bold uppercase tracking-wider text-muted-foreground opacity-0 group-hover/handle:opacity-100 transition-opacity">VAE</span>
+                    {/* VAE Output */}
                     <Handle
                         type="source"
                         position={Position.Right}
                         id="vae_output"
                         isConnectable={isConnectable}
-                        className="!w-3 !h-3 !-right-[6px] !bg-red-500 !border-2 !border-background transition-all hover:scale-125"
+                        className="!w-3 !h-3 !-right-[7px] !bg-red-500 !border-2 !border-background transition-all hover:scale-150 z-50 shadow-md rounded-full"
+                        style={{ top: '75%' }}
                     />
+                </>
+            }
+        >
+            <div className="p-4 space-y-3">
+                {/* Model Preview */}
+                <div className="relative aspect-video bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 overflow-hidden group/preview">
+                    {data.imageUrl ? (
+                        <img src={data.imageUrl} alt="Model Cover" className="w-full h-full object-cover" />
+                    ) : (
+                        <div className="w-full h-full flex flex-col items-center justify-center">
+                            <Layers size={24} className="text-zinc-300 dark:text-zinc-700 mb-2" strokeWidth={1} />
+                            <span className="text-[8px] font-bold font-mono uppercase tracking-widest text-zinc-400">No Preview</span>
+                        </div>
+                    )}
+                    <div className="absolute inset-x-0 bottom-0 bg-zinc-900/70 p-2">
+                        <div className="text-[9px] font-bold font-mono text-white truncate uppercase tracking-tight">
+                            {data.model || 'SDXL_Turbo_v1.0.safetensors'}
+                        </div>
+                    </div>
+                </div>
+
+                {/* Output Labels */}
+                <div className="space-y-1.5">
+                    <div className="flex items-center justify-between text-[7px] font-mono font-bold uppercase tracking-widest text-zinc-400">
+                        <span>Outputs</span>
+                    </div>
+                    <div className="flex gap-2">
+                        <div className="flex items-center gap-1.5">
+                            <div className="w-2 h-2 bg-blue-500" />
+                            <span className="text-[7px] font-mono font-bold text-zinc-500 uppercase">Model</span>
+                        </div>
+                        <div className="flex items-center gap-1.5">
+                            <div className="w-2 h-2 bg-yellow-500" />
+                            <span className="text-[7px] font-mono font-bold text-zinc-500 uppercase">CLIP</span>
+                        </div>
+                        <div className="flex items-center gap-1.5">
+                            <div className="w-2 h-2 bg-red-500" />
+                            <span className="text-[7px] font-mono font-bold text-zinc-500 uppercase">VAE</span>
+                        </div>
+                    </div>
                 </div>
             </div>
-
-        </div>
+        </NodeContainer>
     );
 });

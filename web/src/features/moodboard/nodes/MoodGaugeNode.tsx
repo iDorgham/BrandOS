@@ -9,8 +9,8 @@ export const MoodGaugeNode = ({ id, data, selected }: { id: string; data: MoodNo
         selected={selected}
         title="Pressure"
         icon={Gauge}
-        typeColor="bg-fuchsia-600"
-        handles={<NodeHandles nodeColor="bg-fuchsia-600" />}
+        typeColor="bg-lime-500"
+        handles={<NodeHandles nodeColor="bg-lime-500" />}
         data={{ ...data, id, type: 'mood_gauge' }}
         id={id}
         resizer={

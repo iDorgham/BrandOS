@@ -32,7 +32,8 @@ import {
     Workflow,
     LayoutGrid,
     Type,
-    Box
+    Box,
+    GitBranch
 } from 'lucide-react';
 
 export type NodeCategory = 'CORE' | 'AI_GEN' | 'SIGNAL' | 'SYSTEM' | 'REFINEMENT' | 'EXTRAS';
@@ -95,6 +96,33 @@ export const NODE_REGISTRY: MoodNodeDefinition[] = [
         defaultColor: 'bg-violet-600',
         isCore: true
     },
+    {
+        id: 'paragraph',
+        label: 'Copy',
+        description: 'Detailed narrative and copy blocks.',
+        icon: AlignLeft,
+        category: 'CORE',
+        defaultColor: 'bg-blue-500',
+        isCore: false
+    },
+    {
+        id: 'icons',
+        label: 'Symbols',
+        description: 'Symbol and glyph collections.',
+        icon: Shapes,
+        category: 'CORE',
+        defaultColor: 'bg-blue-500',
+        isCore: false
+    },
+    {
+        id: 'reference',
+        label: 'Link',
+        description: 'Metadata links and external refs.',
+        icon: Link2,
+        category: 'CORE',
+        defaultColor: 'bg-emerald-600',
+        isCore: false
+    },
 
     // --- REFINEMENT (Brand Details) ---
     {
@@ -132,6 +160,24 @@ export const NODE_REGISTRY: MoodNodeDefinition[] = [
         category: 'REFINEMENT',
         defaultColor: 'bg-rose-600',
         isCore: true
+    },
+    {
+        id: 'logic',
+        label: 'Gate',
+        description: 'Conditional logic branching.',
+        icon: GitBranch,
+        category: 'REFINEMENT',
+        defaultColor: 'bg-amber-500',
+        isCore: false
+    },
+    {
+        id: 'preset',
+        label: 'Aesthetic',
+        description: 'Style presets and visual modes.',
+        icon: Zap,
+        category: 'REFINEMENT',
+        defaultColor: 'bg-blue-500',
+        isCore: false
     },
 
     // --- AI GEN (Generative Engine) ---
@@ -178,6 +224,15 @@ export const NODE_REGISTRY: MoodNodeDefinition[] = [
         icon: Gauge,
         category: 'AI_GEN',
         defaultColor: 'bg-lime-500',
+        isCore: false
+    },
+    {
+        id: 'model_profile',
+        label: 'Character',
+        description: 'Identity rig and character profile.',
+        icon: User,
+        category: 'AI_GEN',
+        defaultColor: 'bg-fuchsia-500',
         isCore: false
     },
 
@@ -263,6 +318,15 @@ export const NODE_REGISTRY: MoodNodeDefinition[] = [
         icon: LayoutGrid,
         category: 'SYSTEM',
         defaultColor: 'bg-slate-700',
+        isCore: false
+    },
+    {
+        id: 'content',
+        label: 'Content',
+        description: 'Content architecture and formats.',
+        icon: Layout,
+        category: 'SYSTEM',
+        defaultColor: 'bg-rose-500',
         isCore: false
     },
 

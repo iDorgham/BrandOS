@@ -9,8 +9,8 @@ export const CompetitorNode = ({ id, data, selected }: { id: string; data: MoodN
         selected={selected}
         title="Comparison"
         icon={Swords}
-        typeColor="bg-emerald-600"
-        handles={<NodeHandles nodeColor="bg-emerald-600" />}
+        typeColor="bg-stone-600"
+        handles={<NodeHandles nodeColor="bg-stone-600" />}
         data={{ ...data, id, type: 'competitor' }}
         id={id}
         resizer={
