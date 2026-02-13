@@ -1,107 +1,209 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
-    Layout,
-    Settings,
-    Shield,
-    Activity,
-    Box,
-    Monitor,
-    ChevronRight,
-    Users,
     User,
-    Lock,
-    Key
+    Shield,
+    Settings,
+    Palette,
+    Layout,
+    Brain,
+    CreditCard,
+    Webhook,
+    Users,
+    ChevronRight,
+    Terminal,
 } from 'lucide-react';
-import { ApiKeysView } from './ApiKeysView';
-import { ModulesMarketView } from '../moodboard/components/ModulesMarketView';
-import { GeneralSettings } from './GeneralSettings';
-import { AppearanceSettings } from './AppearanceSettings';
+import { useAuth } from '@/contexts/AuthContext';
 import { ProfileSettings } from './ProfileSettings';
 import { SecuritySettings } from './SecuritySettings';
-import { TeamView } from '../team/TeamView';
-import { AuditLogDashboard } from '../audit/AuditLogDashboard';
-import { AuthStatus } from '@/components/auth/Auth';
-import { useAuth } from '@/contexts/AuthContext';
+import { WorkspaceSettings } from './WorkspaceSettings';
+import { AppearanceSettings } from './AppearanceSettings';
+import { MoodboardSettings } from './MoodboardSettings';
+import { LLMSettings } from './LLMSettings';
+import { SubscriptionSettings } from './SubscriptionSettings';
+import { ApiWebhookSettings } from './ApiWebhookSettings';
+import { TeamSettings } from './TeamSettings';
 
 interface SettingsLayoutProps {
     onAuth: () => void;
 }
 
-type SettingsSection = 'general' | 'profile' | 'security' | 'appearance' | 'team' | 'market' | 'api' | 'compliance';
+type SettingsSection =
+    | 'profile'
+    | 'security'
+    | 'workspace'
+    | 'appearance'
+    | 'moodboard'
+    | 'llm'
+    | 'subscription'
+    | 'api'
+    | 'team';
 
-export const SettingsLayout: React.FC<SettingsLayoutProps> = ({ onAuth }) => {
-    const [activeSection, setActiveSection] = useState<SettingsSection>('general');
-    const { userRole } = useAuth();
-    const isAdmin = userRole === 'admin';
+interface NavGroup {
+    label: string;
+    items: { id: SettingsSection; label: string; icon: React.ElementType; badge?: string }[];
+}
 
-    const MENU = [
-        { id: 'general', label: 'General', icon: Settings },
-        { id: 'profile', label: 'Profile', icon: User },
-        { id: 'security', label: 'Security', icon: Shield },
-        { id: 'appearance', label: 'Appearance', icon: Monitor },
-        { id: 'team', label: 'Team', icon: Users },
-        ...(isAdmin ? [{ id: 'compliance', label: 'Compliance', icon: Activity }] : []),
-        { id: 'market', label: 'Modules', icon: Box },
-        { id: 'api', label: 'API Keys', icon: Key },
-    ];
+const NAV_GROUPS: NavGroup[] = [
+    {
+        label: 'ACCOUNT',
+        items: [
+            { id: 'profile', label: 'Profile', icon: User },
+            { id: 'security', label: 'Security', icon: Shield },
+        ],
+    },
+    {
+        label: 'WORKSPACE',
+        items: [
+            { id: 'workspace', label: 'General', icon: Settings },
+            { id: 'appearance', label: 'Appearance', icon: Palette },
+            { id: 'moodboard', label: 'Moodboard', icon: Layout },
+        ],
+    },
+    {
+        label: 'INTEGRATIONS',
+        items: [
+            { id: 'llm', label: 'LLMs / AI Models', icon: Brain },
+            { id: 'api', label: 'API & Webhooks', icon: Webhook },
+        ],
+    },
+    {
+        label: 'ORGANIZATION',
+        items: [
+            { id: 'team', label: 'Team', icon: Users },
+            { id: 'subscription', label: 'Subscription', icon: CreditCard },
+        ],
+    },
+];
+
+export const SettingsLayout: React.FC<SettingsLayoutProps> = () => {
+    const [activeSection, setActiveSection] = useState<SettingsSection>('profile');
+    const { user, userProfile, activeWorkspace } = useAuth();
+
+    const profileName = userProfile?.name || user?.user_metadata?.full_name || user?.email?.split('@')[0] || 'User';
 
     return (
-        <div className="flex flex-col h-full bg-background relative overflow-hidden">
-            {/* Top Navigation Bar */}
-            {/* Top Navigation Bar - Carbon Style */}
-            <div className="w-full bg-background border-b border-border z-10 pt-8 px-8 md:px-12">
-                <h1 className="text-3xl font-light tracking-tight mb-8">Settings</h1>
+        <div className="flex h-full bg-background relative overflow-hidden">
+            {/* Sidebar Navigation */}
+            <div className="w-[260px] shrink-0 h-full bg-card/80 backdrop-blur-xl border-r border-border/40 flex flex-col">
+                {/* Sidebar Header */}
+                <div className="p-5 border-b border-border/20">
+                    <div className="flex items-center gap-3">
+                        <div className="w-1.5 h-8 bg-primary" />
+                        <div>
+                            <h1 className="text-[14px] font-bold text-foreground tracking-tight">SETTINGS</h1>
+                            <p className="text-[9px] font-mono text-muted-foreground/60 uppercase tracking-[0.15em]">
+                                System_Configuration
+                            </p>
+                        </div>
+                    </div>
+                </div>
 
-                <div className="flex items-center gap-8 overflow-x-auto custom-scrollbar">
-                    {MENU.map((item) => (
-                        <button
-                            key={item.id}
-                            onClick={() => setActiveSection(item.id as SettingsSection)}
-                            className={`
-                                relative flex items-center gap-2 pb-3 text-sm font-medium transition-colors whitespace-nowrap
-                                ${activeSection === item.id
-                                    ? 'text-primary border-b-2 border-primary'
-                                    : 'text-muted-foreground hover:text-foreground border-b-2 border-transparent'
-                                }
-                            `}
-                        >
-                            <span>{item.label}</span>
-                        </button>
+                {/* User Card */}
+                <div className="p-4 border-b border-border/20">
+                    <div className="flex items-center gap-3 p-3 bg-muted/10 border border-border/40">
+                        <div className="w-9 h-9 bg-primary/10 border border-border/40 flex items-center justify-center overflow-hidden">
+                            {userProfile?.avatarUrl || user?.user_metadata?.avatar_url ? (
+                                <img
+                                    src={userProfile?.avatarUrl || user?.user_metadata?.avatar_url}
+                                    alt=""
+                                    className="w-full h-full object-cover"
+                                />
+                            ) : (
+                                <User size={16} className="text-muted-foreground" />
+                            )}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                            <p className="text-[11px] font-bold text-foreground truncate">{profileName}</p>
+                            <p className="text-[9px] font-mono text-muted-foreground/60 truncate">
+                                {activeWorkspace?.name || 'No workspace'}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Navigation Groups */}
+                <nav className="flex-1 overflow-y-auto custom-scrollbar py-2">
+                    {NAV_GROUPS.map((group, gi) => (
+                        <div key={group.label} className={gi > 0 ? 'mt-1' : ''}>
+                            <div className="px-5 py-2.5">
+                                <span className="text-[8px] font-mono font-black text-muted-foreground/40 uppercase tracking-[0.2em]">
+                                    {group.label}
+                                </span>
+                            </div>
+                            <div className="space-y-0.5 px-2">
+                                {group.items.map((item) => {
+                                    const isActive = activeSection === item.id;
+                                    const Icon = item.icon;
+                                    return (
+                                        <button
+                                            key={item.id}
+                                            onClick={() => setActiveSection(item.id)}
+                                            className={`
+                                                w-full flex items-center gap-3 px-3 py-2 text-left transition-all duration-200
+                                                border-l-2
+                                                ${isActive
+                                                    ? 'border-primary bg-primary/10 text-primary'
+                                                    : 'border-transparent text-muted-foreground hover:text-foreground hover:bg-muted/10 hover:border-primary/30'
+                                                }
+                                            `}
+                                        >
+                                            <Icon size={14} className={isActive ? 'text-primary' : ''} />
+                                            <span className="text-[11px] font-bold tracking-wide">{item.label}</span>
+                                            {item.badge && (
+                                                <span className="ml-auto text-[8px] font-mono font-bold bg-primary/20 text-primary px-1.5 py-0.5">
+                                                    {item.badge}
+                                                </span>
+                                            )}
+                                            <ChevronRight
+                                                size={10}
+                                                className={`ml-auto transition-transform ${isActive ? 'opacity-100' : 'opacity-0'}`}
+                                            />
+                                        </button>
+                                    );
+                                })}
+                            </div>
+                        </div>
                     ))}
+                </nav>
+
+                {/* Sidebar Footer */}
+                <div className="p-4 border-t border-border/20">
+                    <div className="flex items-center gap-2">
+                        <Terminal size={10} className="text-muted-foreground/40" />
+                        <span className="text-[8px] font-mono text-muted-foreground/40 uppercase tracking-widest">
+                            BrandOS v4.3.0
+                        </span>
+                    </div>
+                    <div className="flex items-center gap-1.5 mt-1.5">
+                        <div className="w-1.5 h-1.5 bg-emerald-500 animate-pulse" />
+                        <span className="text-[8px] font-mono text-muted-foreground/30">All Systems Operational</span>
+                    </div>
                 </div>
             </div>
 
-            {/* Content Area */}
-            <div className="flex-1 overflow-y-auto custom-scrollbar relative bg-muted/5">
-                <div className="w-full px-6 md:px-10 pt-1 pb-20">
-                    <AnimatePresence mode="wait">
-                        <motion.div
-                            key={activeSection}
-                            initial={{ opacity: 0, y: 10, scale: 0.99 }}
-                            animate={{ opacity: 1, y: 0, scale: 1 }}
-                            exit={{ opacity: 0, y: -10, scale: 0.99 }}
-                            transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
-                            className="bg-transparent"
-                        >
-                            {activeSection === 'general' && <GeneralSettings />}
-                            {activeSection === 'profile' && <ProfileSettings />}
-                            {activeSection === 'security' && <SecuritySettings />}
-                            {activeSection === 'appearance' && <AppearanceSettings />}
-                            {activeSection === 'team' && <TeamView />}
-                            {activeSection === 'compliance' && <AuditLogDashboard />}
-                            {activeSection === 'api' && <ApiKeysView />}
-                            {activeSection === 'market' && <ModulesMarketView />}
-                        </motion.div>
-                    </AnimatePresence>
-                </div>
-            </div>
-
-            {/* Footer / Status Area */}
-            <div className="absolute bottom-6 right-8 pointer-events-none z-50">
-                <div className="pointer-events-auto bg-background/80 backdrop-blur-xl border border-border p-2 rounded-full shadow-2xl">
-                    <AuthStatus />
-                </div>
+            {/* Main Content */}
+            <div className="flex-1 h-full overflow-y-auto custom-scrollbar bg-muted/5">
+                <AnimatePresence mode="wait">
+                    <motion.div
+                        key={activeSection}
+                        initial={{ opacity: 0, x: 8 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        exit={{ opacity: 0, x: -8 }}
+                        transition={{ duration: 0.2, ease: [0.22, 1, 0.36, 1] }}
+                        className="p-8 pb-20"
+                    >
+                        {activeSection === 'profile' && <ProfileSettings />}
+                        {activeSection === 'security' && <SecuritySettings />}
+                        {activeSection === 'workspace' && <WorkspaceSettings />}
+                        {activeSection === 'appearance' && <AppearanceSettings />}
+                        {activeSection === 'moodboard' && <MoodboardSettings />}
+                        {activeSection === 'llm' && <LLMSettings />}
+                        {activeSection === 'subscription' && <SubscriptionSettings />}
+                        {activeSection === 'api' && <ApiWebhookSettings />}
+                        {activeSection === 'team' && <TeamSettings />}
+                    </motion.div>
+                </AnimatePresence>
             </div>
         </div>
     );
