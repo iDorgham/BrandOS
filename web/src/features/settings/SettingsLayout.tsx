@@ -321,7 +321,7 @@ export const SettingsLayout: React.FC<SettingsLayoutProps> = () => {
             const saved = localStorage.getItem(LAYOUT_KEY);
             if (saved === 'sidebar' || saved === 'tabs') return saved;
         } catch { /* ignore */ }
-        return 'sidebar';
+        return 'tabs';
     });
 
     const handleLayoutChange = (mode: LayoutMode) => {
