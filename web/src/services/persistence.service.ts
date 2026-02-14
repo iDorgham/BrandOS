@@ -24,14 +24,14 @@ export const brandService = {
         query = query.is('workspace_id', null);
       }
 
-      console.log(`[BrandService] Fetching brands for orgId: ${orgId || 'Personal'}`);
+
       const { data, error } = await query;
       if (error) {
-        console.error('[BrandService] Query error:', error);
+
         throw error;
       }
 
-      console.log(`[BrandService] Found ${data?.length || 0} brands in DB`);
+
 
       // is_active may not exist in older schema
       let rows = data || [];
@@ -68,10 +68,10 @@ export const brandService = {
 
   // Create a new brand
   async createBrand(brand: Omit<BrandProfile, 'id'>, orgId?: string): Promise<BrandProfile> {
-    console.log('DEBUG: brandService.createBrand starting', { orgId, brandName: brand.name });
+
     const user = await getCurrentUser();
     if (!user) {
-      console.error('DEBUG: No user found in createBrand');
+
       throw new Error('User not authenticated');
     }
     const { data, error } = await supabase
@@ -95,15 +95,10 @@ export const brandService = {
       .single();
 
     if (error) {
-      console.error('DEBUG: [brandService.createBrand] Supabase insertion failed:', {
-        message: error.message,
-        code: error.code,
-        details: error.details,
-        hint: error.hint
-      });
+
       throw error;
     }
-    console.log('DEBUG: Supabase brand insertion success:', data);
+
 
     const newBrand = this.mapDbBrandToApp(data);
 
@@ -162,7 +157,7 @@ export const brandService = {
 
     // If update failed because row doesn't exist (406 Not Acceptable or PGRST116), create it
     if (error.code === 'PGRST116' || error.message?.includes('not found') || error.code === '406') {
-      console.log('Brand not found in database, creating new record...');
+
       const { data: insertData, error: insertError } = await supabase
         .from('brands')
         .insert({
@@ -742,17 +737,13 @@ export const organizationService = {
   // Get all workspaces the user belongs to
   async getWorkspaces(): Promise<Workspace[]> {
     try {
-      console.log('DEBUG: Fetching workspaces from Supabase...');
+
       const { data, error } = await supabase
         .from('workspaces')
         .select('*');
 
       if (error) {
-        console.error('DEBUG: [organizationService.getWorkspaces] Supabase error:', {
-          message: error.message,
-          code: error.code,
-          details: error.details
-        });
+
 
         // If table doesn't exist, log it and return empty for mock fallback
         if (error.code === 'PGRST116' || error.message?.includes('schema cache')) {
@@ -762,14 +753,11 @@ export const organizationService = {
         throw error;
       }
 
-      console.log('DEBUG: RAW Workspaces data:', data);
+
 
       return data.map(this.mapDbOrgToApp);
     } catch (err: any) {
-      console.error('DEBUG: [organizationService.getWorkspaces] Critical error:', {
-        message: err.message,
-        stack: err.stack
-      });
+
       return []; // Return empty to trigger mock fallback in AuthContext
     }
   },

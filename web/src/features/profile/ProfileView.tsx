@@ -24,12 +24,14 @@ import {
 } from 'lucide-react';
 import { Card, Button, Input } from '@/components/ui';
 import { useAuth } from '@/contexts/AuthContext';
+import { useData } from '@/contexts/DataContext';
 import { userService, organizationService } from '@/services/persistence.service';
 import { toast } from 'sonner';
 import { Workspace } from '@/types';
 
 export const ProfileView = React.memo(() => {
-    const { user, workspaces, setActiveWorkspace, activeWorkspace, refreshData, userRole } = useAuth();
+    const { user } = useAuth();
+    const { workspaces, setActiveWorkspace, activeWorkspace, refreshData, userRole } = useData();
     const isAdmin = userRole === 'admin';
     const [isEditing, setIsEditing] = useState(false);
     const [profileName, setProfileName] = useState('');

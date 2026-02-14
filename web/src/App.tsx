@@ -4,6 +4,7 @@ import { Box, Zap } from 'lucide-react';
 import { Sidebar, Header, SiteHeader, BottomNav } from './components/layout';
 import { AuthGuard } from './components/auth/Auth';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
+import { DataProvider, useData } from './contexts/DataContext';
 import { SettingsProvider, useSettings } from './contexts/SettingsContext';
 import { BrandProfile, GeneratedAsset } from './types';
 import { checkApiKeyStatus, openApiKeyDialog } from './services/gemini.service';
@@ -104,7 +105,16 @@ const ViewLoader = () => (
 
 const AppContent: React.FC = () => {
     const { theme } = useTheme();
-    const { user, loading, brands, assets, promptHistory, activeWorkspace } = useAuth();
+    const { user, loading: authLoading } = useAuth();
+    const {
+        brands,
+        assets,
+        promptHistory,
+        activeWorkspace,
+        loadInitialData,
+        clearData,
+        isDataInitialized
+    } = useData();
     const { visibleTabs } = useSettings();
     const [activeTab, setActiveTab] = useState('dashboard');
     const [headerActions, setHeaderActions] = useState<React.ReactNode>(null);
@@ -119,6 +129,17 @@ const AppContent: React.FC = () => {
     const [caseStudiesView, setCaseStudiesView] = useState(false);
     const [pricingView, setPricingView] = useState(false);
     const [isZenMode, setIsZenMode] = useState(false);
+
+    // Sync user state with DataContext
+    useEffect(() => {
+        if (user) {
+            loadInitialData(user);
+        } else {
+            clearData();
+        }
+    }, [user, loadInitialData, clearData]);
+
+    const loading = authLoading || (!!user && !isDataInitialized);
 
     // Reset header actions and Zen Mode when tab changes
     useEffect(() => {
@@ -483,12 +504,20 @@ const AppContent: React.FC = () => {
 const App: React.FC = () => {
     return (
         <AuthProvider>
-            <SettingsProvider>
-                <CookiesPolicyPopup />
-                <AppContent />
-            </SettingsProvider>
+            <DataProviderWrapper>
+                <SettingsProvider>
+                    <CookiesPolicyPopup />
+                    <AppContent />
+                </SettingsProvider>
+            </DataProviderWrapper>
         </AuthProvider>
     );
+};
+
+// Help pass user from AuthProvider to DataProvider
+const DataProviderWrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+    const { user } = useAuth();
+    return <DataProvider user={user}>{children}</DataProvider>;
 };
 
 export default App;

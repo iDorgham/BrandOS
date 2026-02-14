@@ -46,10 +46,7 @@ export const promptBatchService = {
       .select()
       .single();
 
-    if (error) {
-      console.error('Error saving batch:', error);
-      throw error;
-    }
+
 
     // Add analytics data
     await promptBatchService.recordBatchAnalytics(data.id);
@@ -65,10 +62,7 @@ export const promptBatchService = {
       .eq('user_id', (await supabase.auth.getUser()).user?.id)
       .order('created_at', { ascending: false });
 
-    if (error) {
-      console.error('Error fetching batches:', error);
-      return [];
-    }
+
 
     return data;
   },
@@ -82,7 +76,7 @@ export const promptBatchService = {
       .not('is', null);
 
     if (error) {
-      console.error('Error fetching analytics:', error);
+
       return {
         totalBatches: 0,
         totalVariations: 0,
@@ -138,7 +132,7 @@ export const promptBatchService = {
   },
 
   // Record variation selection analytics
-  async recordVariationSelection(batchId: string, variationIds: string[]): Promise<void> => {
+  async recordVariationSelection(batchId: string, variationIds: string[]): Promise<void> {
     await supabase
       .from('prompt_batch_analytics')
       .insert({
@@ -155,7 +149,7 @@ export const promptBatchService = {
   },
 
   // Record prompt generation analytics
-  async recordPromptGeneration(batchId: string, generationTime: number, success: boolean): Promise<void> => {
+  async recordPromptGeneration(batchId: string, generationTime: number, success: boolean): Promise<void> {
     await supabase
       .from('prompt_batch_analytics')
       .insert({
@@ -172,7 +166,7 @@ export const promptBatchService = {
   },
 
   // Update batch performance
-  async updateBatchPerformance(batchId: string, performance: PromptBatch['performance']): Promise<void> => {
+  async updateBatchPerformance(batchId: string, performance: PromptBatch['performance']): Promise<void> {
     await supabase
       .from('prompt_batches')
       .update({
@@ -182,7 +176,7 @@ export const promptBatchService = {
   },
 
   // Delete batch and related analytics
-  async deleteBatch(batchId: string): Promise<void> => {
+  async deleteBatch(batchId: string): Promise<void> {
     await supabase
       .from('prompt_batch_analytics')
       .delete()
@@ -192,8 +186,6 @@ export const promptBatchService = {
       .from('prompt_batches')
       .delete()
       .eq('id', batchId);
-
-    console.log('Batch deleted successfully:', batchId);
   }
 };
 

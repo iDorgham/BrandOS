@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { ViewHeader } from '@/components/layout/ViewHeader';
 import { useAuth } from '@/contexts/AuthContext';
+import { useData } from '@/contexts/DataContext';
 import { toast } from 'sonner';
 import { ArrowLeft, RefreshCw, Zap, ChevronRight, Wand2, Check, Layers, Play, Sparkles, Sliders, Monitor, Cpu, Instagram } from 'lucide-react';
 import { motion } from 'framer-motion';
@@ -11,6 +12,9 @@ import { ASSET_TYPES } from '@/constants';
 import { generateBrandAlignedPrompt, generateImage, auditCompliance } from '@/services/ai.service';
 import { generateId } from '@/utils';
 import AIPromptGenerator from './AIPromptGenerator';
+import { AssetTypeButton } from './components/AssetTypeButton';
+import { BatchItemCard } from './components/BatchItemCard';
+import { BatchItem } from './types';
 
 interface StudioViewProps {
     brand: BrandProfile;
@@ -20,12 +24,7 @@ interface StudioViewProps {
     initialContext?: { subject: string, feedback: string } | null;
 }
 
-interface BatchItem {
-    type: AssetType;
-    orchestratedPrompt: string;
-    status: 'pending' | 'orchestrating' | 'rendering' | 'auditing' | 'complete' | 'failed';
-    result?: GeneratedAsset;
-}
+// Types moved to ./types.ts
 
 interface IntensityMatrixProps {
     intensities: { energy: number; warmth: number; sophistication: number };
@@ -86,7 +85,7 @@ export const StudioView = React.memo<StudioViewProps>(({
     onUpdateHistory,
     initialContext
 }) => {
-    const { userRole } = useAuth();
+    const { userRole } = useData();
     const [selectedAssetTypes, setSelectedAssetTypes] = useState<AssetType[]>([]);
     const [promptSubject, setPromptSubject] = useState(initialContext?.subject || '');
     const [intensities, setIntensities] = useState({ energy: 50, warmth: 30, sophistication: 80 });
@@ -96,24 +95,30 @@ export const StudioView = React.memo<StudioViewProps>(({
     const [refinementFeedback, setRefinementFeedback] = useState(initialContext?.feedback || '');
     const [showAIGenerator, setShowAIGenerator] = useState(false);
 
-    const handleIntensityChange = (key: string, value: number) => {
+    const handleIntensityChange = useCallback((key: string, value: number) => {
         setIntensities(prev => ({ ...prev, [key]: value }));
-    };
+    }, []);
 
-    React.useEffect(() => {
+    useEffect(() => {
         if (initialContext?.subject) {
             setPromptSubject(initialContext.subject);
             setRefinementFeedback(initialContext.feedback);
         }
     }, [initialContext]);
 
-    const toggleAssetType = (type: AssetType) => {
+    const toggleAssetType = useCallback((type: AssetType) => {
         setSelectedAssetTypes(prev =>
             prev.find(t => t.id === type.id)
                 ? prev.filter(t => t.id !== type.id)
                 : [...prev, type]
         );
-    };
+    }, []);
+
+    const handlePromptChange = useCallback((idx: number, value: string) => {
+        setBatchItems(prev => prev.map((item, i) =>
+            i === idx ? { ...item, orchestratedPrompt: value } : item
+        ));
+    }, []);
 
     const handleStartOrchestration = async () => {
         if (!promptSubject || selectedAssetTypes.length === 0) return;
@@ -317,50 +322,14 @@ export const StudioView = React.memo<StudioViewProps>(({
                         </div>
 
                         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 w-full mb-24 max-w-7xl">
-                            {ASSET_TYPES.map(type => {
-                                const isSelected = selectedAssetTypes.find(t => t.id === type.id);
-                                return (
-                                    <button
-                                        key={type.id}
-                                        onClick={() => toggleAssetType(type)}
-                                        className={`group relative transition-all duration-300 flex flex-col items-center gap-4 md:gap-6 text-center p-6 md:p-8 rounded-none overflow-hidden h-48 md:h-64 justify-center ${isSelected
-                                            ? 'bg-primary/5 shadow-[inset_0_0_40px_rgba(var(--primary-rgb),0.1)]'
-                                            : 'bg-card/20 hover:bg-primary/[0.02]'
-                                            }`}
-                                    >
-                                        {/* HUD Corner Markers */}
-                                        <div className={`absolute top-0 left-0 w-3 h-3 border-l file:border-t border-primary/30 transition-all duration-300 ${isSelected ? 'w-full h-full border-primary/50' : 'group-hover:border-primary/80 group-hover:w-4 group-hover:h-4'}`} style={{ clipPath: isSelected ? 'none' : 'polygon(0 0, 0 100%, 1px 100%, 1px 1px, 100% 1px, 100% 0)' }} />
-                                        <div className={`absolute top-0 left-0 w-3 h-3 border-l border-t border-primary/30 transition-all duration-300 ${isSelected ? 'border-primary' : 'group-hover:border-primary'}`} />
-                                        <div className={`absolute top-0 right-0 w-3 h-3 border-r border-t border-primary/30 transition-all duration-300 ${isSelected ? 'border-primary' : 'group-hover:border-primary'}`} />
-                                        <div className={`absolute bottom-0 left-0 w-3 h-3 border-l border-b border-primary/30 transition-all duration-300 ${isSelected ? 'border-primary' : 'group-hover:border-primary'}`} />
-                                        <div className={`absolute bottom-0 right-0 w-3 h-3 border-r border-b border-primary/30 transition-all duration-300 ${isSelected ? 'border-primary' : 'group-hover:border-primary'}`} />
-
-                                        {/* Selection Scanline */}
-                                        {isSelected && (
-                                            <div className="absolute inset-x-0 top-0 h-[1px] bg-primary shadow-[0_0_10px_#00ff00] animate-[scan_2s_ease-in-out_infinite]" />
-                                        )}
-                                        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-primary/5 to-transparent translate-y-[-200%] group-hover:translate-y-[200%] transition-transform duration-1000" />
-
-                                        <div className={`w-16 h-16 flex items-center justify-center transition-all duration-500 relative ${isSelected ? 'scale-110' : 'group-hover:scale-110'}`}>
-                                            <div className={`absolute inset-0 border border-primary/20 rotate-45 transition-all duration-700 ${isSelected ? 'scale-100 opacity-100 rotate-90' : 'scale-75 opacity-0 group-hover:opacity-100 group-hover:scale-100'}`} />
-                                            <type.icon size={28} strokeWidth={1} className={`relative z-10 transition-colors ${isSelected ? 'text-primary' : 'text-muted-foreground group-hover:text-primary'}`} />
-                                        </div>
-
-                                        <div className="space-y-3 relative z-10">
-                                            <h4 className={`font-mono font-black text-[12px] tracking-[0.2em] uppercase transition-colors ${isSelected ? 'text-primary' : 'text-muted-foreground group-hover:text-foreground'}`}>
-                                                {type.label}
-                                            </h4>
-                                            <div className="flex items-center justify-center gap-2 opacity-60">
-                                                <span className="w-1 h-1 bg-primary/50 rounded-full" />
-                                                <p className="text-[9px] text-muted-foreground font-mono tracking-widest uppercase">
-                                                    {type.aspectRatio}
-                                                </p>
-                                                <span className="w-1 h-1 bg-primary/50 rounded-full" />
-                                            </div>
-                                        </div>
-                                    </button>
-                                );
-                            })}
+                            {ASSET_TYPES.map(type => (
+                                <AssetTypeButton
+                                    key={type.id}
+                                    type={type}
+                                    isSelected={!!selectedAssetTypes.find(t => t.id === type.id)}
+                                    onClick={() => toggleAssetType(type)}
+                                />
+                            ))}
                         </div>
 
                         {/* Static Action Bar */}
@@ -530,74 +499,12 @@ export const StudioView = React.memo<StudioViewProps>(({
 
                         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
                             {batchItems.map((item, idx) => (
-                                <Card key={idx} className={`p-5 border-border bg-card transition-all relative overflow-hidden group rounded-sm ${item.status === 'orchestrating' ? 'ring-1 ring-primary/50' : ''}`}>
-                                    {item.status === 'complete' && !item.result && (
-                                        <div className="absolute top-0 right-0 w-12 h-12 bg-primary/10 blur-2xl rounded-full -mr-6 -mt-6" />
-                                    )}
-                                    <div className="flex items-center justify-between mb-4 pb-3 border-b border-border/40">
-                                        <div className="flex items-center gap-3">
-                                            <div className="p-1.5 bg-primary/10 rounded-none text-primary border border-primary/20">
-                                                <item.type.icon size={12} />
-                                            </div>
-                                            <div>
-                                                <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-foreground">{item.type.label}</h4>
-                                                <p className="text-[9px] text-muted-foreground opacity-60 font-mono tracking-widest">PID: {generateId().slice(0, 4).toUpperCase()} // {item.type.aspectRatio}</p>
-                                            </div>
-                                        </div>
-
-                                        <div className="flex items-center gap-2 px-2 py-1 bg-background/50 rounded-full border border-border/50">
-                                            <div className={`w-1.5 h-1.5 rounded-full ${item.status === 'complete' ? 'bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]' :
-                                                item.status === 'failed' ? 'bg-destructive shadow-[0_0_8px_rgba(239,68,68,0.5)]' :
-                                                    item.status === 'pending' ? 'bg-muted-foreground' :
-                                                        'bg-amber-500 animate-pulse shadow-[0_0_8px_rgba(245,158,11,0.5)]'
-                                                }`} />
-                                            <span className="text-[9px] font-mono font-bold uppercase tracking-wider text-muted-foreground">
-                                                {item.status}
-                                            </span>
-                                        </div>
-                                    </div>
-
-                                    <div className="h-32 bg-black/40 border border-border/40 rounded-none p-4 overflow-hidden relative group-hover:bg-black/50 transition-colors font-mono text-[10px]">
-                                        {/* Scanline overlay */}
-                                        <div className="absolute inset-0 bg-[repeating-linear-gradient(0deg,transparent,transparent_1px,rgba(255,255,255,0.03)_2px)] pointer-events-none" />
-
-                                        {item.status === 'orchestrating' ? (
-                                            <div className="flex flex-col items-center justify-center h-full gap-4">
-                                                <div className="w-full max-w-[80%] space-y-2">
-                                                    <div className="flex justify-between text-[9px] text-muted-foreground uppercase tracking-widest">
-                                                        <span>Synthesizing</span>
-                                                        <span>42%</span>
-                                                    </div>
-                                                    <div className="h-0.5 w-full bg-muted/20 relative overflow-hidden">
-                                                        <div className="absolute inset-y-0 left-0 bg-primary w-1/2 animate-[shimmer_1s_infinite]" />
-                                                    </div>
-                                                </div>
-                                                <p className="text-[9px] text-primary/60 animate-pulse">Running Neural Handshake...</p>
-                                            </div>
-                                        ) : (
-                                            <Textarea
-                                                className="bg-transparent border-none p-0 focus-visible:ring-0 text-[10px] leading-relaxed h-full resize-none font-mono text-muted-foreground/80 hover:text-primary/90 transition-colors selection:bg-primary/20 placeholder:text-muted-foreground/20"
-                                                value={item.orchestratedPrompt}
-                                                onChange={(e) => {
-                                                    const newBatch = [...batchItems];
-                                                    newBatch[idx].orchestratedPrompt = e.target.value;
-                                                    setBatchItems(newBatch);
-                                                }}
-                                                placeholder="// AWAITING_INPUT_SIGNAL..."
-                                                rows={3}
-                                            />
-                                        )}
-                                    </div>
-
-                                    {item.result && (
-                                        <div className="mt-5 aspect-video rounded-sm overflow-hidden border border-border group/img relative shadow-sm">
-                                            <img src={item.result.url} className="w-full h-full object-cover group-hover/img:scale-105 transition-transform duration-700" />
-                                            <div className="absolute top-2 right-2 bg-background/80 backdrop-blur-md border border-border px-2 py-1 rounded-sm text-[9px] font-medium text-primary shadow-sm">
-                                                {item.result.complianceScore}% DNA MATCH
-                                            </div>
-                                        </div>
-                                    )}
-                                </Card>
+                                <BatchItemCard
+                                    key={idx}
+                                    item={item}
+                                    idx={idx}
+                                    onPromptChange={handlePromptChange}
+                                />
                             ))}
                         </div>
 

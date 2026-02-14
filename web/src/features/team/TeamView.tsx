@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { ViewHeader } from '@/components/layout/ViewHeader';
 import { useAuth } from '@/contexts/AuthContext';
+import { useData } from '@/contexts/DataContext';
 import { motion } from 'framer-motion';
 import { Card, Button, EmptyState } from '@/components/ui';
 import { Users, UserPlus, Mail, Shield, ShieldAlert, ShieldCheck, MoreVertical, Trash2 } from 'lucide-react';
@@ -9,7 +10,8 @@ import { WorkspaceMember, UserRole } from '@/types';
 import { toast } from 'sonner';
 
 export const TeamView = React.memo(() => {
-    const { activeWorkspace, user, userRole } = useAuth();
+    const { user } = useAuth();
+    const { activeWorkspace, userRole } = useData();
     const isAdmin = userRole === 'admin';
     const [members, setMembers] = useState<(WorkspaceMember & { profile: any })[]>([]);
     const [loading, setLoading] = useState(true);

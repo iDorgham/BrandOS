@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useRef, useEffect } from 'react';
+import React, { useState, useCallback, useRef, useEffect, useMemo } from 'react';
 import { toPng } from 'html-to-image';
 import {
   useViewport,
@@ -12,6 +12,7 @@ import { MoodBoardSettingsPanel } from './MoodBoardSettingsPanel';
 import { useMoodboards } from '@/hooks/useMoodboards';
 import { MoodBoardViewProps } from './types';
 import { useAuth } from '@/contexts/AuthContext';
+import { useData } from '@/contexts/DataContext';
 import {
   Zap,
   Share2,
@@ -54,7 +55,8 @@ const MoodBoardViewContent = React.memo<MoodBoardViewProps>(({
   isZenMode,
   onToggleZenMode
 }) => {
-  const { isAuthInitialized, activeWorkspace } = useAuth();
+  const { isAuthInitialized } = useAuth();
+  const { activeWorkspace, isDataInitialized } = useData();
   const { presences, updateCursor } = usePresence(`moodboard:${brand.id}`);
   const { getInstalledNodes } = useNodeManager();
   const { resolvedTheme } = useTheme();
@@ -165,6 +167,11 @@ const MoodBoardViewContent = React.memo<MoodBoardViewProps>(({
     start: { x: 0, y: 0 },
     current: { x: 0, y: 0 }
   });
+
+  // Performance: Memoize selection lookups
+  const selectedNodes = useMemo(() => nodes.filter(n => n.selected), [nodes]);
+  const selectedNodesCount = selectedNodes.length;
+  const singleSelectedNode = selectedNodes.length === 1 ? selectedNodes[0] : null;
 
   // File Upload Ref
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -321,7 +328,7 @@ const MoodBoardViewContent = React.memo<MoodBoardViewProps>(({
     });
   }, [onNodesChange, updateNodeData]);
 
-  if (!isAuthInitialized || !activeWorkspace) {
+  if (!isAuthInitialized || !isDataInitialized || !activeWorkspace) {
     return (
       <div className="flex items-center justify-center h-full w-full bg-muted/10 backdrop-blur-sm">
         <Loader2 className="animate-spin text-primary opacity-50" size={14} strokeWidth={2.5} />
@@ -357,7 +364,7 @@ const MoodBoardViewContent = React.memo<MoodBoardViewProps>(({
 
       <MoodBoardHeader
         flowName={selectedMoodboard?.name || 'Untitled Flow'}
-        onRenameFlow={(name) => updateMoodboard({ name })}
+        onRenameFlow={(name) => updateMoodboard({ name } as any)}
         onDuplicateFlow={() => {
           if (selectedMoodboard) {
             createMoodboard(`${selectedMoodboard.name} (Copy)`, selectedMoodboard.description);
@@ -368,8 +375,8 @@ const MoodBoardViewContent = React.memo<MoodBoardViewProps>(({
         }}
         onExportJSON={onExportJSON}
 
-        selectedNode={nodes.filter(n => n.selected).length === 1 ? nodes.find(n => n.selected) || null : null}
-        selectedNodesCount={nodes.filter(n => n.selected).length}
+        selectedNode={singleSelectedNode}
+        selectedNodesCount={selectedNodesCount}
         updateNodeData={updateNodeData}
         onDeleteNode={(ids) => onNodesDelete(ids.map(id => ({ id }) as any))}
         onDuplicateNode={(nodesToDup) => nodesToDup.forEach(n => duplicateNode(n))}
@@ -505,7 +512,10 @@ const MoodBoardViewContent = React.memo<MoodBoardViewProps>(({
         onGeneratePrompt={generateBrandPrompt}
         updateNodeData={updateNodeData}
         onDeleteNode={(id) => onNodesDelete([{ id } as any])}
-        onDuplicateNode={(id) => duplicateNode(nodes.filter(n => n.id === id))}
+        onDuplicateNode={(id) => {
+          const node = nodes.find(n => n.id === id);
+          if (node) duplicateNode(node);
+        }}
         onAddNode={(type) => {
           const center = screenToFlowPosition({ x: window.innerWidth / 2, y: window.innerHeight / 2 });
           addNodeWithTracking(type as any, center);

@@ -6,6 +6,8 @@ import { ASSET_TYPES } from '@/constants';
 import { generateBrandAlignedPrompt } from '@/services/ai.service';
 import { generateId } from '@/utils';
 import { toast } from 'sonner';
+import { VariationCard } from './components/VariationCard';
+import { Plus } from 'lucide-react';
 
 interface PromptVariation {
   id: string;
@@ -37,7 +39,7 @@ interface AIPromptGeneratorProps {
 const AIPromptGenerator: React.FC<AIPromptGeneratorProps> = ({ brand, onBatchGenerated }) => {
   const [isGenerating, setIsGenerating] = useState(false);
   const [currentSubject, setCurrentSubject] = useState('');
-  const [targetAssetType, setTargetAssetType] = useState<AssetType>('Stock Image');
+  const [targetAssetType, setTargetAssetType] = useState<string>(ASSET_TYPES[0].id);
   const [batchVariations, setBatchVariations] = useState<PromptVariation[]>([]);
   const [selectedVariations, setSelectedVariations] = useState<string[]>([]);
   const [generationProgress, setGenerationProgress] = useState(0);
@@ -74,7 +76,7 @@ const AIPromptGenerator: React.FC<AIPromptGeneratorProps> = ({ brand, onBatchGen
 
   const generateVariations = useCallback(async () => {
     if (!currentSubject.trim()) return;
-    
+
     setIsGenerating(true);
     setGenerationProgress(0);
     const variations: PromptVariation[] = [];
@@ -91,9 +93,9 @@ const AIPromptGenerator: React.FC<AIPromptGeneratorProps> = ({ brand, onBatchGen
         description: template.description
       };
       variations.push(variation);
-      
+
       setGenerationProgress((prev) => Math.min(prev + 20, 100));
-      
+
       // Small delay to show progress
       await new Promise(resolve => setTimeout(resolve, 100));
     }
@@ -101,7 +103,7 @@ const AIPromptGenerator: React.FC<AIPromptGeneratorProps> = ({ brand, onBatchGen
     setBatchVariations(variations);
     setIsGenerating(false);
     setGenerationProgress(100);
-    
+
     toast.success(`Generated ${variations.length} prompt variations`);
   }, [currentSubject, promptTemplates]);
 
@@ -144,7 +146,7 @@ const AIPromptGenerator: React.FC<AIPromptGeneratorProps> = ({ brand, onBatchGen
       const variation = batchVariations.find(v => v.id === variationId);
       if (variation) {
         setGenerationProgress((prev) => Math.min(prev + 100 / selectedVariations.length, 100));
-        
+
         try {
           const generatedPrompt = await generateBrandAlignedPrompt(
             variation.prompt,
@@ -163,7 +165,7 @@ const AIPromptGenerator: React.FC<AIPromptGeneratorProps> = ({ brand, onBatchGen
           };
 
           generatedBatch.variations.push(promptVariation);
-          
+
           // Small delay for UI feedback
           await new Promise(resolve => setTimeout(resolve, 200));
           setGenerationProgress(prev => Math.min(prev + 100 / selectedVariations.length, 100));
@@ -178,7 +180,7 @@ const AIPromptGenerator: React.FC<AIPromptGeneratorProps> = ({ brand, onBatchGen
     setSelectedVariations([]);
     setIsGenerating(false);
     setGenerationProgress(100);
-    
+
     onBatchGenerated(generatedBatch);
     toast.success(`Generated ${generatedBatch.variations.length} prompts successfully`);
   }, [selectedVariations, batchVariations, brand, targetAssetType, onBatchGenerated]);
@@ -206,7 +208,7 @@ const AIPromptGenerator: React.FC<AIPromptGeneratorProps> = ({ brand, onBatchGen
     toast.success('Batch saved successfully');
   }, [batchVariations]);
 
-  const getPerformanceMetrics = useCallback(() => {
+  const performanceMetrics = useMemo(() => {
     const totalBatches = batches.length;
     const totalVariations = batches.reduce((sum, batch) => sum + batch.variations.length, 0);
     const avgVariationsPerBatch = totalBatches > 0 ? totalVariations / totalBatches : 0;
@@ -233,7 +235,7 @@ const AIPromptGenerator: React.FC<AIPromptGeneratorProps> = ({ brand, onBatchGen
               {batches.length > 0 ? `${batches.length} batches` : 'No batches'}
             </div>
             <Button
-              variant="outline"
+              variant="ghost"
               size="sm"
               onClick={() => setAnalyticsView(!analyticsView)}
               className="gap-2"
@@ -256,26 +258,26 @@ const AIPromptGenerator: React.FC<AIPromptGeneratorProps> = ({ brand, onBatchGen
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                 <div className="p-4 bg-primary/10 rounded-lg border border-primary/20">
-                  <div className="text-2xl font-bold text-primary">{getPerformanceMetrics().totalBatches}</div>
+                  <div className="text-2xl font-bold text-primary">{performanceMetrics.totalBatches}</div>
                   <div className="text-sm text-muted-foreground">Total Batches</div>
                 </div>
                 <div className="p-4 bg-blue-500/10 rounded-lg border border-blue-500/20">
-                  <div className="text-2xl font-bold text-blue-500">{getPerformanceMetrics().totalVariations}</div>
+                  <div className="text-2xl font-bold text-blue-500">{performanceMetrics.totalVariations}</div>
                   <div className="text-sm text-muted-foreground">Total Variations</div>
                 </div>
                 <div className="p-4 bg-green-500/10 rounded-lg border border-green-500/20">
-                  <div className="text-2xl font-bold text-green-600">{getPerformanceMetrics().avgVariationsPerBatch.toFixed(1)}</div>
+                  <div className="text-2xl font-bold text-green-600">{performanceMetrics.avgVariationsPerBatch.toFixed(1)}</div>
                   <div className="text-sm text-muted-foreground">Avg Variations/Batch</div>
                 </div>
                 <div className="p-4 bg-orange-500/10 rounded-lg border border-orange-500/20">
-                  <div className="text-2xl font-bold text-orange-600">{getPerformanceMetrics().efficiencyImprovement}%</div>
+                  <div className="text-2xl font-bold text-orange-600">{performanceMetrics.efficiencyImprovement}%</div>
                   <div className="text-sm text-muted-foreground">Efficiency Improvement</div>
                 </div>
               </div>
-              </div>
+
               <div className="mt-6 p-4 bg-accent/30 rounded-lg border border-border">
                 <h4 className="font-bold mb-2">Weekly Productivity</h4>
-                <div className="text-2xl font-bold text-primary">{getPerformanceMetrics().weeklyProductivity.toFixed(1)}</div>
+                <div className="text-2xl font-bold text-primary">{performanceMetrics.weeklyProductivity.toFixed(1)}</div>
                 <div className="text-sm text-muted-foreground">Batches/Week</div>
               </div>
             </Card>
@@ -320,13 +322,13 @@ const AIPromptGenerator: React.FC<AIPromptGeneratorProps> = ({ brand, onBatchGen
                   onChange={(e) => setCurrentSubject(e.target.value)}
                   className="w-full text-base h-12"
                 />
-                
+
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
                   <div>
                     <label className="block text-sm font-medium text-muted-foreground mb-2">Target Asset Type</label>
                     <select
                       value={targetAssetType}
-                      onChange={(e) => setTargetAssetType(e.target.value as AssetType)}
+                      onChange={(e) => setTargetAssetType(e.target.value)}
                       className="w-full p-3 border border-border rounded-lg bg-background"
                     >
                       {ASSET_TYPES.map(type => (
@@ -334,7 +336,7 @@ const AIPromptGenerator: React.FC<AIPromptGeneratorProps> = ({ brand, onBatchGen
                       ))}
                     </select>
                   </div>
-                  
+
                   <Button
                     onClick={generateVariations}
                     disabled={!currentSubject.trim() || isGenerating}
@@ -364,7 +366,7 @@ const AIPromptGenerator: React.FC<AIPromptGeneratorProps> = ({ brand, onBatchGen
                   <h3 className="text-lg font-bold">Generated Variations</h3>
                   <div className="flex items-center gap-3">
                     <Button
-                      variant="outline"
+                      variant="tertiary"
                       size="sm"
                       onClick={addCustomVariation}
                       className="gap-2"
@@ -373,85 +375,42 @@ const AIPromptGenerator: React.FC<AIPromptGeneratorProps> = ({ brand, onBatchGen
                       Add Custom
                     </Button>
                     <Button
-                      variant="outline"
+                      variant="tertiary"
                       size="sm"
                       onClick={() => toggleVariationSelection(
-                        batchVariations.map(v => v.id).find(v => !selectedVariations.includes(v.id))?.id || ''
+                        batchVariations.map(v => v.id).find(v => !selectedVariations.includes(v)) || ''
                       )}
                       className="gap-2"
                     >
-                        {selectedVariations.length === batchVariations.length ? (
-                          <>
-                            <Check size={16} />
-                            Deselect All
-                          </>
-                        ) : (
-                          <>
-                            <Check size={16} />
-                            Select All
-                          </>
-                        )}
-                      </Button>
+                      {selectedVariations.length === batchVariations.length ? (
+                        <>
+                          <Check size={16} />
+                          Deselect All
+                        </>
+                      ) : (
+                        <>
+                          <Plus size={16} />
+                          Select All
+                        </>
+                      )}
+                    </Button>
                   </div>
                 </div>
 
                 <div className="space-y-4">
                   {batchVariations.map(variation => (
-                    <div
+                    <VariationCard
                       key={variation.id}
-                      className={`p-4 border-2 rounded-lg cursor-pointer transition-all ${
-                        selectedVariations.includes(variation.id)
-                          ? 'border-primary bg-primary/10'
-                          : 'border-border hover:border-primary/30 bg-card'
-                      }`}
-                      onClick={() => toggleVariationSelection(variation.id)}
-                    >
-                      <div className="flex items-start justify-between gap-3">
-                        <div className="flex-1">
-                          <div className="flex items-center gap-2 mb-3">
-                            <div className={`w-8 h-8 rounded-full flex items-center justify-center text-white font-bold text-xs ${
-                              variation.energy >= 70 ? 'bg-red-500' :
-                              variation.energy >= 50 ? 'bg-orange-500' :
-                              variation.energy >= 30 ? 'bg-yellow-500' :
-                              'bg-green-500'
-                            }`}>
-                              {variation.energy}%
-                            </div>
-                            <div className="flex-1 space-y-1">
-                              <div className="font-medium">{variation.label}</div>
-                              <div className="text-sm text-muted-foreground">{variation.description}</div>
-                            </div>
-                          </div>
-                          <div className="flex items-center gap-2">
-                            <div className={`w-8 h-8 rounded-full flex items-center justify-center text-white font-bold text-xs ${
-                              variation.warmth >= 70 ? 'bg-red-500' :
-                              variation.warmth >= 50 ? 'bg-orange-500' :
-                              variation.warmth >= 30 ? 'bg-yellow-500' :
-                              'bg-blue-500'
-                            }`}>
-                              {variation.warmth}%
-                            </div>
-                            <div className={`w-8 h-8 rounded-full flex items-center justify-center text-white font-bold text-xs ${
-                              variation.sophistication >= 80 ? 'bg-purple-500' :
-                              variation.sophistication >= 60 ? 'bg-blue-500' :
-                              variation.sophistication >= 40 ? 'bg-green-500' :
-                              'bg-gray-500'
-                            }`}>
-                              {variation.sophistication}%
-                            </div>
-                          </div>
-                          {selectedVariations.includes(variation.id) && (
-                            <Check size={16} className="text-primary" />
-                          )}
-                        </div>
-                      </div>
-                    </div>
+                      variation={variation}
+                      isSelected={selectedVariations.includes(variation.id)}
+                      onClick={toggleVariationSelection}
+                    />
                   ))}
                 </div>
 
                 <div className="flex gap-3 mt-6">
                   <Button
-                    variant="default"
+                    variant="primary"
                     size="lg"
                     onClick={generateSelectedPrompts}
                     disabled={selectedVariations.length === 0 || isGenerating}
@@ -461,7 +420,7 @@ const AIPromptGenerator: React.FC<AIPromptGeneratorProps> = ({ brand, onBatchGen
                     Generate Selected Prompts ({selectedVariations.length})
                   </Button>
                   <Button
-                    variant="outline"
+                    variant="tertiary"
                     size="lg"
                     onClick={saveBatch}
                     disabled={batchVariations.length === 0 || isGenerating}
@@ -476,7 +435,8 @@ const AIPromptGenerator: React.FC<AIPromptGeneratorProps> = ({ brand, onBatchGen
           </div>
         )}
       </div>
-    );
+    </div>
+  );
 };
 
 export default AIPromptGenerator;
