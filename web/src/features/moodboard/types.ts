@@ -7,7 +7,10 @@ export interface MoodNodeData extends Record<string, unknown> {
     fontSize?: number;
     fontFamily?: string;
     fontWeight?: string;
-    textAlign?: 'left' | 'center' | 'right';
+    fontStyle?: string;
+    textDecoration?: string;
+    textTransform?: string;
+    textAlign?: 'left' | 'center' | 'right' | 'justify';
     gridCols?: number;
     gap?: number;
     toneValue?: number; // 0-100
@@ -38,6 +41,17 @@ export interface MoodNodeData extends Record<string, unknown> {
 
     onChange?: (id: string, newData: Partial<MoodNodeData>, newStyle?: CSSProperties) => void;
 
+    // Execution status
+    executionStatus?: 'idle' | 'pending' | 'running' | 'success' | 'error';
+    executionOutput?: any;
+    executionError?: string;
+
+    // Node settings (per-node-type configuration for execution)
+    nodeSettings?: Record<string, unknown>;
+
+    // Group membership
+    groupId?: string;
+
     // Generative Engine Types (ComfyUI Bridge)
     model?: string; // Model Loader Output
     vae?: string;   // VAE Loader Output
@@ -51,6 +65,25 @@ export interface MoodNodeData extends Record<string, unknown> {
     samplerName?: string; // KSampler Scheduler
     scheduler?: string; // KSampler Scheduler Type
     denoise?: number; // KSampler Denoise
+}
+
+export interface NodeGroup {
+    id: string;
+    name: string;
+    description?: string;
+    color: string;
+    nodeIds: string[];
+    isCollapsed: boolean;
+    position?: { x: number; y: number };
+    size?: { width: number; height: number };
+}
+
+export interface NodeBrowserState {
+    viewMode: 'list' | 'grid' | 'compact';
+    favorites: string[];
+    recentlyUsed: string[];
+    searchQuery: string;
+    sortBy: 'name' | 'category' | 'recent';
 }
 
 import { BrandProfile } from '@/types';

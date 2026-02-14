@@ -2,7 +2,7 @@ import React from 'react';
 import { NodeResizer } from '@xyflow/react';
 import { Layout, FileText, Calendar, PenTool, Layers, Megaphone, Type } from 'lucide-react';
 import { MoodNodeData } from '../types';
-import { NodeContainer, NodeHandles } from '../components/NodeComponents';
+import { NodeContainer, TypedHandles } from '../components/NodeComponents';
 
 export const ContentNode = ({ id, data, selected }: { id: string; data: MoodNodeData; selected: boolean }) => {
     return (
@@ -11,7 +11,7 @@ export const ContentNode = ({ id, data, selected }: { id: string; data: MoodNode
             title="Content Architect"
             icon={Layout}
             typeColor="bg-rose-500"
-            handles={<NodeHandles nodeColor="bg-rose-500" />}
+            handles={<TypedHandles nodeType="content" />}
             data={{ ...data, id, type: 'content' }}
             id={id}
             resizer={

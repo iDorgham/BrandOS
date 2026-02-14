@@ -2,7 +2,7 @@ import React from 'react';
 import { NodeResizer } from '@xyflow/react';
 import { Shapes, Zap, Sparkles, Activity, ShieldCheck, Target, Heart } from 'lucide-react';
 import { MoodNodeData } from '../types';
-import { NodeContainer, NodeHandles } from '../components/NodeComponents';
+import { NodeContainer, TypedHandles } from '../components/NodeComponents';
 
 export const IconsNode = ({ id, data, selected }: { id: string; data: MoodNodeData; selected: boolean }) => (
     <NodeContainer
@@ -10,7 +10,7 @@ export const IconsNode = ({ id, data, selected }: { id: string; data: MoodNodeDa
         title="Symbols"
         icon={Shapes}
         typeColor="bg-blue-600"
-        handles={<NodeHandles nodeColor="bg-blue-600" />}
+        handles={<TypedHandles nodeType="icons" />}
         data={{ ...data, id, type: 'icons' }}
         id={id}
         resizer={

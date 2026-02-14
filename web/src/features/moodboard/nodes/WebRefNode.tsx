@@ -2,7 +2,7 @@ import React from 'react';
 import { NodeResizer } from '@xyflow/react';
 import { Globe } from 'lucide-react';
 import { MoodNodeData } from '../types';
-import { NodeContainer, NodeHandles } from '../components/NodeComponents';
+import { NodeContainer, TypedHandles } from '../components/NodeComponents';
 
 export const WebRefNode = ({ id, data, selected }: { id: string; data: MoodNodeData; selected: boolean }) => (
     <NodeContainer
@@ -10,7 +10,7 @@ export const WebRefNode = ({ id, data, selected }: { id: string; data: MoodNodeD
         title="Web_Portal"
         icon={Globe}
         typeColor="bg-indigo-500"
-        handles={<NodeHandles nodeColor="bg-indigo-500" />}
+        handles={<TypedHandles nodeType="web_ref" />}
         data={{ ...data, id, type: 'web_ref' }}
         id={id}
         resizer={

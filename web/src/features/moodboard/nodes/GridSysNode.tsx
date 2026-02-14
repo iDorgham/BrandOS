@@ -2,7 +2,7 @@ import React from 'react';
 import { NodeResizer } from '@xyflow/react';
 import { Grid3X3 } from 'lucide-react';
 import { MoodNodeData } from '../types';
-import { NodeContainer, NodeHandles } from '../components/NodeComponents';
+import { NodeContainer, TypedHandles } from '../components/NodeComponents';
 
 export const GridSysNode = ({ id, data, selected }: { id: string; data: MoodNodeData; selected: boolean }) => (
     <NodeContainer
@@ -10,7 +10,7 @@ export const GridSysNode = ({ id, data, selected }: { id: string; data: MoodNode
         title="Grid_Array"
         icon={Grid3X3}
         typeColor="bg-blue-600"
-        handles={<NodeHandles nodeColor="bg-blue-600" />}
+        handles={<TypedHandles nodeType="grid" />}
         data={{ ...data, id, type: 'grid' }}
         id={id}
         resizer={

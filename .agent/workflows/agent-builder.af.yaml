@@ -1,0 +1,142 @@
+version: "1.0.0"
+name: "agent-builder"
+description: "Create new AI agent with full configuration"
+metadata:
+  author: "ai-automation-engineer"
+  created: "2026-02-14"
+  tags: ["ai", "agent", "creation"]
+  estimatedDuration: 25
+
+context:
+  agentName: ""
+  domain: ""
+  description: ""
+  capabilities: []
+  variables:
+    agentConfig: []
+
+paths:
+  ai: "./agents/"
+  skills: "./skills/"
+
+steps:
+  - id: "define-agent-role"
+    name: "Define Agent Role and Purpose"
+    agent: "product-planner"
+    parameters:
+      agentName: "{{context.agentName}}"
+      domain: "{{context.domain}}"
+      description: "{{context.description}}"
+    gate: "auto"
+    onSuccess:
+      - setVariable: "role": "{{result}}"
+
+  - id: "define-capabilities"
+    name: "Define Agent Capabilities"
+    agent: "ai-automation-engineer"
+    parameters:
+      domain: "{{context.domain}}"
+      baseCapabilities: "{{context.capabilities}}"
+    gate: "auto"
+    onSuccess:
+      - setVariable: "capabilities": "{{result}}"
+
+  - id: "identify-required-skills"
+    name: "Identify Required Skills"
+    agent: "ai-automation-engineer"
+    parameters:
+      capabilities: "{{variables.capabilities}}"
+    gate: "auto"
+    onSuccess:
+      - setVariable: "requiredSkills": "{{result}}"
+
+  - id: "find-existing-skills"
+    name: "Find Existing Skills to Reuse"
+    agent: "prompt-engineer"
+    parameters:
+      requiredSkills: "{{variables.requiredSkills}}"
+    gate: "auto"
+    onSuccess:
+      - setVariable: "existingSkills": "{{result.matched}}"
+      - setVariable: "newSkills": "{{result.new}}"
+
+  - id: "create-new-skills"
+    name: "Create New Skills"
+    agent: "prompt-engineer"
+    skill: "build-ai-agent"
+    parameters:
+      skills: "{{variables.newSkills}}"
+    gate: "auto"
+    onSuccess:
+      - setVariable: "createdSkills": "{{result}}"
+
+  - id: "write-agent-prompt"
+    name: "Write Agent System Prompt"
+    agent: "prompt-engineer"
+    skill: "write-prompt"
+    parameters:
+      type: "agent-system"
+      role: "{{variables.role}}"
+      capabilities: "{{variables.capabilities}}"
+      skills: "{{variables.requiredSkills}}"
+    gate: "auto"
+    onSuccess:
+      - setVariable: "systemPrompt": "{{result}}"
+
+  - id: "define-rules"
+    name: "Define Agent Rules"
+    agent: "ai-automation-engineer"
+    parameters:
+      domain: "{{context.domain}}"
+      role: "{{variables.role}}"
+    gate: "auto"
+    onSuccess:
+      - setVariable: "rules": "{{result}}"
+
+  - id: "create-agent-config"
+    name: "Create Agent Configuration"
+    agent: "ai-automation-engineer"
+    skill: "build-ai-agent"
+    parameters:
+      name: "{{context.agentName}}"
+      domain: "{{context.domain}}"
+      description: "{{context.description}}"
+      systemPrompt: "{{variables.systemPrompt}}"
+      capabilities: "{{variables.capabilities}}"
+      rules: "{{variables.rules}}"
+      skills:
+        existing: "{{variables.existingSkills}}"
+        new: "{{variables.createdSkills}}"
+    gate: "auto"
+    onSuccess:
+      - setVariable: "agentConfig": "{{result}}"
+
+  - id: "write-agent-json"
+    name: "Write Agent JSON File"
+    agent: "ai-automation-engineer"
+    parameters:
+      config: "{{variables.agentConfig}}"
+      path: "./agents/{{context.domain}}/{{context.agentName}}.json"
+    gate: "auto"
+
+  - id: "register-agent"
+    name: "Register Agent in Workspace"
+    agent: "ai-automation-engineer"
+    parameters:
+      agent: "{{variables.agentConfig}}"
+      workspace: "./workspace.json"
+    gate: "auto"
+
+  - id: "test-agent"
+    name: "Test Agent"
+    agent: "qa-engineer"
+    parameters:
+      agentName: "{{context.agentName}}"
+      testCases: 5
+    gate: "auto"
+
+output:
+  summary: "New agent '{{context.agentName}}' created in {{context.domain}} domain"
+  artifacts:
+    - name: "Agent Config"
+      path: "./agents/{{context.domain}}/{{context.agentName}}.json"

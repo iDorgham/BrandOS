@@ -2,7 +2,7 @@ import React from 'react';
 import { NodeResizer } from '@xyflow/react';
 import { CloudRain } from 'lucide-react';
 import { MoodNodeData } from '../types';
-import { NodeContainer, NodeHandles } from '../components/NodeComponents';
+import { NodeContainer, TypedHandles } from '../components/NodeComponents';
 
 export const WeatherNode = ({ id, data, selected }: { id: string; data: MoodNodeData; selected: boolean }) => (
     <NodeContainer
@@ -10,7 +10,7 @@ export const WeatherNode = ({ id, data, selected }: { id: string; data: MoodNode
         title="Atmosphere"
         icon={CloudRain}
         typeColor="bg-cyan-500"
-        handles={<NodeHandles nodeColor="bg-cyan-500" />}
+        handles={<TypedHandles nodeType="weather" />}
         data={{ ...data, id, type: 'weather' }}
         id={id}
         resizer={

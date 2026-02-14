@@ -2,7 +2,7 @@ import React, { memo } from 'react';
 import { Handle, Position, NodeResizer } from '@xyflow/react';
 import { MoodNodeData } from '../types';
 import { Activity } from 'lucide-react';
-import { NodeContainer } from '../components/NodeComponents';
+import { NodeContainer, TypedHandles } from '../components/NodeComponents';
 
 export const KSamplerNode = memo(({ id, data, selected, isConnectable }: { id: string; data: MoodNodeData; isConnectable?: boolean; selected: boolean }) => {
     return (
@@ -22,27 +22,7 @@ export const KSamplerNode = memo(({ id, data, selected, isConnectable }: { id: s
                     handleClassName="!w-3 !h-3 !bg-purple-600 !border-background !rounded-full shadow-sm hover:scale-150 transition-transform"
                 />
             }
-            handles={
-                <>
-                    {/* Left inputs (targets) - color-coded */}
-                    <Handle type="target" position={Position.Left} id="model" isConnectable={isConnectable}
-                        className="!w-3 !h-3 !-left-[7px] !bg-blue-500 !border-2 !border-background transition-all hover:scale-150 z-50 shadow-md rounded-full"
-                        style={{ top: '28%' }} />
-                    <Handle type="target" position={Position.Left} id="positive" isConnectable={isConnectable}
-                        className="!w-3 !h-3 !-left-[7px] !bg-green-500 !border-2 !border-background transition-all hover:scale-150 z-50 shadow-md rounded-full"
-                        style={{ top: '40%' }} />
-                    <Handle type="target" position={Position.Left} id="negative" isConnectable={isConnectable}
-                        className="!w-3 !h-3 !-left-[7px] !bg-red-500 !border-2 !border-background transition-all hover:scale-150 z-50 shadow-md rounded-full"
-                        style={{ top: '52%' }} />
-                    <Handle type="target" position={Position.Left} id="latent_image" isConnectable={isConnectable}
-                        className="!w-3 !h-3 !-left-[7px] !bg-pink-500 !border-2 !border-background transition-all hover:scale-150 z-50 shadow-md rounded-full"
-                        style={{ top: '64%' }} />
-                    {/* Right output (source) */}
-                    <Handle type="source" position={Position.Right} id="latent_output" isConnectable={isConnectable}
-                        className="!w-3 !h-3 !-right-[7px] !bg-pink-500 !border-2 !border-background transition-all hover:scale-150 z-50 shadow-md rounded-full"
-                        style={{ top: '50%' }} />
-                </>
-            }
+            handles={<TypedHandles nodeType="ksampler" />}
         >
             <div className="flex flex-col p-4 h-full gap-4">
                 {/* Input Labels */}

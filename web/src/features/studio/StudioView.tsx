@@ -250,7 +250,7 @@ export const StudioView = React.memo<StudioViewProps>(({
                 }
             />
 
-            <div className="w-full px-8 py-12 space-y-12 pb-24">
+            <div className="w-full px-4 md:px-8 py-8 md:py-12 space-y-12 pb-24">
                 {initialContext && (
                     <div className="sticky top-0 z-50 -mt-6 -mx-6 px-6 py-2 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b border-border flex items-center justify-between animate-in slide-in-from-top duration-500">
                         <div className="flex items-center gap-3">
@@ -323,7 +323,7 @@ export const StudioView = React.memo<StudioViewProps>(({
                                     <button
                                         key={type.id}
                                         onClick={() => toggleAssetType(type)}
-                                        className={`group relative transition-all duration-300 flex flex-col items-center gap-6 text-center p-8 rounded-none overflow-hidden h-64 justify-center ${isSelected
+                                        className={`group relative transition-all duration-300 flex flex-col items-center gap-4 md:gap-6 text-center p-6 md:p-8 rounded-none overflow-hidden h-48 md:h-64 justify-center ${isSelected
                                             ? 'bg-primary/5 shadow-[inset_0_0_40px_rgba(var(--primary-rgb),0.1)]'
                                             : 'bg-card/20 hover:bg-primary/[0.02]'
                                             }`}
@@ -430,7 +430,7 @@ export const StudioView = React.memo<StudioViewProps>(({
                                     </div>
                                 </div>
 
-                                <Card className="p-10 bg-card/40 border-border/60 space-y-10 rounded-none backdrop-blur-sm shadow-2xl">
+                                <Card className="p-6 md:p-10 bg-card/40 border-border/60 space-y-8 md:space-y-10 rounded-none backdrop-blur-sm shadow-2xl">
                                     <div className="space-y-3">
                                         <div className="flex items-center gap-4 mb-2">
                                             <div className="w-1.5 h-1.5 bg-primary rounded-none shadow-[0_0_8px_rgba(var(--primary-rgb),0.5)]" />
@@ -463,7 +463,7 @@ export const StudioView = React.memo<StudioViewProps>(({
 
                             {/* Right: Parameters & Action (5 cols) */}
                             <div className="lg:col-span-12 xl:col-span-5 space-y-6">
-                                <Card className="p-10 bg-card/40 border-border/60 space-y-10 rounded-none backdrop-blur-sm shadow-2xl">
+                                <Card className="p-6 md:p-10 bg-card/40 border-border/60 space-y-8 md:space-y-10 rounded-none backdrop-blur-sm shadow-2xl">
                                     <div className="flex items-center gap-4 text-foreground mb-4">
                                         <div className="p-2 bg-primary/10 border border-primary/20 text-primary">
                                             <Sliders size={18} />

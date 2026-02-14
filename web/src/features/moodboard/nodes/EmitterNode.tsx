@@ -2,7 +2,7 @@ import React from 'react';
 import { NodeResizer } from '@xyflow/react';
 import { Send, Mail, SendHorizontal, HardDrive, Share2, Globe } from 'lucide-react';
 import { MoodNodeData } from '../types';
-import { NodeContainer, NodeHandles } from '../components/NodeComponents';
+import { NodeContainer, TypedHandles } from '../components/NodeComponents';
 
 export const EmitterNode = ({ id, data, selected }: { id: string; data: MoodNodeData; selected: boolean }) => {
     return (
@@ -11,7 +11,7 @@ export const EmitterNode = ({ id, data, selected }: { id: string; data: MoodNode
             title="Signal Out"
             icon={Send}
             typeColor="bg-indigo-500"
-            handles={<NodeHandles nodeColor="bg-indigo-500" />}
+            handles={<TypedHandles nodeType="emitter" />}
             data={{ ...data, id, type: 'emitter' }}
             id={id}
             resizer={

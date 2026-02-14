@@ -2,8 +2,8 @@ import { WorkflowTemplate } from './types';
 
 export const product_launch_kit: WorkflowTemplate = {
     id: 'product_launch',
-    label: 'Product_Launch_Kit',
-    description: 'Unified campaign trigger -> Email -> Social -> PR -> Art.',
+    label: 'GTM Synergy Blitz',
+    description: 'Integrated launch sequence covering PR, Email, and Social for maximum impact.',
     category: 'Growth & Ads',
     nodes: [
         { id: 't1', type: 'trigger', position: { x: 100, y: 500 }, data: { label: 'Launch_T_Minus_0', type: 'trigger' } },

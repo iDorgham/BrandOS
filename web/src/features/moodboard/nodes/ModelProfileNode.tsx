@@ -2,7 +2,7 @@ import React from 'react';
 import { NodeResizer } from '@xyflow/react';
 import { User, Palette, Sparkles, Wand2, Layers } from 'lucide-react';
 import { MoodNodeData } from '../types';
-import { NodeContainer, NodeHandles } from '../components/NodeComponents';
+import { NodeContainer, TypedHandles } from '../components/NodeComponents';
 
 export const ModelProfileNode = ({ id, data, selected }: { id: string; data: MoodNodeData; selected: boolean }) => {
     return (
@@ -11,7 +11,7 @@ export const ModelProfileNode = ({ id, data, selected }: { id: string; data: Moo
             title="Model Profile"
             icon={User}
             typeColor="bg-fuchsia-500"
-            handles={<NodeHandles nodeColor="bg-fuchsia-500" />}
+            handles={<TypedHandles nodeType="model_profile" />}
             data={{ ...data, id, type: 'model_profile' }}
             id={id}
             resizer={

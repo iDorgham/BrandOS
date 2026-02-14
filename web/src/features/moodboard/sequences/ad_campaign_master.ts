@@ -2,8 +2,8 @@ import { WorkflowTemplate } from './types';
 
 export const ad_campaign_master: WorkflowTemplate = {
     id: 'ad_campaign_master',
-    label: 'Ad_Campaign_Master',
-    description: 'Advanced Research -> Multi-Ad Sets -> Global Platform Emitters.',
+    label: 'Omnichannel Ad Strategist',
+    description: 'End-to-end ad campaign orchestration across Meta, Google, and LinkedIn.',
     category: 'Growth & Ads',
     nodes: [
         { id: 't1', type: 'trigger', position: { x: 0, y: 300 }, data: { label: 'Campaign_Trigger', type: 'trigger' } },

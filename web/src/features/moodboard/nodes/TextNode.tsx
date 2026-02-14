@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { NodeResizer } from '@xyflow/react';
 import { Type } from 'lucide-react';
 import { MoodNodeData } from '../types';
-import { NodeContainer, NodeHandles } from '../components/NodeComponents';
+import { NodeContainer, TypedHandles } from '../components/NodeComponents';
 import { useMoodBoard } from '../MoodBoardContext';
 
 export const TextNode = React.memo(({ id, data, selected }: { id: string; data: MoodNodeData; selected: boolean }) => {
@@ -19,7 +19,7 @@ export const TextNode = React.memo(({ id, data, selected }: { id: string; data: 
             typeColor="bg-blue-600"
             onEdit={() => setIsEditing(!isEditing)}
             isEditing={isEditing}
-            handles={<NodeHandles nodeColor="bg-blue-600" />}
+            handles={<TypedHandles nodeType="text" />}
             data={{ ...data, id, type: 'text' }}
             id={id}
             resizer={

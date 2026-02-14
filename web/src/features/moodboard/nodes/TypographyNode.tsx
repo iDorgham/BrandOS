@@ -2,7 +2,7 @@ import React from 'react';
 import { NodeResizer } from '@xyflow/react';
 import { CaseUpper } from 'lucide-react';
 import { MoodNodeData } from '../types';
-import { NodeContainer, NodeHandles } from '../components/NodeComponents';
+import { NodeContainer, TypedHandles } from '../components/NodeComponents';
 
 export const TypographyNode = ({ id, data, selected }: { id: string; data: MoodNodeData; selected: boolean }) => {
     const families = ['IBM Plex Sans', 'IBM Plex Mono', 'Inter', 'Roboto', 'Playfair Display', 'Space Grotesk'];
@@ -14,7 +14,7 @@ export const TypographyNode = ({ id, data, selected }: { id: string; data: MoodN
             title="Specimen"
             icon={CaseUpper}
             typeColor="bg-blue-600"
-            handles={<NodeHandles nodeColor="bg-blue-600" />}
+            handles={<TypedHandles nodeType="typography" />}
             data={{ ...data, id, type: 'typography' }}
             id={id}
             resizer={

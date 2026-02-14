@@ -2,8 +2,8 @@ import { WorkflowTemplate } from './types';
 
 export const lead_gen_orchestrator: WorkflowTemplate = {
     id: 'lead_gen',
-    label: 'Lead_Gen_Orch',
-    description: 'Lead Magnet -> Landing Page -> 5-Day Email Seq -> CRM Sync.',
+    label: 'Conversion Flow Architect',
+    description: 'Strategic lead capture and automated nurturing workflows for high-intent prospects.',
     category: 'Automations',
     nodes: [
         { id: 't1', type: 'trigger', position: { x: 0, y: 0 }, data: { label: 'Offer_Ideation', type: 'trigger' } },

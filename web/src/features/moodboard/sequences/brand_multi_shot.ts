@@ -2,8 +2,8 @@ import { WorkflowTemplate } from './types';
 
 export const brand_multi_shot: WorkflowTemplate = {
     id: 'brand_multi_shot',
-    label: 'Brand_Multi_Shot',
-    description: 'Complex branching for multi-model creative testing.',
+    label: 'Brand Aesthetics Multi-Shot',
+    description: 'Rapid generation of multi-variant branded visuals for diverse marketing assets.',
     category: 'Brand Architecture',
     nodes: [
         { id: 't2', type: 'trigger', position: { x: 100, y: 300 }, data: { label: 'Cron', type: 'trigger' } },

@@ -1,358 +1,463 @@
+import React, { useState, useRef, useEffect, useCallback } from 'react';
+import { Node, useViewport } from '@xyflow/react';
+import { MoodNodeData } from './types';
 import {
-    ChevronLeft, Undo2, Redo2, Save, Loader2, MousePointer2 as Pointer, Hand, ALargeSmall as TextIcon, Focus, Grid3X3, ImageIcon, Sticker,
-    AlignLeft, AlignCenter, AlignRight, AlignVerticalJustifyStart as AlignTop, AlignVerticalJustifyCenter as AlignMiddle, AlignVerticalJustifyEnd as AlignBottom,
-    LayoutGrid, ChevronDown, Wand2, Zap, Plus, ChevronRight, Search, Share2, ImagePlus
+  ChevronDown, Pencil, Copy, Download, Trash2,
+  Grid3X3, LayoutGrid, Lock, Unlock, ToggleLeft, ToggleRight,
+  AlignStartVertical, AlignCenterVertical, AlignEndVertical,
+  AlignStartHorizontal, AlignCenterHorizontal, AlignEndHorizontal,
+  Group, Undo2, Redo2, Library, Play, Square, Save, Check, Loader2
 } from 'lucide-react';
-import { Button, Popover, PopoverContent, PopoverTrigger } from '@/components/ui';
-import { WORKFLOW_TEMPLATES } from './WorkflowSequences';
-import { toast } from 'sonner';
 
-import { HeaderSearch } from './components/HeaderSearch';
+// ─── Props ───────────────────────────────────────────────────────────────────
 
 interface MoodBoardHeaderProps {
-    onBack: () => void;
-    undo: () => void;
-    redo: () => void;
-    canUndo: boolean;
-    canRedo: boolean;
-    onSave: () => void;
-    hasUnsavedChanges: boolean;
-    isSaving: boolean;
-    activeTool: 'pointer' | 'hand' | 'text' | 'section';
-    setActiveTool: (tool: 'pointer' | 'hand' | 'text' | 'section') => void;
-    snapToGrid: boolean;
-    setSnapToGrid: (snap: boolean) => void;
-    fileInputRef: React.RefObject<HTMLInputElement>;
-    handleImageUpload: (event: React.ChangeEvent<HTMLInputElement>) => void;
-    onAddEmoji: (emoji: string) => void;
-    onExportJSON: () => void;
-    selectedNodesCount?: number;
-    onAlignNodes?: (direction: 'left' | 'center' | 'right' | 'top' | 'middle' | 'bottom') => void;
-    onReorganizeNodes?: (config: { type: 'rows' | 'cols', count: number }) => void;
-    onInjectTemplate?: (templateId: string) => void;
-    isSidebarOpen?: boolean;
-    isSidebarMini?: boolean;
-    onNewWorkflow?: () => void;
-    onOpenUserWorkflows?: () => void;
-    onOpenWorkflowLibrary?: () => void;
-    isZenMode?: boolean;
-    onToggleZenMode?: () => void;
-    onAddNode?: (type: string) => void;
+  // Flow identity
+  flowName: string;
+  onRenameFlow: (name: string) => void;
+  onDuplicateFlow: () => void;
+  onDeleteFlow: () => void;
+  onExportJSON: () => void;
+
+  // Contextual controls
+  selectedNode: Node<MoodNodeData> | null;
+  selectedNodesCount: number;
+  updateNodeData: (id: string, data: Partial<MoodNodeData>, style?: React.CSSProperties) => void;
+  onDeleteNode: (ids: string[]) => void;
+  onDuplicateNode: (nodes: Node<MoodNodeData>[]) => void;
+  onAlignNodes: (direction: 'left' | 'center' | 'right' | 'top' | 'middle' | 'bottom') => void;
+  onCreateGroup: (nodeIds: string[]) => void;
+  snapToGrid: boolean;
+  setSnapToGrid: (snap: boolean) => void;
+  onReorganizeNodes: (config: { type: 'rows' | 'cols'; count: number }) => void;
+  allNodes: Node<MoodNodeData>[];
+
+  // Global actions
+  undo: () => void;
+  redo: () => void;
+  canUndo: boolean;
+  canRedo: boolean;
+  onOpenWorkflowLibrary: () => void;
+  onRun: () => void;
+  isRunning: boolean;
+  onSave: () => void;
+  hasUnsavedChanges: boolean;
+  isSaving: boolean;
 }
 
-export const MoodBoardHeader: React.FC<MoodBoardHeaderProps> = ({
-    onBack,
-    undo,
-    redo,
-    canUndo,
-    canRedo,
-    onSave,
-    hasUnsavedChanges,
-    isSaving,
-    activeTool,
-    setActiveTool,
-    snapToGrid,
-    setSnapToGrid,
-    fileInputRef,
-    handleImageUpload,
-    onAddEmoji,
-    onExportJSON,
-    selectedNodesCount = 0,
-    onAlignNodes,
-    onReorganizeNodes,
-    onInjectTemplate,
-    isSidebarOpen,
-    isSidebarMini,
-    onNewWorkflow,
-    onOpenUserWorkflows,
-    onOpenWorkflowLibrary,
-    isZenMode = false,
-    onToggleZenMode,
-    onAddNode
-}) => {
-    return (
-        <div className="absolute top-0 left-0 right-0 z-30 h-10 bg-card/80 backdrop-blur-xl border-b border-border/40 flex items-center justify-between pr-4 transition-all duration-300 ease-out">
-            {/* Left: Navigation Core & Tooling */}
-            <div className="flex items-center h-full relative">
+// ─── Helpers ─────────────────────────────────────────────────────────────────
 
-                {/* Zen Mode Cube - Absolute to the workflow button area */}
-                <button
-                    onClick={(e) => { e.stopPropagation(); onToggleZenMode?.(); }}
-                    className={`
-                     absolute -top-1 -left-1 z-50 w-3 h-3 bg-yellow-400 shadow-[0_0_10px_rgba(250,204,21,0.5)] 
-                     hover:bg-yellow-300 transition-all duration-300 cursor-pointer
-                     flex items-center justify-center group rounded-[1px]
-                     ${isZenMode ? 'fixed top-4 left-4' : ''} 
-                   `}
-                    title="Toggle Zen Mode"
-                    style={{
-                        // When in Zen Mode, we want this to be invisible as per user request ("header after it move up and disappear")
-                        // but practical usage suggests we might want a way back.
-                        // However, user said "header after it move up and disappear" implying the trigger also disappears?
-                        // "when user cilick on it it will hide app header... header after it move up and disappear"
-                        // I'll stick to the strict interpretation: EVERYTHING disappears.
-                        // User will have to use ESC or I'll add a separate restoration mechanism if they get stuck.
-                        // Actually, let's keep it simple: The header moves up. The button is IN the header. It moves up too.
-                    }}
-                >
-                    <div className="w-1 h-1 bg-black/20" />
-                </button>
+function cn(...classes: (string | undefined | null | false)[]) {
+  return classes.filter(Boolean).join(' ');
+}
 
-                <Popover>
-                    <PopoverTrigger asChild>
-                        <Button
-                            variant="primary"
-                            size="sm"
-                            className={`h-full ${isSidebarMini ? 'w-14' : 'w-56'} gap-2 px-3 justify-center bg-blue-600 hover:bg-blue-500 text-white border-none shadow-none rounded-none transition-all duration-300 ease-in-out group active:scale-95 overflow-hidden relative`}
-                            title="Workflow Templates (Sequences)"
-                        >
-                            <div className="flex items-center gap-2 shrink-0">
-                                <Plus size={18} className="transition-transform duration-500 group-hover:rotate-90" strokeWidth={3} />
-                                {!isSidebarMini && (
-                                    <span className="text-[10px] font-black tracking-widest uppercase items-center flex transition-all duration-300">
-                                        Workflows
-                                    </span>
-                                )}
-                            </div>
-                            {!isSidebarMini && (
-                                <ChevronDown size={10} className="hidden opacity-0" />
-                            )}
-                        </Button>
-                    </PopoverTrigger>
-                    {/* Popover content width matches the button width (dynamic or fixed to expanded width based on UX preference) */}
-                    {/* User requested "same width as the button", so we track isSidebarMini. */}
-                    {/* However, a w-14 dropdown is unusable. We assume the user implies the standard w-56 width or the button expands on click. */}
-                    {/* Given the "exactly under" constraint, we'll use w-56 as the standard operational width. */}
-                    <PopoverContent
-                        className={`${isSidebarMini ? 'w-56' : 'w-56'} p-0 bg-blue-600 text-white border-blue-500 shadow-xl shadow-blue-600/20 overflow-hidden rounded-none border-t-0`}
-                        side="bottom"
-                        align="start"
-                        sideOffset={0}
-                    >
-                        <div className="flex flex-col">
-                            {/* New Workflow */}
-                            <button
-                                className="w-full flex items-center gap-3 px-4 py-3 hover:bg-white/10 transition-colors group border-b border-white/10"
-                                onClick={() => onNewWorkflow?.()}
-                            >
-                                <div className="w-6 h-6 flex items-center justify-center bg-white/20 text-yellow-400 rounded-sm transition-colors">
-                                    <Plus size={12} strokeWidth={3} />
-                                </div>
-                                <span className="text-[10px] font-black uppercase tracking-widest text-white transition-colors text-left flex-1">New</span>
-                                <ChevronRight size={12} className="text-white/40 group-hover:text-white transition-colors" />
-                            </button>
+// ─── Flow Name Dropdown (Left Section) ───────────────────────────────────────
 
-                            {/* User Workflows (Browser) */}
-                            <button
-                                className="w-full flex items-center gap-3 px-4 py-3 hover:bg-white/10 transition-colors group border-b border-white/10"
-                                onClick={() => onOpenUserWorkflows?.()}
-                            >
-                                <div className="w-6 h-6 flex items-center justify-center bg-white/20 text-yellow-400 rounded-sm transition-colors">
-                                    <LayoutGrid size={12} />
-                                </div>
-                                <span className="text-[10px] font-black uppercase tracking-widest text-white transition-colors text-left flex-1">User</span>
-                                <ChevronRight size={12} className="text-white/40 group-hover:text-white transition-colors" />
-                            </button>
+const FlowNameDropdown: React.FC<{
+  name: string;
+  onRename: (name: string) => void;
+  onDuplicate: () => void;
+  onDelete: () => void;
+  onExport: () => void;
+}> = ({ name, onRename, onDuplicate, onDelete, onExport }) => {
+  const [isEditing, setIsEditing] = useState(false);
+  const [editValue, setEditValue] = useState(name);
+  const [isOpen, setIsOpen] = useState(false);
+  const inputRef = useRef<HTMLInputElement>(null);
+  const dropdownRef = useRef<HTMLDivElement>(null);
 
-                            {/* Workflows Library (Browser) */}
-                            <button
-                                className="w-full flex items-center gap-3 px-4 py-3 hover:bg-white/10 transition-colors group"
-                                onClick={() => onOpenWorkflowLibrary?.()}
-                            >
-                                <div className="w-6 h-6 flex items-center justify-center bg-white/20 text-yellow-400 rounded-sm transition-colors">
-                                    <Zap size={12} />
-                                </div>
-                                <span className="text-[10px] font-black uppercase tracking-widest text-white transition-colors text-left flex-1">Library</span>
-                                <ChevronRight size={12} className="text-white/40 group-hover:text-white transition-colors" />
-                            </button>
-                        </div>
-                    </PopoverContent>
-                </Popover>
+  useEffect(() => {
+    setEditValue(name);
+  }, [name]);
 
-                <div className="w-[1px] h-4 bg-border/40 mx-2" />
+  useEffect(() => {
+    if (isEditing && inputRef.current) {
+      inputRef.current.focus();
+      inputRef.current.select();
+    }
+  }, [isEditing]);
 
-                {/* Search Bar - Integrated */}
-                <HeaderSearch
-                    onAddNode={onAddNode || (() => { })}
-                    onInjectTemplate={onInjectTemplate || (() => { })}
-                    activeTool={activeTool}
-                    setActiveTool={setActiveTool}
-                    onSave={onSave}
-                    onExport={onExportJSON}
-                    onToggleZenMode={onToggleZenMode || (() => { })}
-                />
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target as HTMLElement)) {
+        setIsOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
-                <div className="w-[1px] h-4 bg-border/40 mx-2" />
+  const commitRename = useCallback(() => {
+    const trimmed = editValue.trim();
+    if (trimmed && trimmed !== name) {
+      onRename(trimmed);
+    } else {
+      setEditValue(name);
+    }
+    setIsEditing(false);
+  }, [editValue, name, onRename]);
 
-                {/* History Controls */}
-                <div className="flex items-center gap-0.5">
-                    <Button variant="ghost" size="icon" onClick={undo} disabled={!canUndo} className="h-8 w-8 text-muted-foreground hover:text-foreground disabled:opacity-20 hover:bg-muted/20">
-                        <Undo2 size={14} />
-                    </Button>
-                    <Button variant="ghost" size="icon" onClick={redo} disabled={!canRedo} className="h-8 w-8 text-muted-foreground hover:text-foreground disabled:opacity-20 hover:bg-muted/20">
-                        <Redo2 size={14} />
-                    </Button>
-                </div>
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') commitRename();
+    if (e.key === 'Escape') { setEditValue(name); setIsEditing(false); }
+  };
 
-                <div className="w-[1px] h-4 bg-border/40 mx-2" />
+  const menuItems = [
+    { label: 'Rename', icon: Pencil, action: () => { setIsOpen(false); setIsEditing(true); } },
+    { label: 'Duplicate', icon: Copy, action: () => { setIsOpen(false); onDuplicate(); } },
+    { label: 'Export JSON', icon: Download, action: () => { setIsOpen(false); onExport(); } },
+    { label: 'Delete', icon: Trash2, action: () => { setIsOpen(false); onDelete(); }, danger: true },
+  ];
 
-                {/* Save Status */}
-                <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={onSave}
-                    disabled={!hasUnsavedChanges || isSaving}
-                    className={`h-8 w-8 transition-all ${hasUnsavedChanges ? 'text-primary hover:text-primary hover:bg-primary/10' : 'text-muted-foreground/40 hover:text-foreground'}`}
-                    title={isSaving ? 'Saving...' : hasUnsavedChanges ? 'Unsaved Changes' : 'All Changes Saved'}
-                >
-                    {isSaving ? <Loader2 size={12} className="animate-spin" /> : <Save size={14} />}
-                </Button>
+  return (
+    <div className="relative flex items-center gap-1 min-w-0" ref={dropdownRef}>
+      {isEditing ? (
+        <input
+          ref={inputRef}
+          value={editValue}
+          onChange={(e) => setEditValue(e.target.value)}
+          onBlur={commitRename}
+          onKeyDown={handleKeyDown}
+          className="text-[13px] font-medium bg-transparent border border-primary/40 px-1.5 py-0.5 outline-none text-foreground w-[180px]"
+        />
+      ) : (
+        <button
+          className="flex items-center gap-1 min-w-0 hover:bg-muted/40 px-2 py-1 transition-colors"
+          onDoubleClick={() => setIsEditing(true)}
+          onClick={() => setIsOpen(!isOpen)}
+        >
+          <span className="text-[13px] font-medium text-foreground truncate max-w-[200px]">
+            {name || 'Untitled Flow'}
+          </span>
+          <ChevronDown size={12} className="text-muted-foreground shrink-0" />
+        </button>
+      )}
 
-                <div className="w-[1px] h-4 bg-border/40 mx-2" />
-
-                {/* Organization Tools - Left Aligned */}
-                <div className="flex items-center gap-0.5">
-                    <Button
-                        variant="ghost"
-                        size="icon"
-                        className={`h-8 w-8 rounded-none transition-all duration-300 ${activeTool === 'pointer' ? 'text-primary bg-primary/10' : 'text-muted-foreground/60 hover:text-primary hover:bg-primary/5'}`}
-                        title="Navigation Mode"
-                        onClick={() => setActiveTool('pointer')}
-                    >
-                        <Pointer size={14} fill={activeTool === 'pointer' ? "currentColor" : "none"} />
-                    </Button>
-                    <Button
-                        variant="ghost"
-                        size="icon"
-                        className={`h-8 w-8 rounded-none transition-all duration-300 ${activeTool === 'hand' ? 'text-primary bg-primary/10' : 'text-muted-foreground/60 hover:text-primary hover:bg-primary/5'}`}
-                        title="Move Tool"
-                        onClick={() => setActiveTool('hand')}
-                    >
-                        <Hand size={14} />
-                    </Button>
-                    <Button
-                        variant="ghost"
-                        size="icon"
-                        className={`h-8 w-8 rounded-none transition-all duration-300 ${activeTool === 'text' ? 'text-primary bg-primary/10' : 'text-muted-foreground/60 hover:text-primary hover:bg-primary/5'}`}
-                        title="Text Injection"
-                        onClick={() => setActiveTool('text')}
-                    >
-                        <TextIcon size={14} />
-                    </Button>
-                    <Button
-                        variant="ghost"
-                        size="icon"
-                        className={`h-8 w-8 rounded-none transition-all duration-300 ${activeTool === 'section' ? 'text-primary bg-primary/10' : 'text-muted-foreground/60 hover:text-primary hover:bg-primary/5'}`}
-                        title="Area Selection"
-                        onClick={() => setActiveTool('section')}
-                    >
-                        <Focus size={14} />
-                    </Button>
-                    <Button
-                        variant="ghost"
-                        size="icon"
-                        className={`h-8 w-8 rounded-none transition-all duration-300 ${snapToGrid ? 'text-primary bg-primary/10' : 'text-muted-foreground/60 hover:text-primary hover:bg-primary/5'}`}
-                        title="Grid Alignment"
-                        onClick={() => setSnapToGrid(!snapToGrid)}
-                    >
-                        <Grid3X3 size={14} />
-                    </Button>
-
-                    <div className="w-[1px] h-4 bg-border/40 mx-1" />
-
-                    {/* Media & Stickers */}
-                    <Button
-                        variant="ghost"
-                        size="icon"
-                        className="h-8 w-8 rounded-none text-muted-foreground/60 hover:text-primary hover:bg-primary/5 transition-all duration-300"
-                        title="Import Image"
-                        onClick={() => fileInputRef.current?.click()}
-                    >
-                        <ImagePlus size={14} />
-                        <input
-                            type="file"
-                            ref={fileInputRef}
-                            className="hidden"
-                            accept="image/png, image/jpeg, image/gif, image/svg+xml"
-                            onChange={handleImageUpload}
-                        />
-                    </Button>
-
-                    <Popover>
-                        <PopoverTrigger asChild>
-                            <Button
-                                variant="ghost"
-                                size="icon"
-                                className="h-8 w-8 rounded-none text-muted-foreground/60 hover:text-primary hover:bg-primary/5 transition-all duration-300"
-                                title="Drop Sticker / Emoji"
-                            >
-                                <Sticker size={14} />
-                            </Button>
-                        </PopoverTrigger>
-                        <PopoverContent className="w-64 p-2" sideOffset={8}>
-                            <div className="grid grid-cols-6 gap-1">
-                                {['👍', '👎', '🔥', '💡', '⚠️', '✅', '❌', '🚀', '🎨', '🖌️', '📝', '📊', '🔗', '📂', '❤️', '⭐', '🎉', '👀', '🧠', '⚡', '💣', '💎', '🚩', '🏁'].map(emoji => (
-                                    <button
-                                        key={emoji}
-                                        className="aspect-square flex items-center justify-center text-lg hover:bg-muted rounded-sm transition-colors"
-                                        onClick={() => onAddEmoji(emoji)}
-                                    >
-                                        {emoji}
-                                    </button>
-                                ))}
-                            </div>
-                        </PopoverContent>
-                    </Popover>
-
-                    <div className="w-[1px] h-4 bg-border/40 mx-1" />
-
-                    <Button
-                        variant="ghost"
-                        size="icon"
-                        className="h-8 w-8 rounded-none transition-all duration-300 text-muted-foreground/60 hover:text-primary hover:bg-primary/5"
-                        title="Export Workflow JSON"
-                        onClick={onExportJSON}
-                    >
-                        <Share2 size={14} className="group-hover:scale-110 transition-transform" />
-                    </Button>
-                </div>
-
-                <div className="w-[1px] h-4 bg-border/40 mx-2" />
-
-                {/* Alignment Dropdown */}
-                <Popover>
-                    <PopoverTrigger asChild>
-                        <Button
-                            variant="ghost"
-                            size="sm"
-                            disabled={selectedNodesCount <= 1}
-                            className={`h-8 gap-1 px-2 transition-all ${selectedNodesCount > 1 ? 'text-primary bg-primary/5' : 'text-muted-foreground/30'}`}
-                            title="Alignment Tools"
-                        >
-                            <AlignLeft size={14} />
-                            <ChevronDown size={10} className="opacity-50" />
-                        </Button>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-40 p-1" sideOffset={8}>
-                        <div className="grid grid-cols-3 gap-1">
-                            <Button variant="ghost" size="icon" className="h-8 w-8" title="Align Left" onClick={() => onAlignNodes?.('left')}><AlignLeft size={14} /></Button>
-                            <Button variant="ghost" size="icon" className="h-8 w-8" title="Align Center X" onClick={() => onAlignNodes?.('center')}><AlignCenter size={14} /></Button>
-                            <Button variant="ghost" size="icon" className="h-8 w-8" title="Align Right" onClick={() => onAlignNodes?.('right')}><AlignRight size={14} /></Button>
-                            <Button variant="ghost" size="icon" className="h-8 w-8" title="Align Top" onClick={() => onAlignNodes?.('top')}><AlignTop size={14} /></Button>
-                            <Button variant="ghost" size="icon" className="h-8 w-8" title="Align Middle Y" onClick={() => onAlignNodes?.('middle')}><AlignMiddle size={14} /></Button>
-                            <Button variant="ghost" size="icon" className="h-8 w-8" title="Align Bottom" onClick={() => onAlignNodes?.('bottom')}><AlignBottom size={14} /></Button>
-                        </div>
-                    </PopoverContent>
-                </Popover>
-
-                {/* Workflow dropdown moved to far left */}
-            </div>
-
-
-            {/* Right Side: Empty for now (can add more later) */}
-            <div className="flex items-center gap-1">
-                {/* Could add User Profile or specific view toggles here */}
-            </div>
+      {isOpen && (
+        <div className="absolute top-full left-0 mt-1 w-48 bg-popover border border-border/40 py-1 z-50 animate-in fade-in slide-in-from-top-1 duration-150">
+          {menuItems.map((item) => (
+            <button
+              key={item.label}
+              onClick={item.action}
+              className={cn(
+                "w-full flex items-center gap-2 px-3 py-1.5 text-[11px] transition-colors",
+                (item as any).danger
+                  ? "text-destructive hover:bg-destructive/10"
+                  : "text-foreground hover:bg-muted/50"
+              )}
+            >
+              <item.icon size={12} />
+              {item.label}
+            </button>
+          ))}
         </div>
+      )}
+    </div>
+  );
+};
+
+// ─── Contextual Controls (Center Section) ────────────────────────────────────
+
+const ContextualControls: React.FC<{
+  selectedNode: Node<MoodNodeData> | null;
+  selectedNodesCount: number;
+  updateNodeData: (id: string, data: Partial<MoodNodeData>, style?: React.CSSProperties) => void;
+  onDeleteNode: (ids: string[]) => void;
+  onDuplicateNode: (nodes: Node<MoodNodeData>[]) => void;
+  onAlignNodes: (direction: 'left' | 'center' | 'right' | 'top' | 'middle' | 'bottom') => void;
+  onCreateGroup: (nodeIds: string[]) => void;
+  snapToGrid: boolean;
+  setSnapToGrid: (snap: boolean) => void;
+  onReorganizeNodes: (config: { type: 'rows' | 'cols'; count: number }) => void;
+  allNodes: Node<MoodNodeData>[];
+}> = ({
+  selectedNode,
+  selectedNodesCount,
+  updateNodeData,
+  onDeleteNode,
+  onDuplicateNode,
+  onAlignNodes,
+  onCreateGroup,
+  snapToGrid,
+  setSnapToGrid,
+  onReorganizeNodes,
+  allNodes,
+}) => {
+  const { zoom } = useViewport();
+  const selectedNodes = allNodes.filter(n => n.selected);
+
+  // ── Multi-select (2+) ──
+  if (selectedNodesCount >= 2) {
+    return (
+      <div className="flex items-center gap-1">
+        <span className="text-[10px] font-mono text-muted-foreground bg-primary/10 text-primary px-1.5 py-0.5 mr-1">
+          {selectedNodesCount} selected
+        </span>
+
+        <div className="h-4 w-px bg-border/30 mx-1" />
+
+        {/* Align buttons */}
+        {([
+          { dir: 'left' as const, icon: AlignStartVertical, tip: 'Left' },
+          { dir: 'center' as const, icon: AlignCenterVertical, tip: 'Center H' },
+          { dir: 'right' as const, icon: AlignEndVertical, tip: 'Right' },
+          { dir: 'top' as const, icon: AlignStartHorizontal, tip: 'Top' },
+          { dir: 'middle' as const, icon: AlignCenterHorizontal, tip: 'Middle' },
+          { dir: 'bottom' as const, icon: AlignEndHorizontal, tip: 'Bottom' },
+        ]).map(({ dir, icon: Icon, tip }) => (
+          <button
+            key={dir}
+            onClick={() => onAlignNodes(dir)}
+            className="p-1 hover:bg-muted/50 text-muted-foreground hover:text-foreground transition-colors"
+            title={`Align ${tip}`}
+          >
+            <Icon size={13} />
+          </button>
+        ))}
+
+        <div className="h-4 w-px bg-border/30 mx-1" />
+
+        <button
+          onClick={() => onCreateGroup(selectedNodes.map(n => n.id))}
+          className="flex items-center gap-1 px-1.5 py-0.5 text-[10px] text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors"
+        >
+          <Group size={12} /> Group
+        </button>
+
+        <button
+          onClick={() => onDeleteNode(selectedNodes.map(n => n.id))}
+          className="p-1 text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors"
+          title="Delete selected"
+        >
+          <Trash2 size={13} />
+        </button>
+      </div>
     );
+  }
+
+  // ── Single node selected ──
+  if (selectedNode) {
+    const nodeData = selectedNode.data;
+    const isLocked = nodeData.isLocked ?? false;
+    const isActive = nodeData.isActive !== false; // default true
+
+    return (
+      <div className="flex items-center gap-1">
+        <span className="text-[10px] font-mono text-muted-foreground bg-muted/30 px-1.5 py-0.5 uppercase tracking-wider">
+          {selectedNode.type || 'node'}
+        </span>
+
+        <div className="h-4 w-px bg-border/30 mx-1" />
+
+        <button
+          onClick={() => onDuplicateNode([selectedNode])}
+          className="p-1 hover:bg-muted/50 text-muted-foreground hover:text-foreground transition-colors"
+          title="Duplicate"
+        >
+          <Copy size={13} />
+        </button>
+
+        <button
+          onClick={() => updateNodeData(selectedNode.id, { isLocked: !isLocked })}
+          className={cn(
+            "p-1 hover:bg-muted/50 transition-colors",
+            isLocked ? "text-amber-500" : "text-muted-foreground hover:text-foreground"
+          )}
+          title={isLocked ? 'Unlock' : 'Lock'}
+        >
+          {isLocked ? <Lock size={13} /> : <Unlock size={13} />}
+        </button>
+
+        <button
+          onClick={() => updateNodeData(selectedNode.id, { isActive: !isActive })}
+          className={cn(
+            "p-1 hover:bg-muted/50 transition-colors",
+            isActive ? "text-foreground" : "text-muted-foreground/50"
+          )}
+          title={isActive ? 'Disable' : 'Enable'}
+        >
+          {isActive ? <ToggleRight size={13} /> : <ToggleLeft size={13} />}
+        </button>
+
+        <button
+          onClick={() => onDeleteNode([selectedNode.id])}
+          className="p-1 text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors"
+          title="Delete"
+        >
+          <Trash2 size={13} />
+        </button>
+      </div>
+    );
+  }
+
+  // ── Nothing selected — canvas controls ──
+  return (
+    <div className="flex items-center gap-1">
+      <span className="text-[10px] font-mono text-muted-foreground tabular-nums">
+        {Math.round(zoom * 100)}%
+      </span>
+
+      <div className="h-4 w-px bg-border/30 mx-1" />
+
+      <button
+        onClick={() => setSnapToGrid(!snapToGrid)}
+        className={cn(
+          "flex items-center gap-1 px-1.5 py-0.5 text-[10px] transition-colors",
+          snapToGrid
+            ? "text-primary bg-primary/10"
+            : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
+        )}
+        title="Snap to grid"
+      >
+        <Grid3X3 size={12} />
+        <span className="hidden sm:inline">Snap</span>
+      </button>
+
+      <button
+        onClick={() => onReorganizeNodes({ type: 'rows', count: 3 })}
+        className="flex items-center gap-1 px-1.5 py-0.5 text-[10px] text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors"
+        title="Auto-layout"
+      >
+        <LayoutGrid size={12} />
+        <span className="hidden sm:inline">Auto-layout</span>
+      </button>
+    </div>
+  );
+};
+
+// ─── Global Actions (Right Section) ──────────────────────────────────────────
+
+const GlobalActions: React.FC<{
+  undo: () => void;
+  redo: () => void;
+  canUndo: boolean;
+  canRedo: boolean;
+  onOpenWorkflowLibrary: () => void;
+  onRun: () => void;
+  isRunning: boolean;
+  onSave: () => void;
+  hasUnsavedChanges: boolean;
+  isSaving: boolean;
+}> = ({ undo, redo, canUndo, canRedo, onOpenWorkflowLibrary, onRun, isRunning, onSave, hasUnsavedChanges, isSaving }) => {
+  return (
+    <div className="flex items-center gap-1">
+      {/* History */}
+      <button
+        onClick={undo}
+        disabled={!canUndo}
+        className="p-1.5 text-muted-foreground hover:text-foreground hover:bg-muted/50 disabled:opacity-25 disabled:pointer-events-none transition-colors"
+        title="Undo (Ctrl+Z)"
+      >
+        <Undo2 size={14} />
+      </button>
+      <button
+        onClick={redo}
+        disabled={!canRedo}
+        className="p-1.5 text-muted-foreground hover:text-foreground hover:bg-muted/50 disabled:opacity-25 disabled:pointer-events-none transition-colors"
+        title="Redo (Ctrl+Shift+Z)"
+      >
+        <Redo2 size={14} />
+      </button>
+
+      <div className="h-4 w-px bg-border/30 mx-0.5" />
+
+      {/* Library */}
+      <button
+        onClick={onOpenWorkflowLibrary}
+        className="p-1.5 text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors"
+        title="Workflow Library"
+      >
+        <Library size={14} />
+      </button>
+
+      <div className="h-4 w-px bg-border/30 mx-0.5" />
+
+      {/* Run */}
+      <button
+        onClick={onRun}
+        className={cn(
+          "flex items-center gap-1.5 px-2.5 py-1 text-[11px] font-medium border transition-colors",
+          isRunning
+            ? "border-destructive/40 text-destructive hover:bg-destructive/10"
+            : "border-border/40 text-foreground hover:bg-muted/50"
+        )}
+      >
+        {isRunning ? <Square size={11} /> : <Play size={11} />}
+        {isRunning ? 'Stop' : 'Run'}
+      </button>
+
+      {/* Save */}
+      <button
+        onClick={onSave}
+        disabled={isSaving || !hasUnsavedChanges}
+        className={cn(
+          "flex items-center gap-1.5 px-2.5 py-1 text-[11px] font-medium transition-colors",
+          hasUnsavedChanges && !isSaving
+            ? "bg-primary text-primary-foreground hover:bg-primary/90"
+            : "bg-muted/30 text-muted-foreground border border-border/30"
+        )}
+      >
+        {isSaving ? (
+          <Loader2 size={11} className="animate-spin" />
+        ) : hasUnsavedChanges ? (
+          <Save size={11} />
+        ) : (
+          <Check size={11} />
+        )}
+        {isSaving ? 'Saving' : hasUnsavedChanges ? 'Save' : 'Saved'}
+      </button>
+    </div>
+  );
+};
+
+// ─── Main Header Component ───────────────────────────────────────────────────
+
+export const MoodBoardHeader: React.FC<MoodBoardHeaderProps> = (props) => {
+  return (
+    <div className="absolute top-0 left-0 right-0 z-30 h-11 bg-card/95 backdrop-blur-xl border-b border-border/40 flex items-center px-2 transition-all duration-300 ease-out">
+      {/* Left — Flow Identity */}
+      <div className="shrink-0">
+        <FlowNameDropdown
+          name={props.flowName}
+          onRename={props.onRenameFlow}
+          onDuplicate={props.onDuplicateFlow}
+          onDelete={props.onDeleteFlow}
+          onExport={props.onExportJSON}
+        />
+      </div>
+
+      {/* Center — Contextual Controls */}
+      <div className="flex-1 flex items-center justify-center min-w-0">
+        <ContextualControls
+          selectedNode={props.selectedNode}
+          selectedNodesCount={props.selectedNodesCount}
+          updateNodeData={props.updateNodeData}
+          onDeleteNode={props.onDeleteNode}
+          onDuplicateNode={props.onDuplicateNode}
+          onAlignNodes={props.onAlignNodes}
+          onCreateGroup={props.onCreateGroup}
+          snapToGrid={props.snapToGrid}
+          setSnapToGrid={props.setSnapToGrid}
+          onReorganizeNodes={props.onReorganizeNodes}
+          allNodes={props.allNodes}
+        />
+      </div>
+
+      {/* Right — Global Actions */}
+      <div className="shrink-0">
+        <GlobalActions
+          undo={props.undo}
+          redo={props.redo}
+          canUndo={props.canUndo}
+          canRedo={props.canRedo}
+          onOpenWorkflowLibrary={props.onOpenWorkflowLibrary}
+          onRun={props.onRun}
+          isRunning={props.isRunning}
+          onSave={props.onSave}
+          hasUnsavedChanges={props.hasUnsavedChanges}
+          isSaving={props.isSaving}
+        />
+      </div>
+    </div>
+  );
 };

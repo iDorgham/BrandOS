@@ -2,8 +2,8 @@ import { WorkflowTemplate } from './types';
 
 export const blog_factory: WorkflowTemplate = {
     id: 'blog_factory',
-    label: 'Blog_Factory',
-    description: 'End-to-end SEO blog generation with meta tags.',
+    label: 'Global Editorial Engine',
+    description: 'Scalable content production pipeline for long-form blogs and strategic archives.',
     category: 'Content Engine',
     nodes: [
         { id: 't1', type: 'trigger', position: { x: 0, y: 0 }, data: { label: 'Manual_Start', type: 'trigger' } },

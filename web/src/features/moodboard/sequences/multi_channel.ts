@@ -2,8 +2,8 @@ import { WorkflowTemplate } from './types';
 
 export const multi_channel_distro: WorkflowTemplate = {
     id: 'multi_channel',
-    label: 'Multi_Channel_Distro',
-    description: 'Distribute content to Email, Drive, and Telegram at once.',
+    label: 'Omni-Network Synchronizer',
+    description: 'Unified distribution hub for seamless cross-platform content synchronization.',
     category: 'Automations',
     nodes: [
         { id: 'r1', type: 'receiver', position: { x: 100, y: 300 }, data: { label: 'Final_Review', type: 'receiver' } },

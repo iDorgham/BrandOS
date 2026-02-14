@@ -52,8 +52,8 @@ export const LibraryView = React.memo<LibraryViewProps>(({ assets, onRefine }) =
                 }
             />
 
-            <div className="w-full px-8 py-12 space-y-12 pb-24">
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-6 gap-6 pb-20">
+            <div className="w-full px-4 md:px-8 py-8 md:py-12 space-y-12 pb-24">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-6 gap-4 md:gap-6 pb-20">
                     {assets.length === 0 ? (
                         <div className="col-span-full py-40 text-center opacity-40">
                             <ImageIcon size={64} className="mx-auto mb-6 text-muted-foreground" strokeWidth={1} />

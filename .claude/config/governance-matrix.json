@@ -1,0 +1,169 @@
+{
+  "version": "1.0.0",
+  "description": "AI governance matrix for task routing and risk scoring",
+  "riskCalculation": {
+    "formula": "(complexity * 0.4) + (dataSensitivity * 0.3) + (reversibility * 0.3)",
+    "complexity": {
+      "1": "Simple one-file change",
+      "3": "Component or hook creation",
+      "5": "Service layer or context changes",
+      "7": "Multi-file feature with state management",
+      "9": "Database migration or schema change",
+      "10": "Full feature with backend and UI"
+    },
+    "dataSensitivity": {
+      "1": "No user data, public content",
+      "3": "Non-sensitive user preferences",
+      "5": "User-generated content",
+      "8": "PII, authentication, payment data",
+      "10": "Financial or health data"
+    },
+    "reversibility": {
+      "1": "Easy to revert (git revert)",
+      "3": "Requires manual cleanup",
+      "5": "Migration rollback needed",
+      "8": "Data migration required",
+      "10": "Irreversible (deleted data, secrets)"
+    }
+  },
+  "routingRules": [
+    {
+      "name": "Gemini Fast Track",
+      "riskThreshold": "0.3",
+      "useCases": [
+        "Simple UI fixes",
+        "Code explanations",
+        "Quick generation tasks",
+        "Documentation updates",
+        "Small refactors (<5 files)",
+        "Content generation first drafts"
+      ],
+      "model": "gemini-2.0-flash",
+      "strengths": ["fast", "cheap", "high volume"],
+      "tokenMultiplier": 1,
+      "estimatedCost": "$0.001/1k tokens"
+    },
+    {
+      "name": "Claude Balanced",
+      "riskThreshold": "0.7",
+      "useCases": [
+        "Complex bug fixes",
+        "Architecture decisions",
+        "Multi-file features",
+        "Security reviews",
+        "Creative content refinement",
+        "Design system work"
+      ],
+      "model": "claude-sonnet-4-20250514",
+      "strengths": ["reasoning", "context", "quality"],
+      "tokenMultiplier": 5,
+      "estimatedCost": "$0.005/1k tokens"
+    },
+    {
+      "name": "KiloCode Efficient",
+      "riskThreshold": "0.5",
+      "useCases": [
+        "Long development sessions",
+        "Iterative feature development",
+        "Context-heavy tasks",
+        "Token-sensitive operations"
+      ],
+      "model": "kilo/minimax-m2.5:free",
+      "strengths": ["context preservation", "token efficiency"],
+      "tokenMultiplier": 0.5,
+      "estimatedCost": "$0.0005/1k tokens"
+    },
+    {
+      "name": "Human Approval Required",
+      "riskThreshold": "0.7",
+      "useCases": [
+        "Database migrations",
+        "Secret rotation",
+        "Production deploys",
+        "Bulk deletions",
+        "Schema changes",
+        "RLS policy changes"
+      ],
+      "model": "claude + human",
+      "strengths": ["safety", "accountability"],
+      "tokenMultiplier": 10,
+      "requiresApproval": true
+    }
+  ],
+  "taskExamples": [
+    {
+      "task": "Add button component",
+      "complexity": 2,
+      "dataSensitivity": 1,
+      "reversibility": 1,
+      "riskScore": 0.27,
+      "routing": "Gemini"
+    },
+    {
+      "task": "Fix CSS centering bug",
+      "complexity": 3,
+      "dataSensitivity": 1,
+      "reversibility": 1,
+      "riskScore": 0.38,
+      "routing": "Gemini"
+    },
+    {
+      "task": "Create new React hook",
+      "complexity": 4,
+      "dataSensitivity": 1,
+      "reversibility": 2,
+      "riskScore": 0.53,
+      "routing": "Claude Balanced"
+    },
+    {
+      "task": "Add Supabase migration",
+      "complexity": 8,
+      "dataSensitivity": 5,
+      "reversibility": 5,
+      "riskScore": 0.83,
+      "routing": "Human Approval Required"
+    },
+    {
+      "task": "Write marketing copy",
+      "complexity": 3,
+      "dataSensitivity": 1,
+      "reversibility": 1,
+      "riskScore": 0.35,
+      "routing": "Gemini"
+    },
+    {
+      "task": "Design brand guidelines",
+      "complexity": 7,
+      "dataSensitivity": 1,
+      "reversibility": 3,
+      "riskScore": 0.67,
+      "routing": "Claude Balanced"
+    }
+  ],
+  "optimization": {
+    "tokenBudget": {
+      "monthly": 10000000,
+      "allocation": {
+        "gemini": 0.6,
+        "claude": 0.25,
+        "kilocode": 0.1,
+        "opencode": 0.05
+      }
+    },
+    "caching": {
+      "enabled": true,
+      "ttl": 3600,
+      "strategies": [
+        "File content hash caching",
+        "Agent response caching",
+        "Skill output caching",
+        "Workflow state caching"
+      ]
+    },
+    "batching": {
+      "enabled": true,
+      "maxBatchSize": 10,
+      "windowSeconds": 60
+    }
+  }
+}

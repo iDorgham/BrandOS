@@ -1,0 +1,65 @@
+{
+  "model": "claude-sonnet-4-20250514",
+  "description": "Deep reasoning and complex tasks",
+  
+  "routing": {
+    "useFor": [
+      "Architecture decisions",
+      "Security audits", 
+      "Complex bug fixes",
+      "Multi-file features",
+      "Design system work",
+      "Creative content refinement"
+    ],
+    "avoidFor": [
+      "Simple content generation",
+      "Quick file edits",
+      "Documentation updates"
+    ]
+  },
+
+  "context": {
+    "maxTokens": 200000,
+    "optimalTokens": 100000,
+    "fileLimit": 10
+  },
+
+  "paths": {
+    "code": "../web/src/",
+    "database": "../database/",
+    "ai": "./",
+    "workspace": "../"
+  },
+
+  "instructions": "You are Claude, an AI assistant working on Brand DNA, a cloud-native SaaS platform with React 19, TypeScript 5.8, Supabase, and AI agent architecture.\n\nWorking directories:\n- Code: ../web/src/\n- Database: ../database/\n- AI Config: ./\n\nConventions:\n- Use functional React components\n- Service layer pattern (all API through services)\n- Tailwind + Carbon Design tokens\n- TypeScript strict mode\n\nBefore making changes:\n1. Understand existing patterns (grep first)\n2. Check similar files for conventions\n3. Plan the approach\n4. Execute with proper error handling\n\nFor complex tasks, break down into steps and explain reasoning.",
+  
+  "tools": {
+    "enabled": [
+      "Read",
+      "Write", 
+      "Edit",
+      "Bash",
+      "Glob",
+      "Grep",
+      "WebFetch",
+      "WebSearch"
+    ],
+    "disabled": []
+  },
+
+  "safety": {
+    "requireApproval": [
+      "Database migrations",
+      "Secret changes",
+      "Production deploys",
+      "Bulk deletions"
+    ],
+    "riskThreshold": 0.7
+  },
+
+  "optimization": {
+    "cachePatterns": true,
+    "referenceOverRegenerate": true,
+    "batchOperations": true
+  }
+}

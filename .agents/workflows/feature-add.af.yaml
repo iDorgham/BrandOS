@@ -1,0 +1,122 @@
+version: "1.0.0"
+name: "feature-add"
+description: "Full feature implementation from database to UI"
+metadata:
+  author: "system-architect"
+  created: "2026-02-14"
+  tags: ["development", "feature", "fullstack"]
+  estimatedDuration: 30
+
+context:
+  featureName: ""
+  description: ""
+  variables:
+    hasBackend: true
+
+paths:
+  code: "../web/src/"
+  database: "../database/"
+
+steps:
+  - id: "analyze-requirements"
+    name: "Analyze Feature Requirements"
+    agent: "product-planner"
+    skill: "create-roadmap"
+    parameters:
+      feature: "{{context.featureName}}"
+      description: "{{context.description}}"
+    gate: "auto"
+    onSuccess:
+      - setVariable: "requirements": "{{result}}"
+
+  - id: "design-architecture"
+    name: "Design System Architecture"
+    agent: "system-architect"
+    parameters:
+      feature: "{{context.featureName}}"
+      requirements: "{{variables.requirements}}"
+    gate: "auto"
+    onSuccess:
+      - setVariable: "architecture": "{{result}}"
+
+  - id: "create-database-schema"
+    name: "Create Database Schema"
+    agent: "supabase-expert"
+    skill: "create-migration"
+    parameters:
+      schema: "{{variables.architecture.schema}}"
+    workingDirectory: "../database/migrations/"
+    gate: "hitl"
+    validation:
+      - command: "supabase migration diff"
+        exitCode: 0
+
+  - id: "create-backend-api"
+    name: "Create Backend API"
+    agent: "fullstack-developer"
+    skill: "create-service"
+    parameters:
+      schema: "{{variables.architecture.schema}}"
+      feature: "{{context.featureName}}"
+    workingDirectory: "../web/src/services/"
+    gate: "auto"
+    validation:
+      - command: "npm run typecheck"
+        workingDirectory: "../web/"
+        exitCode: 0
+    onSuccess:
+      - setVariable: "apiFiles": "{{result}}"
+
+  - id: "create-react-context"
+    name: "Create React Context"
+    agent: "react-specialist"
+    skill: "create-context"
+    parameters:
+      feature: "{{context.featureName}}"
+      api: "{{variables.apiFiles}}"
+    workingDirectory: "../web/src/contexts/"
+    gate: "auto"
+
+  - id: "create-react-components"
+    name: "Create React Components"
+    agent: "react-specialist"
+    skill: "create-component"
+    parameters:
+      feature: "{{context.featureName}}"
+      design: "{{variables.architecture.ui}}"
+    workingDirectory: "../web/src/components/"
+    gate: "auto"
+    onSuccess:
+      - setVariable: "components": "{{result}}"
+
+  - id: "create-custom-hooks"
+    name: "Create Custom Hooks"
+    agent: "react-specialist"
+    skill: "create-hook"
+    parameters:
+      feature: "{{context.featureName}}"
+      context: "{{variables.context}}"
+    workingDirectory: "../web/src/hooks/"
+    gate: "auto"
+
+  - id: "add-tests"
+    name: "Add Unit Tests"
+    agent: "qa-engineer"
+    parameters:
+      components: "{{variables.components}}"
+    workingDirectory: "../web/src/test/"
+    gate: "auto"
+
+  - id: "validate-build"
+    name: "Validate Build"
+    validation:
+      - command: "npm run build"
+        workingDirectory: "../web/"
+        exitCode: 0
+    gate: "passive"
+    onFailure:
+      - log: "Build validation failed"
+      - abort: true
+
+output:
+  summary: "Feature '{{context.featureName}}' implemented successfully"

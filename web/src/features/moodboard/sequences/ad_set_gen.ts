@@ -2,8 +2,8 @@ import { WorkflowTemplate } from './types';
 
 export const ad_set_generator: WorkflowTemplate = {
     id: 'ad_set_gen',
-    label: 'Ad_Set_Generator',
-    description: 'Rapid creation of Facebook/IG ad sets with DNA testing.',
+    label: 'Rapid Ad Forge',
+    description: 'Fast-track creative generation and architectural framing for multi-variant ad testing.',
     category: 'Growth & Ads',
     nodes: [
         { id: 't1', type: 'trigger', position: { x: 100, y: 100 }, data: { label: 'Campaign_Start', type: 'trigger' } },

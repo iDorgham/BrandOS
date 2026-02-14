@@ -2,8 +2,8 @@ import { WorkflowTemplate } from './types';
 
 export const brand_dna_audit_flow: WorkflowTemplate = {
     id: 'brand_dna_audit',
-    label: 'Brand_DNA_Audit',
-    description: 'Comprehensive Audit -> Auto-Style Guide -> Creative Asset Gen.',
+    label: 'Global Brand Intelligence',
+    description: 'Deep market analysis and site-wide auditing for data-driven brand strategies.',
     category: 'Brand Architecture',
     nodes: [
         { id: 't1', type: 'trigger', position: { x: 0, y: 300 }, data: { label: 'Audit_Start', type: 'trigger' } },

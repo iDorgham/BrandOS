@@ -136,10 +136,10 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
             <div className="absolute inset-0 bg-background/60 backdrop-blur-sm" onClick={onClose} />
 
             {/* Main Palette */}
-            <div className="relative w-full max-w-2xl bg-popover border border-border/40 shadow-2xl rounded-lg overflow-hidden flex flex-col animate-in fade-in zoom-in-95 duration-200">
+            <div className="relative w-full max-w-2xl bg-card/90 backdrop-blur-xl border border-border/40 shadow-2xl rounded-lg overflow-hidden flex flex-col animate-in fade-in zoom-in-95 duration-200">
                 {/* Search Header */}
                 <div className="flex items-center px-4 py-3 border-b border-border/40 bg-muted/10">
-                    <Search className="w-5 h-5 text-muted-foreground mr-3" />
+                    <Search size={14} strokeWidth={2.5} className="text-muted-foreground mr-3" />
                     <input
                         autoFocus
                         type="text"
@@ -159,7 +159,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
                 <div className="max-h-[60vh] overflow-y-auto custom-scrollbar p-2">
                     {filteredItems.length === 0 ? (
                         <div className="py-12 text-center text-muted-foreground/50">
-                            <Command className="w-12 h-12 mx-auto mb-3 opacity-20" />
+                            <Command size={14} strokeWidth={2.5} className="mx-auto mb-3 opacity-20" />
                             <p className="text-sm">No results found.</p>
                         </div>
                     ) : (
@@ -178,16 +178,17 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
                                         flex items-center justify-center w-8 h-8 rounded-sm
                                         ${index === selectedIndex ? 'bg-primary/20' : 'bg-muted/30 text-muted-foreground'}
                                     `}>
-                                        <item.icon size={16} />
+                                        <item.icon size={14} strokeWidth={2.5} />
                                     </div>
+
 
                                     <div className="flex-1 min-w-0">
                                         <div className="flex items-center gap-2">
                                             <span className="text-sm font-medium truncate">{item.label}</span>
                                             <span className={`text-[9px] px-1.5 py-0.5 rounded-full uppercase font-bold tracking-wider opacity-60 ${item.category === 'Node' ? 'bg-emerald-500/10 text-emerald-500' :
-                                                    item.category === 'Workflow' ? 'bg-blue-500/10 text-blue-500' :
-                                                        item.category === 'Action' ? 'bg-rose-500/10 text-rose-500' :
-                                                            'bg-slate-500/10 text-slate-500'
+                                                item.category === 'Workflow' ? 'bg-blue-500/10 text-blue-500' :
+                                                    item.category === 'Action' ? 'bg-rose-500/10 text-rose-500' :
+                                                        'bg-slate-500/10 text-slate-500'
                                                 }`}>
                                                 {item.category}
                                             </span>

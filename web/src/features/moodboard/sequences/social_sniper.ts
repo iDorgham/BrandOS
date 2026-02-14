@@ -2,8 +2,8 @@ import { WorkflowTemplate } from './types';
 
 export const social_sniper: WorkflowTemplate = {
     id: 'social_sniper',
-    label: 'Social_Sniper',
-    description: 'Multi-platform social post generation and planning.',
+    label: 'Precision Engagement Targeter',
+    description: 'High-impact social targeting and personalized content delivery for niche audiences.',
     category: 'Content Engine',
     nodes: [
         { id: 't1', type: 'trigger', position: { x: 0, y: 0 }, data: { label: 'Daily_Pulse', type: 'trigger' } },

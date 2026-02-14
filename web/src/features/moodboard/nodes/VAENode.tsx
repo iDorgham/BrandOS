@@ -2,7 +2,7 @@ import React, { memo } from 'react';
 import { Handle, Position, NodeResizer } from '@xyflow/react';
 import { MoodNodeData } from '../types';
 import { Image, Cpu } from 'lucide-react';
-import { NodeContainer } from '../components/NodeComponents';
+import { NodeContainer, TypedHandles } from '../components/NodeComponents';
 
 export const VAENode = memo(({ id, data, selected, isConnectable }: { id: string; data: MoodNodeData; isConnectable?: boolean; selected: boolean }) => {
     return (
@@ -22,21 +22,7 @@ export const VAENode = memo(({ id, data, selected, isConnectable }: { id: string
                     handleClassName="!w-3 !h-3 !bg-red-500 !border-background !rounded-full shadow-sm hover:scale-150 transition-transform"
                 />
             }
-            handles={
-                <>
-                    {/* Left inputs (targets) */}
-                    <Handle type="target" position={Position.Left} id="samples" isConnectable={isConnectable}
-                        className="!w-3 !h-3 !-left-[7px] !bg-pink-500 !border-2 !border-background transition-all hover:scale-150 z-50 shadow-md rounded-full"
-                        style={{ top: '35%' }} />
-                    <Handle type="target" position={Position.Left} id="vae" isConnectable={isConnectable}
-                        className="!w-3 !h-3 !-left-[7px] !bg-red-500 !border-2 !border-background transition-all hover:scale-150 z-50 shadow-md rounded-full"
-                        style={{ top: '50%' }} />
-                    {/* Right output (source) */}
-                    <Handle type="source" position={Position.Right} id="image_output" isConnectable={isConnectable}
-                        className="!w-3 !h-3 !-right-[7px] !bg-blue-300 !border-2 !border-background transition-all hover:scale-150 z-50 shadow-md rounded-full"
-                        style={{ top: '50%' }} />
-                </>
-            }
+            handles={<TypedHandles nodeType="vae" />}
         >
             <div className="flex flex-col p-4 h-full gap-3">
                 {/* Input Labels */}

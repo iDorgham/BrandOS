@@ -2,7 +2,7 @@ import React from 'react';
 import { NodeResizer } from '@xyflow/react';
 import { Terminal, ShieldAlert, CheckCircle2, ListFilter, Search } from 'lucide-react';
 import { MoodNodeData } from '../types';
-import { NodeContainer, NodeHandles } from '../components/NodeComponents';
+import { NodeContainer, TypedHandles } from '../components/NodeComponents';
 
 export const ReceiverNode = ({ id, data, selected }: { id: string; data: MoodNodeData; selected: boolean }) => {
     return (
@@ -11,7 +11,7 @@ export const ReceiverNode = ({ id, data, selected }: { id: string; data: MoodNod
             title="Receiver"
             icon={Terminal}
             typeColor="bg-emerald-600"
-            handles={<NodeHandles nodeColor="bg-emerald-600" />}
+            handles={<TypedHandles nodeType="receiver" />}
             data={{ ...data, id, type: 'receiver' }}
             id={id}
             resizer={

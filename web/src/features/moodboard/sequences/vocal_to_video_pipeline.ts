@@ -2,8 +2,8 @@ import { WorkflowTemplate } from './types';
 
 export const vocal_to_video_pipeline: WorkflowTemplate = {
     id: 'vocal_to_video',
-    label: 'Vocal_to_Video',
-    description: 'AI Script -> Voiceover -> Visual Assets -> Video Encoding.',
+    label: 'Sonic-to-Visual Pipeline',
+    description: 'Advanced transcription and visual synthesis for high-engagement video content.',
     category: 'Automations',
     nodes: [
         { id: 't1', type: 'trigger', position: { x: 0, y: 0 }, data: { label: 'Script_Prompt', type: 'trigger' } },

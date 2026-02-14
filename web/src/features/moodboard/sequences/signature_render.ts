@@ -2,8 +2,8 @@ import { WorkflowTemplate } from './types';
 
 export const signature_render: WorkflowTemplate = {
     id: 'signature_render',
-    label: 'Signature_Render',
-    description: 'Linear high-fidelity branded art pipeline.',
+    label: 'Brand Visual Synthesizer',
+    description: 'High-fidelity, automated visual production for consistent brand aesthetics.',
     category: 'Brand Architecture',
     nodes: [
         { id: 't1', type: 'trigger', position: { x: 100, y: 100 }, data: { label: 'Start', type: 'trigger' } },

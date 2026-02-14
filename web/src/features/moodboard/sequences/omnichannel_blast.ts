@@ -2,8 +2,8 @@ import { WorkflowTemplate } from './types';
 
 export const omnichannel_blast: WorkflowTemplate = {
     id: 'omnichannel_blast',
-    label: 'Omnichannel_Blast',
-    description: 'Post/Story + SEO Blog + Art + Caption -> Parallel Global Distro.',
+    label: 'Strategic Market Saturation',
+    description: 'Maximum-reach distribution engine across every digital and social touchpoint.',
     category: 'Content Engine',
     nodes: [
         { id: 't1', type: 'trigger', position: { x: 0, y: 400 }, data: { label: 'Launch_Signal', type: 'trigger' } },

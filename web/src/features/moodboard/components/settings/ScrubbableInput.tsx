@@ -52,7 +52,6 @@ export const ScrubbableInput: React.FC<ScrubbableInputProps> = ({
         if (min !== undefined) newValue = Math.max(min, newValue);
         if (max !== undefined) newValue = Math.min(max, newValue);
 
-        // Round to 1 decimal place if step is small, else round to step
         const precision = step < 1 ? 2 : 0;
         onChange(Number(newValue.toFixed(precision)));
     }, [isDragging, step, min, max, onChange]);
@@ -96,17 +95,17 @@ export const ScrubbableInput: React.FC<ScrubbableInputProps> = ({
     return (
         <div
             ref={containerRef}
-            className={`flex flex-col gap-1.5 select-none group ${className}`}
+            className={`flex flex-col gap-0.5 select-none group ${className}`}
         >
             <span
-                className={`text-[12px] font-medium transition-colors cursor-ew-resize px-0.5 ${isDragging ? 'text-primary' : 'text-muted-foreground'}`}
+                className={`text-[9px] font-medium uppercase tracking-wider transition-colors cursor-ew-resize px-0.5 ${isDragging ? 'text-primary' : 'text-muted-foreground/50'}`}
                 onMouseDown={onMouseDown}
                 onClick={() => !isDragging && setIsEditing(true)}
             >
                 {label}
             </span>
 
-            <div className={`relative overflow-hidden bg-muted/20 hover:bg-muted/30 transition-all h-9 flex items-center border-b-2 ${isDragging || isEditing ? 'border-primary' : 'border-border/40'}`}>
+            <div className={`relative overflow-hidden bg-muted/10 hover:bg-muted/20 transition-all h-7 flex items-center border ${isDragging || isEditing ? 'border-primary/40' : 'border-border/20'}`}>
                 {isEditing ? (
                     <Input
                         autoFocus
@@ -114,23 +113,22 @@ export const ScrubbableInput: React.FC<ScrubbableInputProps> = ({
                         defaultValue={value}
                         onBlur={handleInputBlur}
                         onKeyDown={handleKeyDown}
-                        className="h-full w-full bg-transparent border-none text-[13px] font-mono px-3 focus-visible:ring-0"
+                        className="h-full w-full bg-transparent border-none text-[11px] font-mono px-2 focus-visible:ring-0"
                     />
                 ) : (
                     <div
-                        className="w-full h-full flex items-center justify-between px-3 cursor-ew-resize"
+                        className="w-full h-full flex items-center justify-between px-2 cursor-ew-resize"
                         onMouseDown={onMouseDown}
                         onClick={() => setIsEditing(true)}
                     >
-                        <span className="text-[13px] font-mono text-foreground font-medium">
+                        <span className="text-[11px] font-mono text-foreground">
                             {prefix}{value}
                         </span>
 
                         {unit && (
-                            <span className="text-[10px] font-mono text-muted-foreground/40 uppercase tracking-wider">{unit}</span>
+                            <span className="text-[8px] font-mono text-muted-foreground/30 uppercase tracking-wider">{unit}</span>
                         )}
 
-                        {/* Drag Indicator Bar */}
                         {isDragging && (
                             <div className="absolute inset-x-0 bottom-0 h-0.5 bg-primary/30" />
                         )}

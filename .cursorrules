@@ -1,0 +1,131 @@
+# Brand DNA - Cursor/VS Code Configuration
+
+## Project Paths
+
+This workspace is configured with path awareness for Brand DNA:
+
+```
+Brand DNA/
+├── web/                    # Main React application
+│   ├── src/               # Source code
+│   │   ├── components/   # React components
+│   │   ├── services/    # Service layer
+│   │   ├── hooks/       # Custom hooks
+│   │   ├── contexts/    # React contexts
+│   │   └── features/    # Feature modules
+│   └── package.json
+└── .agents/               # Unified AI Workspace
+    ├── agents/           # Agent definitions
+    ├── skills/           # Skill definitions
+    ├── rules/            # Operating rules
+    ├── protocols/        # Protocols (DSL, HITL)
+    └── workflows/        # Workflow blueprints
+```
+
+## Context Rules
+
+### Grep-First Protocol
+
+**ALWAYS search before reading files:**
+
+1. Use `Cmd+Shift+F` (grep) to find code patterns
+2. Use glob patterns: `**/*.tsx`, `**/services/*.ts`
+3. Read only 3-5 files max per context
+4. Reference patterns, don't regenerate
+
+### Token Optimization
+
+- **MAX 5 files** in context at once
+- Use `pick` command to select specific files
+- Avoid reading full directories
+- Reference existing patterns from:
+  - `web/src/components/ui/` for components
+  - `web/src/services/` for services
+  - `web/src/hooks/` for hooks
+
+## AI Routing
+
+Route based on task complexity:
+
+| Task | Tool | Reasoning |
+|------|------|-----------|
+| Simple fixes | Gemini | Fast, cheap |
+| Component creation | OpenCode | Bulk operations |
+| Complex features | KiloCode | Token efficiency |
+| Architecture decisions | Claude | Deep reasoning |
+
+## Brand DNA Conventions
+
+### Component Structure
+```typescript
+// Use functional components
+// Props interface inline
+interface Props {
+  // ...
+}
+
+export function ComponentName({ prop1, prop2 }: Props) {
+  // No comments unless complex logic
+  return <div>...</div>
+}
+```
+
+### Service Layer
+```typescript
+// All API calls go through services
+// No direct Supabase calls from components
+import { brandService } from '@/services/brand.service'
+```
+
+### CSS/Tailwind
+- Use Tailwind utilities with CSS variables
+- Carbon Design tokens: `var(--cds-ui-background)`
+- No box shadows (flat design)
+- No rounded corners (4px radius only)
+
+## Key Files
+
+| Purpose | Location |
+|---------|----------|
+| App routing | `web/src/App.tsx` |
+| Auth context | `web/src/contexts/AuthContext.tsx` |
+| Brand service | `web/src/services/brand.service.ts` |
+| Types | `web/src/types/` |
+| Agents | `.agents/agents/` |
+| Skills | `.agents/skills/` |
+| Rules  | `.agents/rules/` |
+| Protocols | `.agents/protocols/` |
+
+## Commands
+
+```bash
+# Development
+npm run dev          # Start dev server (port 3000)
+npm run build        # Production build
+
+# AI Operations
+# Use the .agents/workflows directory for workflows
+```
+
+## Git Integration
+
+Commit format:
+```
+<type>(<scope>): <subject>
+
+Types: feat, fix, docs, style, refactor, perf, test, chore
+```
+
+## Environment
+
+- Node.js 20+
+- Supabase for backend
+- Vite for build
+- React 19, TypeScript 5.8
+
+## Security
+
+- Never commit `.env` files
+- Use RLS policies in Supabase
+- Validate all user input
+- No secrets in client code

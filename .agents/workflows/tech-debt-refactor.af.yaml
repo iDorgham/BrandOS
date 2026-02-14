@@ -1,0 +1,127 @@
+version: "1.0.0"
+name: "tech-debt-refactor"
+description: "Bundle optimization, performance improvements, code cleanup"
+metadata:
+  author: "fullstack-developer"
+  created: "2026-02-14"
+  tags: ["refactor", "performance", "optimization"]
+  estimatedDuration: 25
+
+context:
+  focus: "bundle"
+  variables:
+    improvements: []
+
+paths:
+  code: "../web/src/"
+
+steps:
+  - id: "analyze-bundle"
+    name: "Analyze Bundle Size"
+    agent: "fullstack-developer"
+    parameters:
+      analyze: "bundle"
+    workingDirectory: "../web/"
+    gate: "auto"
+    onSuccess:
+      - setVariable: "bundleAnalysis": "{{result}}"
+      - log: "Bundle size: {{bundleAnalysis.size}}"
+
+  - id: "analyze-dependencies"
+    name: "Analyze Dependencies"
+    agent: "devops-engineer"
+    parameters:
+      checkUnused: true
+      checkDuplicates: true
+    workingDirectory: "../web/"
+    gate: "auto"
+    onSuccess:
+      - setVariable: "depIssues": "{{result.issues}}"
+
+  - id: "analyze-performance"
+    name: "Analyze Performance Issues"
+    agent: "qa-engineer"
+    parameters:
+      areas: ["render", "api", "database"]
+    gate: "auto"
+    onSuccess:
+      - setVariable: "perfIssues": "{{result.issues}}"
+
+  - id: "identify-code-smells"
+    name: "Identify Code Smells"
+    agent: "fullstack-developer"
+    parameters:
+      rules: ["complexity", "duplication", "naming"]
+    workingDirectory: "../web/src/"
+    gate: "auto"
+    onSuccess:
+      - setVariable: "codeSmells": "{{result.issues}}"
+
+  - id: "prioritize-refactors"
+    name: "Prioritize Refactoring Tasks"
+    agent: "product-planner"
+    parameters:
+      issues:
+        - "{{variables.depIssues}}"
+        - "{{variables.perfIssues}}"
+        - "{{variables.codeSmells}}"
+      impact: "{{variables.bundleAnalysis}}"
+    gate: "auto"
+    onSuccess:
+      - setVariable: "refactorList": "{{result.sorted}}"
+
+  - id: "remove-unused-deps"
+    name: "Remove Unused Dependencies"
+    agent: "devops-engineer"
+    skill: "optimize-performance"
+    parameters:
+      packages: "{{variables.depIssues.unused}}"
+    workingDirectory: "../web/"
+    gate: "passive"
+    validation:
+      - command: "npm run build"
+        exitCode: 0
+
+  - id: "lazy-load-components"
+    name: "Implement Lazy Loading"
+    agent: "react-specialist"
+    skill: "optimize-performance"
+    parameters:
+      components: "{{variables.bundleAnalysis.largeComponents}}"
+    workingDirectory: "../web/src/"
+    gate: "auto"
+    validation:
+      - command: "npm run typecheck"
+        workingDirectory: "../web/"
+        exitCode: 0
+
+  - id: "optimize-context"
+    name: "Optimize React Context"
+    agent: "react-specialist"
+    parameters:
+      contexts: "{{variables.perfIssues.contexts}}"
+    workingDirectory: "../web/src/"
+    gate: "auto"
+
+  - id: "refactor-duplicate-code"
+    name: "Refactor Duplicate Code"
+    agent: "fullstack-developer"
+    skill: "refactor-code"
+    parameters:
+      duplications: "{{variables.codeSmells.duplicates}}"
+    workingDirectory: "../web/src/"
+    gate: "passive"
+
+  - id: "validate-optimizations"
+    name: "Validate All Optimizations"
+    validation:
+      - command: "npm run build"
+        workingDirectory: "../web/"
+        exitCode: 0
+      - command: "npm run test"
+        workingDirectory: "../web/"
+        exitCode: 0
+    gate: "auto"
+
+output:
+  summary: "Tech debt refactored. Bundle reduced by {{bundleAnalysis.reduction}}%."

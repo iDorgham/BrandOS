@@ -2,7 +2,7 @@ import React from 'react';
 import { NodeResizer } from '@xyflow/react';
 import { Palette } from 'lucide-react';
 import { MoodNodeData } from '../types';
-import { NodeContainer, NodeHandles, hexToRgbForDisplay } from '../components/NodeComponents';
+import { NodeContainer, TypedHandles, hexToRgbForDisplay } from '../components/NodeComponents';
 import { useMoodBoard } from '../MoodBoardContext';
 
 export const PaletteNode = React.memo(({ id, data, selected }: { id: string; data: MoodNodeData; selected: boolean }) => {
@@ -13,7 +13,7 @@ export const PaletteNode = React.memo(({ id, data, selected }: { id: string; dat
             title="Chromatic"
             icon={Palette}
             typeColor="bg-blue-600"
-            handles={<NodeHandles nodeColor="bg-blue-600" />}
+            handles={<TypedHandles nodeType="palette" />}
             data={{ ...data, id, type: 'palette' }}
             id={id}
             resizer={

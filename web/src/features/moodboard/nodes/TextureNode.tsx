@@ -2,7 +2,7 @@ import React from 'react';
 import { NodeResizer } from '@xyflow/react';
 import { Layers } from 'lucide-react';
 import { MoodNodeData } from '../types';
-import { NodeContainer, NodeHandles } from '../components/NodeComponents';
+import { NodeContainer, TypedHandles } from '../components/NodeComponents';
 
 export const TextureNode = ({ id, data, selected }: { id: string; data: MoodNodeData; selected: boolean }) => (
     <NodeContainer
@@ -10,7 +10,7 @@ export const TextureNode = ({ id, data, selected }: { id: string; data: MoodNode
         title="Material"
         icon={Layers}
         typeColor="bg-slate-400"
-        handles={<NodeHandles nodeColor="bg-slate-400" />}
+        handles={<TypedHandles nodeType="texture" />}
         data={{ ...data, id, type: 'texture' }}
         id={id}
         resizer={

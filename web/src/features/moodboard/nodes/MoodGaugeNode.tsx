@@ -2,7 +2,7 @@ import React from 'react';
 import { NodeResizer } from '@xyflow/react';
 import { Gauge } from 'lucide-react';
 import { MoodNodeData } from '../types';
-import { NodeContainer, NodeHandles } from '../components/NodeComponents';
+import { NodeContainer, TypedHandles } from '../components/NodeComponents';
 
 export const MoodGaugeNode = ({ id, data, selected }: { id: string; data: MoodNodeData; selected: boolean }) => (
     <NodeContainer
@@ -10,7 +10,7 @@ export const MoodGaugeNode = ({ id, data, selected }: { id: string; data: MoodNo
         title="Pressure"
         icon={Gauge}
         typeColor="bg-lime-500"
-        handles={<NodeHandles nodeColor="bg-lime-500" />}
+        handles={<TypedHandles nodeType="mood_gauge" />}
         data={{ ...data, id, type: 'mood_gauge' }}
         id={id}
         resizer={

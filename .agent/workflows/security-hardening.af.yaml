@@ -1,0 +1,116 @@
+version: "1.0.0"
+name: "security-hardening"
+description: "RLS audit, JWT validation, and security improvements"
+metadata:
+  author: "security-engineer"
+  created: "2026-02-14"
+  tags: ["security", "audit", "rls"]
+  estimatedDuration: 20
+
+context:
+  auditScope: "full"
+  variables:
+    issuesFound: []
+
+paths:
+  code: "../web/src/"
+  database: "../supabase/"
+
+steps:
+  - id: "audit-rls-policies"
+    name: "Audit Row Level Security Policies"
+    agent: "security-engineer"
+    parameters:
+      scope: "{{context.auditScope}}"
+    workingDirectory: "../supabase/migrations/"
+    gate: "auto"
+    onSuccess:
+      - setVariable: "rlsIssues": "{{result.issues}}"
+      - log: "Found {{rlsIssues.length}} RLS issues"
+
+  - id: "audit-jwt-validation"
+    name: "Audit JWT Token Validation"
+    agent: "security-engineer"
+    parameters:
+      files: "auth, services"
+    workingDirectory: "../web/src/"
+    gate: "auto"
+    onSuccess:
+      - setVariable: "jwtIssues": "{{result.issues}}"
+
+  - id: "audit-env-variables"
+    name: "Audit Environment Variables"
+    agent: "security-engineer"
+    parameters:
+      checkSecrets: true
+    gate: "auto"
+    onSuccess:
+      - setVariable: "envIssues": "{{result.issues}}"
+
+  - id: "audit-supabase-client"
+    name: "Audit Supabase Client Usage"
+    agent: "supabase-expert"
+    parameters:
+      checkRLS: true
+      checkAnonKey: true
+    workingDirectory: "../web/src/"
+    gate: "auto"
+    onSuccess:
+      - setVariable: "clientIssues": "{{result.issues}}"
+
+  - id: "consolidate-findings"
+    name: "Consolidate Security Findings"
+    agent: "security-engineer"
+    parameters:
+      issues:
+        - "{{variables.rlsIssues}}"
+        - "{{variables.jwtIssues}}"
+        - "{{variables.envIssues}}"
+        - "{{variables.clientIssues}}"
+    gate: "auto"
+    onSuccess:
+      - setVariable: "severity": "{{result.critical}}"
+      - setVariable: "totalIssues": "{{result.count}}"
+
+  - id: "fix-critical-issues"
+    name: "Fix Critical Security Issues"
+    agent: "security-engineer"
+    parameters:
+      issues: "{{variables.critical}}"
+      severity: "critical"
+    gate: "hitl"
+    retry:
+      maxAttempts: 2
+    onSuccess:
+      - log: "Fixed {{result.fixed}} critical issues"
+
+  - id: "fix-medium-issues"
+    name: "Fix Medium Security Issues"
+    agent: "security-engineer"
+    parameters:
+      issues: "{{variables.medium}}"
+      severity: "medium"
+    gate: "passive"
+    onSuccess:
+      - setVariable: "mediumFixed": "{{result.fixed}}"
+
+  - id: "validate-security"
+    name: "Validate Security Fixes"
+    agent: "qa-engineer"
+    parameters:
+      testType: "security"
+    gate: "auto"
+
+  - id: "generate-report"
+    name: "Generate Security Report"
+    agent: "security-engineer"
+    parameters:
+      format: "markdown"
+      includeRemediation: true
+    gate: "auto"
+
+output:
+  summary: "Security audit complete. Fixed {{totalIssues}} issues."
+  artifacts:
+    - name: "Security Report"
+      path: "./security-report.md"

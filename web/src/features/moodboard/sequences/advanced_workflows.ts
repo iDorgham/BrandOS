@@ -8,9 +8,9 @@ const pos = (x: number, y: number) => ({ x, y });
 // ============================================================================
 export const research_flow_advanced: WorkflowTemplate = {
     id: 'research_flow_advanced',
-    label: 'Deep Research Protocol',
-    category: 'Research',
-    description: 'End-to-end market analysis: Competitors, Aesthetics, and Narrative.',
+    label: 'Competitive Intelligence Protocol',
+    category: 'Intelligence Lab',
+    description: 'End-to-end market analysis: Competitors, Aesthetics, and Trend Forecasting.',
     nodes: [
         // --- Phase 1: Input & Reference ---
         { id: 'h1', type: 'title', position: pos(0, 0), data: { label: 'Phase 1: Ingestion', content: 'Phase 1: Data Ingestion', fontSize: 48 } },
@@ -46,8 +46,8 @@ export const research_flow_advanced: WorkflowTemplate = {
 export const generative_engine_basic: WorkflowTemplate = {
     id: 'generative_engine_basic',
     label: 'Glass Engine (SDXL)',
-    category: 'Generative',
-    description: 'Standard Stable Diffusion XL pipeline with Glass UI.',
+    category: 'Intelligence Lab',
+    description: 'High-precision Stable Diffusion XL pipeline for cinematic output.',
     nodes: [
         { id: 'ckpt', type: 'checkpoint', position: pos(0, 50), data: { label: 'Model Loader', model: 'sd_xl_base_1.0.safetensors' } },
         { id: 'vae', type: 'vae', position: pos(0, 300), data: { label: 'VAE Handler', model: 'sdxl_vae.safetensors' } },
@@ -74,9 +74,9 @@ export const generative_engine_basic: WorkflowTemplate = {
 // ============================================================================
 export const social_scheduler_grid: WorkflowTemplate = {
     id: 'social_scheduler_grid',
-    label: 'Social 7-Day Grid',
-    category: 'Marketing',
-    description: 'Monday-Sunday content calendar grid with platform specific slots.',
+    label: 'Social 7-Day Matrix',
+    category: 'Growth & Ads',
+    description: 'Automated Monday-Sunday content calendar with platform-specific optimization.',
     nodes: [
         // Days Headers
         { id: 'mon', type: 'title', position: pos(0, 0), data: { label: 'Mon', content: 'MONDAY', fontSize: 24 } },
@@ -109,9 +109,9 @@ export const social_scheduler_grid: WorkflowTemplate = {
 // ============================================================================
 export const unified_master_canvas: WorkflowTemplate = {
     id: 'unified_master_canvas',
-    label: 'Unified Master Protocol',
-    category: 'Mega-Structure',
-    description: 'The ultimate BRAND OS workflow. Research -> Strategy -> Generation -> Distribution.',
+    label: 'unified Master Executive',
+    category: 'Systems Architecture',
+    description: 'The ultimate BRAND OS command workflow: Research -> Strategy -> Generation -> Distribution.',
     nodes: [
         // --- ZONE 1: STRATEGY (Left) ---
         { id: 's_title', type: 'title', position: pos(0, 0), data: { label: 'STRATEGY CORE', content: 'STRATEGY CORE', fontSize: 64 } },

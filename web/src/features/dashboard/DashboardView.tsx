@@ -154,7 +154,7 @@ export const DashboardView: React.FC<DashboardViewProps> = React.memo(({
                 }
             />
 
-            <div className="w-full px-8 py-12 space-y-12 pb-24">
+            <div className="w-full px-4 md:px-8 py-8 md:py-12 space-y-12 pb-24">
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 min-h-[260px]">
                     {/* 1. Compact Active Identity Card (4/12) */}
                     <Card className="lg:col-span-4 p-5 bg-card/80 backdrop-blur-xl border border-border relative overflow-hidden flex flex-col justify-between group transition-all hover:border-primary/20 rounded-sm">

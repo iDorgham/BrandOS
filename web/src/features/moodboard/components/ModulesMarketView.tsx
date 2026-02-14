@@ -1,6 +1,6 @@
 import React, { useState, useMemo, useCallback } from 'react';
 import { Card, Button, Input, EmptyState } from '@/components/ui';
-import { Sparkles, Download, Check, ExternalLink, Box, Search, Filter, Trash2, Loader2 } from 'lucide-react';
+import { Sparkles, Download, Check, ExternalLink, Box, Search, Filter, Trash2, Loader2, Star } from 'lucide-react';
 import { useNodeManager } from '@/hooks/useNodeManager';
 import { NodeCategory } from '@/features/moodboard/NodeRegistry';
 import { useDebounce } from '@/hooks/useDebounce';
@@ -73,17 +73,14 @@ export const ModulesMarketView = () => {
             {/* Carbon SideNav: Deep Filters */}
             <div className="w-72 bg-card border-r border-border/40 flex flex-col pt-8">
                 <div className="px-6 mb-4">
-                    <div className="text-[12px] font-black text-foreground uppercase tracking-[0.2em] mb-6 flex items-center gap-3">
-                        <Filter size={14} className="text-primary" /> Logic_Filters
-                    </div>
 
                     <div className="relative mb-8">
                         <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground/40" />
                         <Input
-                            placeholder="SEARCH SYSTEM MODULES..."
+                            placeholder="Search modules..."
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
-                            className="h-10 pl-10 bg-muted/20 border-border/20 focus:border-primary/40 text-[10px] uppercase font-mono tracking-widest rounded-none shadow-none placeholder:text-muted-foreground/20"
+                            className="h-10 pl-10 bg-muted/20 border-border/20 focus:border-primary/50 text-[10px] uppercase font-medium tracking-widest rounded-none shadow-none placeholder:text-muted-foreground/40"
                         />
                     </div>
                 </div>
@@ -91,7 +88,7 @@ export const ModulesMarketView = () => {
                 <div className="flex-1 overflow-y-auto custom-scrollbar px-3 space-y-8">
                     {/* Status Filter Section */}
                     <div className="space-y-2">
-                        <div className="px-3 py-1 text-[9px] font-black text-muted-foreground/30 uppercase tracking-[0.25em]">Registry_Status</div>
+                        <div className="px-3 py-1 text-[9px] font-bold text-muted-foreground/40 uppercase tracking-[0.2em]">Deployment Status</div>
                         {(['All', 'Installed', 'Available'] as const).map(status => (
                             <button
                                 key={status}
@@ -103,7 +100,7 @@ export const ModulesMarketView = () => {
                                         : 'text-muted-foreground/60 border-transparent hover:bg-muted/10 hover:text-foreground'}
                                 `}
                             >
-                                <span className="text-[11px] font-mono uppercase tracking-widest">{status}</span>
+                                <span className="text-[11px] font-medium uppercase tracking-widest">{status}</span>
                                 {statusFilter === status && <div className="w-1.5 h-1.5 rounded-full bg-primary shadow-[0_0_8px_rgba(var(--primary-rgb),0.5)]" />}
                             </button>
                         ))}
@@ -111,7 +108,7 @@ export const ModulesMarketView = () => {
 
                     {/* Category Filter Section */}
                     <div className="space-y-2">
-                        <div className="px-3 py-1 text-[9px] font-black text-muted-foreground/30 uppercase tracking-[0.25em]">Functional_DNA</div>
+                        <div className="px-3 py-1 text-[9px] font-bold text-muted-foreground/40 uppercase tracking-[0.2em]">Functional Areas</div>
                         <button
                             onClick={() => setActiveFilter('All')}
                             className={`
@@ -121,7 +118,7 @@ export const ModulesMarketView = () => {
                                     : 'text-muted-foreground/60 border-transparent hover:bg-muted/10 hover:text-foreground'}
                             `}
                         >
-                            <span className="text-[11px] font-mono uppercase tracking-widest">All_Modules</span>
+                            <span className="text-[11px] font-medium uppercase tracking-widest">All Modules</span>
                             {activeFilter === 'All' && <div className="w-1.5 h-1.5 rounded-full bg-primary shadow-[0_0_8px_rgba(var(--primary-rgb),0.5)]" />}
                         </button>
                         {categories.map(cat => (
@@ -135,7 +132,7 @@ export const ModulesMarketView = () => {
                                         : 'text-muted-foreground/60 border-transparent hover:bg-muted/10 hover:text-foreground'}
                                 `}
                             >
-                                <span className="text-[11px] font-mono uppercase tracking-widest">{cat}</span>
+                                <span className="text-[11px] font-medium uppercase tracking-widest">{cat.replace(/_/g, ' ')}</span>
                                 {activeFilter === cat && <div className="w-1.5 h-1.5 rounded-full bg-primary shadow-[0_0_8px_rgba(var(--primary-rgb),0.5)]" />}
                             </button>
                         ))}
@@ -143,7 +140,7 @@ export const ModulesMarketView = () => {
 
                     {/* Sort Section */}
                     <div className="space-y-2">
-                        <div className="px-3 py-1 text-[9px] font-black text-muted-foreground/30 uppercase tracking-[0.25em]">Sequence_Order</div>
+                        <div className="px-3 py-1 text-[9px] font-bold text-muted-foreground/40 uppercase tracking-[0.2em]">Sort Order</div>
                         <button
                             onClick={() => setSortBy('label')}
                             className={`
@@ -153,7 +150,7 @@ export const ModulesMarketView = () => {
                                     : 'text-muted-foreground/60 border-transparent hover:bg-muted/10 hover:text-foreground'}
                             `}
                         >
-                            <span className="text-[11px] font-mono uppercase tracking-widest">Descriptor (A-Z)</span>
+                            <span className="text-[11px] font-medium uppercase tracking-widest">Name (A-Z)</span>
                             {sortBy === 'label' && <div className="w-1.5 h-1.5 rounded-full bg-primary shadow-[0_0_8px_rgba(var(--primary-rgb),0.5)]" />}
                         </button>
                     </div>
@@ -162,7 +159,7 @@ export const ModulesMarketView = () => {
                 <div className="p-6 border-t border-border/40 bg-card">
                     <div className="flex items-center gap-3 text-muted-foreground/40 mb-2">
                         <Box size={12} />
-                        <span className="text-[9px] font-mono tracking-widest uppercase truncate letter-spacing-widest">Registry_Protocol_v1.0</span>
+                        <span className="text-[9px] font-medium tracking-widest uppercase truncate letter-spacing-widest">System Registry v1.0</span>
                     </div>
                 </div>
             </div>
@@ -182,14 +179,14 @@ export const ModulesMarketView = () => {
                     {filteredNodes.length === 0 ? (
                         <div className="h-[60vh] flex flex-col items-center justify-center border border-border/20 border-dashed bg-muted/5 backdrop-blur-sm">
                             <Search size={48} className="text-muted-foreground/20 mb-6" />
-                            <h3 className="text-sm font-black uppercase tracking-[0.4em] text-muted-foreground/60 mb-2">Null_Result_Set</h3>
-                            <p className="text-[11px] text-muted-foreground/30 uppercase tracking-widest font-mono">No logical modules matched the current trajectory.</p>
+                            <h3 className="text-sm font-bold uppercase tracking-[0.3em] text-muted-foreground/60 mb-2">No Modules Found</h3>
+                            <p className="text-[11px] text-muted-foreground/40 uppercase tracking-widest font-medium">No results matched your current filters.</p>
                             <Button
                                 variant="ghost"
                                 onClick={() => { setSearchQuery(''); setStatusFilter('All'); setActiveFilter('All'); }}
-                                className="mt-8 text-[10px] uppercase tracking-widest border border-border/40 text-muted-foreground/60 hover:text-foreground rounded-none"
+                                className="mt-8 text-[10px] uppercase tracking-widest border border-border/60 text-muted-foreground hover:bg-muted/20 hover:text-foreground rounded-none"
                             >
-                                Reset_Query
+                                Reset Filters
                             </Button>
                         </div>
                     ) : (
@@ -202,8 +199,8 @@ export const ModulesMarketView = () => {
                                             {category}
                                         </h3>
                                         <div className="h-[1px] flex-1 bg-border/20 translate-y-0.5" />
-                                        <div className="px-3 py-1 border border-border/20 text-[10px] font-mono text-muted-foreground/40 font-bold bg-muted/5 backdrop-blur-xs">
-                                            SEC::{category.substring(0, 3).toUpperCase()} // CNT::{nodes.length.toString().padStart(2, '0')}
+                                        <div className="px-3 py-1 border border-border/20 text-[10px] font-medium text-muted-foreground/60 bg-muted/5 backdrop-blur-xs">
+                                            {category.replace(/_/g, ' ')} // {nodes.length.toString().padStart(2, '0')} Units
                                         </div>
                                     </div>
 
@@ -214,79 +211,99 @@ export const ModulesMarketView = () => {
                                             return (
                                                 <div
                                                     key={node.id}
-                                                    className="group relative flex flex-col bg-card/40 backdrop-blur-md border border-border/40 transition-all duration-500 hover:border-primary/60 hover:shadow-[0_20px_50px_rgba(0,0,0,0.2)] dark:hover:shadow-[0_20px_50px_rgba(0,0,0,0.4)] overflow-hidden scale-100 hover:scale-[1.02] active:scale-[0.98]"
+                                                    className="group relative flex flex-col bg-card border border-border/40 transition-all duration-700 hover:border-primary/60 hover:shadow-[0_40px_100px_rgba(0,0,0,0.3)] dark:hover:shadow-[0_40px_100px_rgba(0,0,0,0.6)] overflow-hidden scale-100 hover:scale-[1.04] hover:-translate-y-2 active:scale-[0.98] rounded-none ease-[cubic-bezier(0.23,1,0.32,1)]"
                                                 >
                                                     {/* Color Bar with Glow */}
-                                                    <div className={`h-[5px] w-full ${node.defaultColor} opacity-50 group-hover:opacity-100 transition-all duration-500 group-hover:shadow-[0_0_15px_rgba(var(--primary-rgb),0.3)]`} />
+                                                    <div className={`h-[6px] w-full ${node.defaultColor} opacity-70 group-hover:opacity-100 transition-all duration-500`} />
 
                                                     {/* Corner Tech Accents */}
-                                                    <div className="absolute top-[5px] left-0 w-4 h-4 border-t-2 border-l-2 border-primary/0 group-hover:border-primary/60 transition-all duration-500 -translate-x-1 -translate-y-1 group-hover:translate-x-0 group-hover:translate-y-0" />
-                                                    <div className="absolute top-[5px] right-0 w-4 h-4 border-t-2 border-r-2 border-primary/0 group-hover:border-primary/60 transition-all duration-500 translate-x-1 -translate-y-1 group-hover:translate-x-0 group-hover:translate-y-0" />
+                                                    <div className="absolute top-[6px] left-0 w-5 h-5 border-t-2 border-l-2 border-primary/0 group-hover:border-primary/60 transition-all duration-500 -translate-x-1 -translate-y-1 group-hover:translate-x-0 group-hover:translate-y-0" />
+                                                    <div className="absolute top-[6px] right-0 w-5 h-5 border-t-2 border-r-2 border-primary/0 group-hover:border-primary/60 transition-all duration-500 translate-x-1 -translate-y-1 group-hover:translate-x-0 group-hover:translate-y-0" />
 
-                                                    <div className="p-7 flex-1 flex flex-col relative">
-                                                        {/* Ghost Label Background */}
-                                                        <div className="absolute top-10 right-[-10px] text-[40px] font-black text-foreground/[0.02] uppercase select-none pointer-events-none group-hover:text-primary/[0.03] transition-colors leading-none tracking-tighter">
+                                                    {/* Premium Glass Sweep Effect */}
+                                                    <div className="absolute inset-0 pointer-events-none bg-gradient-to-r from-transparent via-white/[0.05] to-transparent -translate-x-[100%] group-hover:translate-x-[100%] transition-transform duration-[1200ms] ease-[cubic-bezier(0.23,1,0.32,1)] z-20" />
+
+                                                    <div className="p-8 flex-1 flex flex-col relative bg-card/50 backdrop-blur-xl">
+                                                        {/* Ghost Label Background - Larger and higher contrast on hover */}
+                                                        <div className="absolute top-12 right-[-15px] text-[56px] font-black text-foreground/[0.03] uppercase select-none pointer-events-none group-hover:text-primary/[0.05] transition-colors leading-none tracking-tighter">
                                                             {node.label}
                                                         </div>
 
-                                                        <div className="flex justify-between items-start mb-10 relative z-10">
-                                                            <div className={`w-14 h-14 flex items-center justify-center bg-muted/20 border border-border/20 text-foreground group-hover:border-primary/60 group-hover:text-primary group-hover:bg-primary/5 transition-all duration-500 shadow-inner group-hover:rotate-[360deg]`}>
-                                                                <node.icon size={26} strokeWidth={1} />
+                                                        {/* Top Header Area: Icon & Big Badges */}
+                                                        <div className="flex justify-between items-start mb-8 relative z-10">
+                                                            <div className={`w-16 h-16 flex items-center justify-center bg-muted/30 border border-border/30 text-foreground group-hover:border-primary/60 group-hover:text-primary group-hover:bg-primary/5 transition-all duration-700 shadow-md group-hover:scale-110 group-hover:shadow-[0_0_30px_rgba(var(--primary-rgb),0.2)] rounded-none`}>
+                                                                <node.icon size={32} strokeWidth={1} />
                                                             </div>
-                                                            <div className="flex flex-col items-end gap-2 pt-1">
+                                                            <div className="flex flex-col items-end gap-2">
                                                                 {node.isCore ? (
-                                                                    <span className="text-[8px] font-black uppercase tracking-[0.2em] text-emerald-500 bg-emerald-500/10 px-2 py-1 border border-emerald-500/30 shadow-[0_0_10px_rgba(16,185,129,0.1)]">Core_Module</span>
+                                                                    <span className="text-[9px] font-black uppercase tracking-[0.2em] text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 px-3 py-1.5 border border-emerald-500/30">CORE MODULE</span>
                                                                 ) : (
-                                                                    <span className="text-[8px] font-mono text-muted-foreground/40 uppercase tracking-[0.2em] border border-border/20 px-2 py-1 bg-muted/5">
-                                                                        Ver::1.2.0
-                                                                    </span>
+                                                                    <span className="text-[9px] font-mono font-bold text-muted-foreground/60 uppercase tracking-[0.2em] border border-border/30 px-3 py-1.5 bg-muted/10">v1.2.0</span>
                                                                 )}
                                                                 {installed && (
-                                                                    <div className="flex items-center gap-2 text-[7px] font-black uppercase tracking-[0.3em] text-primary mt-1 px-2 py-1 bg-primary/10 border border-primary/30 animate-in fade-in duration-500">
-                                                                        <div className="w-1.5 h-1.5 bg-primary animate-pulse rounded-full shadow-[0_0_10px_rgba(var(--primary-rgb),0.8)]" />
-                                                                        Registered
+                                                                    <div className="flex items-center gap-2 text-[8px] font-black uppercase tracking-[0.3em] text-primary px-3 py-1.5 bg-primary/10 border border-primary/40 shadow-[0_0_15px_rgba(var(--primary-rgb),0.1)]">
+                                                                        <div className="w-2 h-2 bg-primary animate-pulse rounded-full shadow-[0_0_12px_rgba(var(--primary-rgb),1)]" />
+                                                                        ACTIVE
                                                                     </div>
                                                                 )}
                                                             </div>
                                                         </div>
 
-                                                        <div className="space-y-4 mb-10 flex-1 relative z-10">
+                                                        {/* Info Body */}
+                                                        <div className="space-y-4 mb-8 flex-1 relative z-10">
                                                             <div className="flex items-center gap-3">
-                                                                <h4 className="font-black text-[14px] uppercase tracking-[0.1em] text-foreground group-hover:text-primary transition-colors duration-300">{node.label}</h4>
-                                                                <div className="h-[2px] flex-1 bg-border/10 group-hover:bg-primary/20 transition-all duration-500" />
+                                                                <h4 className="font-black text-[16px] uppercase tracking-[0.1em] text-foreground group-hover:text-primary transition-colors duration-300">{node.label}</h4>
                                                             </div>
-                                                            <p className="text-[11px] text-muted-foreground leading-relaxed font-medium tracking-wide line-clamp-3 group-hover:text-foreground/90 transition-colors opacity-70 group-hover:opacity-100">
+
+                                                            {/* Rating - Relocated for maximum visibility */}
+                                                            <div className="flex items-center gap-2 py-1">
+                                                                <div className="flex items-center bg-amber-500/10 px-2 py-1 border border-amber-500/20 rounded-sm">
+                                                                    <div className="flex items-center mr-2">
+                                                                        {[...Array(5)].map((_, i) => {
+                                                                            const rating = (node.id.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0) % 15 + 35) / 10;
+                                                                            const fill = i < Math.floor(rating);
+                                                                            const isHalf = !fill && i < Math.ceil(rating) && (rating % 1) >= 0.5;
+                                                                            return (
+                                                                                <Star
+                                                                                    key={i}
+                                                                                    size={10}
+                                                                                    fill={fill || isHalf ? "#f59e0b" : "none"}
+                                                                                    className={fill ? "opacity-100" : isHalf ? "opacity-60" : "opacity-20"}
+                                                                                    color="#f59e0b"
+                                                                                    strokeWidth={fill ? 0 : 2}
+                                                                                />
+                                                                            );
+                                                                        })}
+                                                                    </div>
+                                                                    <span className="text-[10px] font-black text-amber-600 dark:text-amber-400 font-mono">
+                                                                        {((node.id.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0) % 15 + 35) / 10).toFixed(1)}
+                                                                    </span>
+                                                                </div>
+                                                            </div>
+
+                                                            <p className="text-[12px] text-muted-foreground leading-relaxed font-semibold tracking-wide group-hover:text-foreground transition-colors">
                                                                 {node.description}
                                                             </p>
                                                         </div>
 
-                                                        <div className="mt-auto pt-6 border-t border-border/10 group-hover:border-primary/20 transition-all duration-500 flex flex-col gap-5 relative z-10">
-                                                            {/* Technical Footer Metas */}
-                                                            <div className="flex items-center justify-between opacity-20 group-hover:opacity-50 transition-all duration-500">
-                                                                <span className="text-[7px] font-mono uppercase tracking-[0.3em] text-muted-foreground group-hover:text-primary">
-                                                                    HEX_ID::{node.id.substring(0, 8).toUpperCase()}
-                                                                </span>
-                                                                <span className="text-[7px] font-mono uppercase tracking-[0.3em] text-muted-foreground">
-                                                                    SGN::QUANTUM.VAL
-                                                                </span>
-                                                            </div>
+                                                        <div className="mt-auto pt-6 border-t border-border/20 group-hover:border-primary/40 transition-all duration-500 relative z-10">
+                                                            {/* Desired Focused Data Only - Metadata Removed */}
 
                                                             {installed ? (
                                                                 node.isCore ? (
-                                                                    <div className="w-full flex items-center justify-between px-5 h-11 bg-muted/10 border border-border/5 opacity-50 cursor-not-allowed">
-                                                                        <span className="text-[9px] font-black uppercase tracking-[0.25em] text-foreground/40">Immutable_Block</span>
-                                                                        <Check size={14} className="text-foreground/20" />
+                                                                    <div className="w-full flex items-center justify-between px-6 h-12 bg-muted/20 border border-border/10 opacity-70 cursor-not-allowed">
+                                                                        <span className="text-[10px] font-black uppercase tracking-[0.2em] text-foreground/40 text-center w-full">PROTECTED CORE SYSTEM</span>
                                                                     </div>
                                                                 ) : (
                                                                     <Button
                                                                         variant="ghost"
                                                                         onClick={() => handleNodeAction(node.id, 'uninstall')}
                                                                         disabled={isLoading}
-                                                                        className="w-full h-11 text-[10px] font-black uppercase tracking-[0.25em] bg-transparent border border-border/40 text-muted-foreground/60 hover:bg-rose-500/10 hover:text-rose-500 hover:border-rose-500/60 transition-all rounded-none disabled:opacity-50 group/un"
+                                                                        className="w-full h-12 text-[11px] font-black uppercase tracking-[0.3em] bg-transparent border border-border/40 text-muted-foreground/80 hover:bg-rose-500/10 hover:text-rose-600 hover:border-rose-500/60 transition-all rounded-none disabled:opacity-50 group/un"
                                                                     >
-                                                                        {isLoading ? 'DEPROVISIONING...' : (
+                                                                        {isLoading ? 'Decrypting...' : (
                                                                             <span className="flex items-center gap-2">
-                                                                                <Trash2 size={13} className="group-hover/un:scale-110 transition-transform" /> Uninstall_Module
+                                                                                <Trash2 size={16} className="group-hover/un:scale-110 transition-transform" /> UNINSTALL
                                                                             </span>
                                                                         )}
                                                                     </Button>
@@ -295,16 +312,16 @@ export const ModulesMarketView = () => {
                                                                 <Button
                                                                     onClick={() => handleNodeAction(node.id, 'install')}
                                                                     disabled={isLoading}
-                                                                    className="w-full h-11 text-[10px] font-black uppercase tracking-[0.25em] bg-primary hover:bg-primary/90 text-primary-foreground rounded-none border-none transition-all shadow-[0_4px_15px_rgba(var(--primary-rgb),0.3)] active:scale-[0.97] disabled:opacity-80 group/btn relative overflow-hidden"
+                                                                    className="w-full h-12 text-[11px] font-black uppercase tracking-[0.3em] bg-primary hover:bg-primary/90 text-primary-foreground rounded-none border-none transition-all shadow-lg active:scale-[0.98] disabled:opacity-80 group/btn relative overflow-hidden"
                                                                 >
-                                                                    <div className="absolute inset-0 bg-white/10 translate-x-[-100%] group-hover/btn:translate-x-[100%] transition-transform duration-1000 ease-in-out" />
+                                                                    <div className="absolute inset-0 bg-white/20 translate-x-[-100%] group-hover/btn:translate-x-[100%] transition-transform duration-1000 ease-in-out" />
                                                                     {isLoading ? (
                                                                         <span className="flex items-center gap-2">
-                                                                            <Loader2 size={13} className="animate-spin" /> Provisioning...
+                                                                            <Loader2 size={16} className="animate-spin" /> PROVISIONING...
                                                                         </span>
                                                                     ) : (
                                                                         <span className="flex items-center gap-2 relative z-10">
-                                                                            <Download size={14} className="group-hover/btn:-translate-y-0.5 transition-transform" /> Deploy_Module
+                                                                            <Download size={16} className="group-hover/btn:-translate-y-0.5 transition-transform" /> DEPLOY MODULE
                                                                         </span>
                                                                     )}
                                                                 </Button>

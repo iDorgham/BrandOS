@@ -41,7 +41,7 @@ export const ViewHeader: React.FC<ViewHeaderProps> = React.memo(({
                         <h1 className="text-3xl font-display font-black tracking-tighter uppercase leading-none flex items-baseline">
                             {title}
                             <span className="text-muted-foreground font-light text-xl ml-4 lowercase tracking-normal flex items-center h-full opacity-70">
-                                {subtitle}
+                                // {subtitle}
                             </span>
                         </h1>
                     </div>

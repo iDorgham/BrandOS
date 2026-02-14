@@ -7,6 +7,18 @@ export const LabelNode = React.memo(({ id, data, selected }: { id: string; data:
     const [isEditing, setIsEditing] = useState(false);
     const [tempLabel, setTempLabel] = useState(data.label);
 
+    const typographyStyle: React.CSSProperties = {
+        fontFamily: data.fontFamily || 'Inter',
+        fontSize: data.fontSize ? `${data.fontSize}pt` : '16px',
+        fontWeight: data.fontWeight || 'inherit',
+        fontStyle: data.fontStyle || 'inherit',
+        textDecoration: data.textDecoration || 'none',
+        textTransform: (data.textTransform as React.CSSProperties['textTransform']) || 'none',
+        letterSpacing: data.letterSpacing || 'inherit',
+        lineHeight: data.lineHeight || 'inherit',
+        textAlign: data.textAlign || 'center',
+    };
+
     return (
         <div className={`relative group/label transition-all ${selected ? 'z-50' : 'z-10'} ${data.isLocked ? 'cursor-default' : ''}`}>
             <NodeResizer
@@ -22,7 +34,8 @@ export const LabelNode = React.memo(({ id, data, selected }: { id: string; data:
                         value={tempLabel}
                         onChange={(e) => setTempLabel(e.target.value)}
                         onBlur={() => { data.onChange?.(id, { label: tempLabel }); setIsEditing(false); }}
-                        className="bg-transparent border-none outline-none text-[16px] font-bold uppercase tracking-tight text-zinc-900 dark:text-zinc-100 font-mono w-full text-center placeholder:text-zinc-400"
+                        style={typographyStyle}
+                        className="bg-transparent border-none outline-none font-bold uppercase text-zinc-900 dark:text-zinc-100 w-full placeholder:text-zinc-400"
                         autoFocus
                         placeholder="ENTER_ID"
                     />
@@ -37,7 +50,10 @@ export const LabelNode = React.memo(({ id, data, selected }: { id: string; data:
                     <div className="absolute top-0 left-0 w-1.5 h-1.5 border-t border-l border-zinc-200 dark:border-zinc-700 opacity-0 group-hover/label_inner:opacity-100 transition-opacity" />
                     <div className="absolute bottom-0 right-0 w-1.5 h-1.5 border-b border-r border-zinc-200 dark:border-zinc-700 opacity-0 group-hover/label_inner:opacity-100 transition-opacity" />
 
-                    <span className={`text-[16px] font-bold uppercase tracking-tight font-mono transition-all duration-500 ${data.label ? 'text-zinc-900 dark:text-zinc-100' : 'text-zinc-300 dark:text-zinc-700 italic'} italic`}>
+                    <span
+                        style={typographyStyle}
+                        className={`font-bold uppercase transition-all duration-500 ${data.label ? 'text-zinc-900 dark:text-zinc-100' : 'text-zinc-300 dark:text-zinc-700 italic'} italic block`}
+                    >
                         {data.label || 'ADD_LABEL'}
                     </span>
 

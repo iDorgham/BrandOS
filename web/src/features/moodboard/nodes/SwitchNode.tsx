@@ -3,17 +3,18 @@ import { NodeResizer, Handle, Position } from '@xyflow/react';
 import { GitBranch, Merge, Split, Grid3X3 } from 'lucide-react';
 import { MoodNodeData } from '../types';
 import { NodeContainer } from '../components/NodeComponents';
+import { PORT_TYPE_COLORS } from '../execution/portTypes';
 
 // Specialized Hook-style Handle for Switch Logic
 const SwitchHandle = ({ type, position, index, total, color }: { type: 'source' | 'target', position: Position, index: number, total: number, color: string }) => {
-    // Calculate vertical distribution
     const top = `${((index + 1) / (total + 1)) * 100}%`;
+    const portId = type === 'target' ? `input_${index}` : `output_${index}`;
 
     return (
         <Handle
             type={type}
             position={position}
-            id={`${type}-${index}`}
+            id={portId}
             style={{
                 top,
                 background: 'transparent',

@@ -1,0 +1,153 @@
+version: "1.0.0"
+name: "seo-authority"
+description: "Create 5 SEO-optimized blog posts with full content strategy"
+metadata:
+  author: "content-strategist"
+  created: "2026-02-14"
+  tags: ["seo", "content", "blog"]
+  estimatedDuration: 40
+
+context:
+  topic: ""
+  niche: ""
+  targetKeywords: []
+  variables:
+    posts: []
+
+paths:
+  code: "../web/src/"
+  ai: "./"
+
+steps:
+  - id: "seo-audit"
+    name: "Perform SEO Audit"
+    agent: "content-strategist"
+    skill: "seo-audit"
+    parameters:
+      url: "{{context.url}}"
+    gate: "auto"
+    onSuccess:
+      - setVariable: "seoAudit": "{{result}}"
+
+  - id: "keyword-research"
+    name: "Comprehensive Keyword Research"
+    agent: "content-strategist"
+    skill: "keyword-research"
+    parameters:
+      niche: "{{context.niche}}"
+      topic: "{{context.topic}}"
+      count: 50
+    gate: "auto"
+    onSuccess:
+      - setVariable: "keywords": "{{result}}"
+
+  - id: "content-strategy"
+    name: "Develop Content Strategy"
+    agent: "content-strategist"
+    skill: "create-content-calendar"
+    parameters:
+      topic: "{{context.topic}}"
+      keywords: "{{variables.keywords}}"
+      posts: 5
+    gate: "auto"
+    onSuccess:
+      - setVariable: "contentPlan": "{{result}}"
+
+  - id: "create-post-1"
+    name: "Create SEO Post 1 - Pillar Content"
+    agent: "copywriter"
+    skill: "write-copy"
+    parameters:
+      type: "blog-post"
+      title: "{{variables.contentPlan.posts[0].title}}"
+      keywords: "{{variables.contentPlan.posts[0].keywords}}"
+      wordCount: 2500
+      seo: true
+    gate: "auto"
+    onSuccess:
+      - setVariable: "post1": "{{result}}"
+
+  - id: "create-post-2"
+    name: "Create SEO Post 2 - Supporting"
+    agent: "copywriter"
+    skill: "write-copy"
+    parameters:
+      type: "blog-post"
+      title: "{{variables.contentPlan.posts[1].title}}"
+      keywords: "{{variables.contentPlan.posts[1].keywords}}"
+      wordCount: 1500
+      seo: true
+    gate: "auto"
+    onSuccess:
+      - setVariable: "post2": "{{result}}"
+
+  - id: "create-post-3"
+    name: "Create SEO Post 3 - How-To"
+    agent: "technical-writer"
+    skill: "write-copy"
+    parameters:
+      type: "how-to"
+      title: "{{variables.contentPlan.posts[2].title}}"
+      keywords: "{{variables.contentPlan.posts[2].keywords}}"
+      wordCount: 2000
+      seo: true
+    gate: "auto"
+    onSuccess:
+      - setVariable: "post3": "{{result}}"
+
+  - id: "create-post-4"
+    name: "Create SEO Post 4 - Listicle"
+    agent: "copywriter"
+    skill: "write-copy"
+    parameters:
+      type: "listicle"
+      title: "{{variables.contentPlan.posts[3].title}}"
+      keywords: "{{variables.contentPlan.posts[3].keywords}}"
+      wordCount: 1800
+      seo: true
+    gate: "auto"
+    onSuccess:
+      - setVariable: "post4": "{{result}}"
+
+  - id: "create-post-5"
+    name: "Create SEO Post 5 - Comparison"
+    agent: "technical-writer"
+    skill: "write-copy"
+    parameters:
+      type: "comparison"
+      title: "{{variables.contentPlan.posts[4].title}}"
+      keywords: "{{variables.contentPlan.posts[4].keywords}}"
+      wordCount: 2200
+      seo: true
+    gate: "auto"
+    onSuccess:
+      - setVariable: "post5": "{{result}}"
+
+  - id: "create-internal-links"
+    name: "Create Internal Linking Strategy"
+    agent: "content-strategist"
+    parameters:
+      posts:
+        - "{{variables.post1}}"
+        - "{{variables.post2}}"
+        - "{{variables.post3}}"
+        - "{{variables.post4}}"
+        - "{{variables.post5}}"
+    gate: "auto"
+
+  - id: "optimize-meta-tags"
+    name: "Optimize Meta Tags"
+    agent: "prompt-engineer"
+    skill: "write-prompt"
+    parameters:
+      type: "meta-tags"
+      posts: 5
+    gate: "auto"
+
+output:
+  summary: "5 SEO-optimized blog posts created for '{{context.topic}}'"
+  artifacts:
+    - name: "Blog Posts"
+      path: "./blog-posts/"
+    - name: "SEO Strategy"
+      path: "./seo-strategy.md"

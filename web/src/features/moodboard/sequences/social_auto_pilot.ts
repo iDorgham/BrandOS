@@ -2,8 +2,8 @@ import { WorkflowTemplate } from './types';
 
 export const social_auto_pilot: WorkflowTemplate = {
     id: 'social_auto_pilot',
-    label: 'Social_Auto_Pilot',
-    description: 'Scheduled multi-format content generation.',
+    label: 'Automated Social Presence',
+    description: 'Multi-channel content scheduling and generation for effortless social growth.',
     category: 'Automations',
     nodes: [
         { id: 't3', type: 'trigger', position: { x: 100, y: 1000 }, data: { label: 'Daily_Pulse', type: 'trigger' } },

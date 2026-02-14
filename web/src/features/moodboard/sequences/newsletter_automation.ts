@@ -2,8 +2,8 @@ import { WorkflowTemplate } from './types';
 
 export const newsletter_automation: WorkflowTemplate = {
     id: 'newsletter_auto',
-    label: 'Newsletter_Auto',
-    description: 'Curation -> AI Summary -> Branded Visual -> Distribution.',
+    label: 'Periodic Engagement Stream',
+    description: 'Automated high-value newsletter production and recurrent audience delivery.',
     category: 'Automations',
     nodes: [
         { id: 't1', type: 'trigger', position: { x: 0, y: 0 }, data: { label: 'Topic_Trigger', type: 'trigger' } },

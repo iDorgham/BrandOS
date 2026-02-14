@@ -1,0 +1,133 @@
+version: "1.0.0"
+name: "zero-to-brand"
+description: "Complete brand identity generation from scratch"
+metadata:
+  author: "creative-director"
+  created: "2026-02-14"
+  tags: ["branding", "identity", "full-brand"]
+  estimatedDuration: 45
+
+context:
+  brandName: ""
+  industry: ""
+  targetAudience: ""
+  values: []
+  variables:
+    brandColors: []
+    brandFonts: []
+
+paths:
+  code: "../web/src/"
+  ai: "./"
+
+steps:
+  - id: "brand-discovery"
+    name: "Brand Discovery Session"
+    agent: "brand-strategist"
+    skill: "develop-brand-strategy"
+    parameters:
+      brandName: "{{context.brandName}}"
+      industry: "{{context.industry}}"
+      targetAudience: "{{context.targetAudience}}"
+      values: "{{context.values}}"
+    gate: "auto"
+    onSuccess:
+      - setVariable: "brandStrategy": "{{result}}"
+
+  - id: "create-brand-name"
+    name: "Generate Brand Names"
+    agent: "copywriter"
+    skill: "create-tagline"
+    parameters:
+      type: "brand-name"
+      industry: "{{context.industry}}"
+      values: "{{context.values}}"
+    gate: "auto"
+
+  - id: "design-logo-concept"
+    name: "Design Logo Concepts"
+    agent: "graphic-designer"
+    skill: "design-component"
+    parameters:
+      type: "logo"
+      brandStrategy: "{{variables.brandStrategy}}"
+    gate: "auto"
+    onSuccess:
+      - setVariable: "logos": "{{result}}"
+
+  - id: "define-color-palette"
+    name: "Define Color Palette"
+    agent: "ui-designer"
+    skill: "create-style-guide"
+    parameters:
+      type: "colors"
+      brandStrategy: "{{variables.brandStrategy}}"
+    gate: "auto"
+    onSuccess:
+      - setVariable: "brandColors": "{{result.colors}}"
+
+  - id: "define-typography"
+    name: "Define Typography System"
+    agent: "ui-designer"
+    skill: "create-style-guide"
+    parameters:
+      type: "typography"
+      brandStrategy: "{{variables.brandStrategy}}"
+    gate: "auto"
+    onSuccess:
+      - setVariable: "brandFonts": "{{result.fonts}}"
+
+  - id: "create-tone-of-voice"
+    name: "Create Tone of Voice"
+    agent: "copywriter"
+    skill: "write-copy"
+    parameters:
+      type: "brand-voice"
+      brandStrategy: "{{variables.brandStrategy}}"
+    gate: "auto"
+
+  - id: "design-key-components"
+    name: "Design Key UI Components"
+    agent: "ui-designer"
+    skill: "design-component"
+    parameters:
+      components: ["Button", "Card", "Input", "Navigation"]
+      style: "{{variables.brandStrategy}}"
+    workingDirectory: "../web/src/components/ui/"
+    gate: "auto"
+
+  - id: "create-brand-guidelines"
+    name: "Create Brand Guidelines Document"
+    agent: "technical-writer"
+    parameters:
+      brandStrategy: "{{variables.brandStrategy}}"
+      colors: "{{variables.brandColors}}"
+      fonts: "{{variables.brandFonts}}"
+      logos: "{{variables.logos}}"
+    gate: "auto"
+
+  - id: "generate-social-assets"
+    name: "Generate Social Media Assets"
+    agent: "graphic-designer"
+    skill: "generate-image-prompt"
+    parameters:
+      platforms: ["instagram", "twitter", "linkedin"]
+      brandStyle: "{{variables.brandStrategy}}"
+    gate: "auto"
+
+  - id: "plan-brand-content"
+    name: "Plan Initial Brand Content"
+    agent: "content-strategist"
+    skill: "create-content-calendar"
+    parameters:
+      channels: ["website", "social", "email"]
+      brandStrategy: "{{variables.brandStrategy}}"
+    gate: "auto"
+
+output:
+  summary: "Complete brand identity created for '{{context.brandName}}'"
+  artifacts:
+    - name: "Brand Guidelines"
+      path: "./brand-guidelines.md"
+    - name: "Logo Concepts"
+      path: "./logos/"

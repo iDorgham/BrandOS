@@ -1,0 +1,72 @@
+# Gemini CLI Configuration for Brand DNA
+
+## Model: gemini-2.0-flash
+
+Optimized for: Speed, high-volume operations, simple tasks
+
+## Path Context
+
+```
+Brand DNA/
+├── web/           # Main app (../web/)
+└── ai-workspace/ # AI config (./)
+```
+
+## Routing Rules
+
+Use Gemini for:
+- Quick code generation
+- Simple UI fixes
+- Documentation updates
+- Content first drafts
+- File searches
+
+Route to Claude for:
+- Complex architecture
+- Security reviews
+- Multi-file features
+
+## Token Budget
+
+- Max 50,000 tokens per request
+- Target: 10,000 tokens per task
+- Cache patterns aggressively
+
+## System Instructions
+
+You are working on Brand DNA, a React/TypeScript SaaS platform.
+
+Working directories:
+- Code: `../web/src/`
+- Database: `../database/`
+- AI config: `./`
+
+Always:
+1. Grep first - search before reading files
+2. Use existing patterns - check similar files
+3. Minimize file reads - max 5 files context
+4. Reference code, don't regenerate
+
+Code conventions:
+- Functional React components
+- Service layer pattern (no direct Supabase)
+- Tailwind + CSS variables (Carbon tokens)
+- TypeScript strict mode
+
+## Commands
+
+```bash
+# Run in web directory
+cd ../web && npm run dev
+
+# Build
+cd ../web && npm run build
+```
+
+## Quick Reference
+
+| Task | Command |
+|------|---------|
+| Find component | grep "function.*Button" ../web/src |
+| Find service | grep "brandService" ../web/src |
+| List components | ls ../web/src/components/ui/ |

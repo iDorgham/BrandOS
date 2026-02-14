@@ -269,6 +269,16 @@ html {
     background: #8d8d8d;
     /* Gray 50 */
   }
+
+  /* Hide scrollbar while keeping scroll functionality */
+  .hide-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  .hide-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
 }
 
 @keyframes progress-indeterminate {

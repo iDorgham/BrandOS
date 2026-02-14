@@ -69,8 +69,8 @@ export const IdentityView = React.memo<IdentityViewProps>(({ brand }) => {
                 }
             />
 
-            <div className="w-full px-8 py-12 space-y-12 pb-24">
-                <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
+            <div className="w-full px-4 md:px-8 py-8 md:py-12 space-y-12 pb-24">
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12">
                     {/* Left Column: Technical Specs */}
                     <div className="lg:col-span-8 space-y-12">
                         {/* Chromatic Spectrum */}
@@ -148,7 +148,7 @@ export const IdentityView = React.memo<IdentityViewProps>(({ brand }) => {
                             </div>
 
                             <div className="space-y-6">
-                                <Card className="p-10 bg-card/20 border-border/40 rounded-none relative overflow-hidden group">
+                                <Card className="p-4 md:p-10 bg-card/20 border-border/40 rounded-none relative overflow-hidden group">
                                     {/* Decor Background Lines */}
                                     <div className="absolute inset-0 opacity-[0.03] pointer-events-none">
                                         {Array.from({ length: 12 }).map((_, i) => (
@@ -165,7 +165,7 @@ export const IdentityView = React.memo<IdentityViewProps>(({ brand }) => {
                                                 <span>64px // -0.05em</span>
                                             </div>
                                             <div className="relative">
-                                                <h3 className="text-7xl font-display font-black tracking-tighter leading-none hover:text-primary transition-colors cursor-default">
+                                                <h3 className="text-4xl md:text-7xl font-display font-black tracking-tighter leading-none hover:text-primary transition-colors cursor-default">
                                                     DNA ORCHESTRATION
                                                 </h3>
                                                 <div className="absolute -left-4 top-0 h-full w-[2px] bg-primary/20 opacity-0 group-hover:opacity-100 transition-opacity" />
@@ -178,7 +178,7 @@ export const IdentityView = React.memo<IdentityViewProps>(({ brand }) => {
                                                 <span>Character Set // A-Z 0-9</span>
                                                 <div className="flex-1 h-[1px] bg-primary/10" />
                                             </div>
-                                            <p className="text-2xl font-mono tracking-widest opacity-40 hover:opacity-100 transition-opacity cursor-default leading-tight">
+                                            <p className="text-lg md:text-2xl font-mono tracking-widest opacity-40 hover:opacity-100 transition-opacity cursor-default leading-tight break-all">
                                                 ABCDEFGHIJKLMNOPQRSTUVWXYZ<br />
                                                 abcdefghijklmnopqrstuvwxyz<br />
                                                 0123456789!@#$%^&*()
@@ -186,7 +186,7 @@ export const IdentityView = React.memo<IdentityViewProps>(({ brand }) => {
                                         </div>
 
                                         {/* Specimen C: Contextual Text */}
-                                        <div className="grid grid-cols-2 gap-12">
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12">
                                             <div className="space-y-2">
                                                 <p className="text-[13px] leading-relaxed text-foreground/80 font-medium">
                                                     Synthesis of brand DNA requires absolute precision in every typographic interaction. Kinetic flow protocols are active and monitored for consistency.

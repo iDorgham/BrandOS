@@ -1,0 +1,149 @@
+version: "1.0.0"
+name: "social-omnichannel"
+description: "30-day content calendar across all social platforms"
+metadata:
+  author: "social-media-strategist"
+  created: "2026-02-14"
+  tags: ["social-media", "content", "calendar"]
+  estimatedDuration: 30
+
+context:
+  brandName: ""
+  platforms: []
+  goals: []
+  variables:
+    contentPieces: []
+
+paths:
+  ai: "./"
+
+steps:
+  - id: "social-audit"
+    name: "Audit Current Social Presence"
+    agent: "social-media-strategist"
+    parameters:
+      platforms: "{{context.platforms}}"
+    gate: "auto"
+    onSuccess:
+      - setVariable: "audit": "{{result}}"
+
+  - id: "define-audience"
+    name: "Define Target Audience"
+    agent: "social-media-manager"
+    parameters:
+      platforms: "{{context.platforms}}"
+      brand: "{{context.brandName}}"
+    gate: "auto"
+    onSuccess:
+      - setVariable: "audience": "{{result}}"
+
+  - id: "content-strategy"
+    name: "Develop Content Strategy"
+    agent: "social-media-strategist"
+    skill: "create-social-campaign"
+    parameters:
+      duration: 30
+      platforms: "{{context.platforms}}"
+      goals: "{{context.goals}}"
+    gate: "auto"
+    onSuccess:
+      - setVariable: "strategy": "{{result}}"
+
+  - id: "content-themes"
+    name: "Define Weekly Content Themes"
+    agent: "content-strategist"
+    skill: "create-content-calendar"
+    parameters:
+      type: "social"
+      weeks: 4
+      platforms: "{{context.platforms}}"
+    gate: "auto"
+    onSuccess:
+      - setVariable: "themes": "{{result}}"
+
+  - id: "week-1-content"
+    name: "Create Week 1 Content"
+    agent: "copywriter"
+    skill: "plan-social-content"
+    parameters:
+      week: 1
+      theme: "{{variables.themes.week1}}"
+      platforms: "{{context.platforms}}"
+    gate: "auto"
+    onSuccess:
+      - setVariable: "week1": "{{result}}"
+
+  - id: "week-2-content"
+    name: "Create Week 2 Content"
+    agent: "copywriter"
+    skill: "plan-social-content"
+    parameters:
+      week: 2
+      theme: "{{variables.themes.week2}}"
+      platforms: "{{context.platforms}}"
+    gate: "auto"
+    onSuccess:
+      - setVariable: "week2": "{{result}}"
+
+  - id: "week-3-content"
+    name: "Create Week 3 Content"
+    agent: "copywriter"
+    skill: "plan-social-content"
+    parameters:
+      week: 3
+      theme: "{{variables.themes.week3}}"
+      platforms: "{{context.platforms}}"
+    gate: "auto"
+    onSuccess:
+      - setVariable: "week3": "{{result}}"
+
+  - id: "week-4-content"
+    name: "Create Week 4 Content"
+    agent: "copywriter"
+    skill: "plan-social-content"
+    parameters:
+      week: 4
+      theme: "{{variables.themes.week4}}"
+      platforms: "{{context.platforms}}"
+    gate: "auto"
+    onSuccess:
+      - setVariable: "week4": "{{result}}"
+
+  - id: "create-visuals"
+    name: "Create Social Media Visuals"
+    agent: "graphic-designer"
+    skill: "generate-image-prompt"
+    parameters:
+      platforms: "{{context.platforms}}"
+      contentCount: 60
+    gate: "auto"
+    onSuccess:
+      - setVariable: "visuals": "{{result}}"
+
+  - id: "schedule-posts"
+    name: "Schedule Posts"
+    agent: "social-media-manager"
+    parameters:
+      calendar:
+        week1: "{{variables.week1}}"
+        week2: "{{variables.week2}}"
+        week3: "{{variables.week3}}"
+        week4: "{{variables.week4}}"
+      platforms: "{{context.platforms}}"
+    gate: "passive"
+
+  - id: "setup-analytics"
+    name: "Setup Analytics Dashboard"
+    agent: "marketing-strategist"
+    parameters:
+      platforms: "{{context.platforms}}"
+      metrics: ["engagement", "reach", "conversions"]
+    gate: "auto"
+
+output:
+  summary: "30-day social media calendar created for {{context.brandName}}"
+  artifacts:
+    - name: "Content Calendar"
+      path: "./content-calendar.md"
+    - name: "Post Templates"
+      path: "./templates/"

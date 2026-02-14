@@ -2,8 +2,8 @@ import { WorkflowTemplate } from './types';
 
 export const brand_identity_quantum: WorkflowTemplate = {
     id: 'brand_identity_quantum',
-    label: 'Brand Identity Quantum',
-    description: 'Deep DNA audit with multi-shot generation and logic gating.',
+    label: 'Brand Identity Quantum Protocol',
+    description: 'Deep DNA audit with multi-shot generation and advanced logic gating for brand evolution.',
     category: 'Brand Architecture',
     nodes: [
         { id: 'n1', type: 'attribute', position: { x: 0, y: 0 }, data: { label: 'Core Archetype' } },
@@ -31,8 +31,8 @@ export const brand_identity_quantum: WorkflowTemplate = {
 
 export const omnichannel_growth_loop: WorkflowTemplate = {
     id: 'omnichannel_growth_loop',
-    label: 'Omnichannel Growth Loop',
-    description: 'Social sniper + Ad set gen + Newsletter + CMS Sync with feedback.',
+    label: 'Omnichannel Growth Accelerator',
+    description: 'High-velocity growth loop: Social precision + Ad orchestration + Newsletter automation.',
     category: 'Growth & Ads',
     nodes: [
         { id: 'n1', type: 'trigger', position: { x: 0, y: 100 }, data: { label: 'Campaign Start' } },
@@ -59,8 +59,8 @@ export const omnichannel_growth_loop: WorkflowTemplate = {
 
 export const visual_hierarchy_validator: WorkflowTemplate = {
     id: 'visual_hierarchy_validator',
-    label: 'Visual Hierarchy Validator',
-    description: 'Section + Title + Palette + Vibe for strict layout consistency.',
+    label: 'Visual Hierarchy Architect',
+    description: 'Structural sectioning + Paletted titles + Tone validation for layout consistency.',
     category: 'Systems Architecture',
     nodes: [
         { id: 'n1', type: 'section', position: { x: 0, y: 0 }, data: { label: 'Layout Area' } },
@@ -80,8 +80,8 @@ export const visual_hierarchy_validator: WorkflowTemplate = {
 
 export const generative_pipeline_pro: WorkflowTemplate = {
     id: 'generative_pipeline_pro',
-    label: 'Generative Pipeline Pro',
-    description: 'Full ComfyUI-style pipeline with intensity monitoring.',
+    label: 'Glass Generation Pipeline Pro',
+    description: 'Full-stack generative infrastructure with LoRA refinement and intensity monitoring.',
     category: 'Intelligence Lab',
     nodes: [
         { id: 'n1', type: 'checkpoint', position: { x: 0, y: 0 }, data: { label: 'Base Model' } },
@@ -104,8 +104,8 @@ export const generative_pipeline_pro: WorkflowTemplate = {
 
 export const competitive_dna_disruptor: WorkflowTemplate = {
     id: 'competitive_dna_disruptor',
-    label: 'Competitive DNA Disruptor',
-    description: 'Analyze rivals and re-interpret brand DNA.',
+    label: 'Strategic DNA Disruptor',
+    description: 'Competitive market analysis and strategic re-interpretation of core brand DNA.',
     category: 'Brand Architecture',
     nodes: [
         { id: 'n1', type: 'competitor', position: { x: 0, y: 0 }, data: { label: 'Rival A' } },
@@ -127,8 +127,8 @@ export const competitive_dna_disruptor: WorkflowTemplate = {
 
 export const sonic_visualizer_sync: WorkflowTemplate = {
     id: 'sonic_visualizer_sync',
-    label: 'Sonic Visualizer Sync',
-    description: 'Spotify Link -> Mood Gauge -> AI Gen (visualizing audio vibe).',
+    label: 'Sonic-to-Visual Synesthesia',
+    description: 'Audio source analysis -> Vibe detection -> Generative visual synthesis.',
     category: 'Intelligence Lab',
     nodes: [
         { id: 'n1', type: 'spotify', position: { x: 0, y: 50 }, data: { label: 'Music Source' } },
@@ -148,8 +148,8 @@ export const sonic_visualizer_sync: WorkflowTemplate = {
 
 export const dynamic_ambience_engine: WorkflowTemplate = {
     id: 'dynamic_ambience_engine',
-    label: 'Dynamic Ambience Engine',
-    description: 'Weather node -> Vibe adjustment -> Visual output shifting.',
+    label: 'Adaptive Ambience Reactor',
+    description: 'Environmental data triggering -> Tone adjustment -> Dynamic visual state shifting.',
     category: 'Intelligence Lab',
     nodes: [
         { id: 'n1', type: 'weather', position: { x: 0, y: 50 }, data: { label: 'Local Sky' } },
@@ -168,8 +168,8 @@ export const dynamic_ambience_engine: WorkflowTemplate = {
 
 export const automated_styleguide_gen: WorkflowTemplate = {
     id: 'automated_styleguide_gen',
-    label: 'Automated Styleguide Gen',
-    description: 'Colors + Fonts + Grid -> Markdown Narrative auto-generation.',
+    label: 'Automated Style System Generator',
+    description: 'Color/Type/Grid mapping -> Narrative structure and brand documentation generation.',
     category: 'Systems Architecture',
     nodes: [
         { id: 'n1', type: 'palette', position: { x: 0, y: 0 }, data: { label: 'Brand Palette' } },
@@ -190,8 +190,8 @@ export const automated_styleguide_gen: WorkflowTemplate = {
 
 export const lead_gen_nurture_orchestra: WorkflowTemplate = {
     id: 'lead_gen_nurture_orchestra',
-    label: 'Lead Gen Nurture Orchestra',
-    description: 'Trigger -> Intelligence -> Growth -> Sync.',
+    label: 'Lead Nurture Lifecycle Orchestrator',
+    description: 'Lead capture -> Profile intelligence -> Multi-path automated engagement sequences.',
     category: 'Growth & Ads',
     nodes: [
         { id: 'n1', type: 'trigger', position: { x: 0, y: 50 }, data: { label: 'New Lead' } },
@@ -213,8 +213,8 @@ export const lead_gen_nurture_orchestra: WorkflowTemplate = {
 
 export const product_concept_laboratory: WorkflowTemplate = {
     id: 'product_concept_laboratory',
-    label: 'Product Concept Laboratory',
-    description: 'Image Ref -> Attributes -> Prompts -> 4x Variants.',
+    label: 'Product Concept Synthesizer',
+    description: 'Visual inspiration -> Attribute extraction -> Conceptual generation with variant output.',
     category: 'Content Engine',
     nodes: [
         { id: 'n1', type: 'image', position: { x: 0, y: 50 }, data: { label: 'Inspiration' } },
@@ -236,8 +236,8 @@ export const product_concept_laboratory: WorkflowTemplate = {
 
 export const creative_ad_strategist: WorkflowTemplate = {
     id: 'creative_ad_strategist',
-    label: 'Creative Ad Strategist',
-    description: 'Ad campaign master + Competitive analysis -> Final Ad Ref.',
+    label: 'Tactical Ad Strategist',
+    description: 'Omnichannel campaign mastery fused with competitive intelligence for high-impact ads.',
     category: 'Growth & Ads',
     nodes: [
         { id: 'n1', type: 'competitor', position: { x: 0, y: 0 }, data: { label: 'Rival Ad' } },
@@ -259,8 +259,8 @@ export const creative_ad_strategist: WorkflowTemplate = {
 
 export const content_velocity_factory: WorkflowTemplate = {
     id: 'content_velocity_factory',
-    label: 'Content Velocity Factory',
-    description: 'Multi-platform distribution via CMS and Social.',
+    label: 'Narrative Velocity Engine',
+    description: 'Multi-platform content distribution via synchronized CMS and social broadcasting.',
     category: 'Content Engine',
     nodes: [
         { id: 'n1', type: 'text', position: { x: 0, y: 50 }, data: { label: 'Master Story' } },
@@ -281,8 +281,8 @@ export const content_velocity_factory: WorkflowTemplate = {
 
 export const narrative_logic_branch: WorkflowTemplate = {
     id: 'narrative_logic_branch',
-    label: 'Narrative Logic Branch',
-    description: 'Different brand stories based on attributes.',
+    label: 'Narrative Logic Transformer',
+    description: 'Dynamic audience-aware story branching based on specific psychographic attributes.',
     category: 'Brand Architecture',
     nodes: [
         { id: 'n1', type: 'attribute', position: { x: 0, y: 50 }, data: { label: 'Audience Segment' } },
@@ -302,8 +302,8 @@ export const narrative_logic_branch: WorkflowTemplate = {
 
 export const system_architecture_blueprint: WorkflowTemplate = {
     id: 'system_architecture_blueprint',
-    label: 'System Architecture Blueprint',
-    description: 'High-level UI/UX system mapping.',
+    label: 'Master System Blueprint',
+    description: 'High-level UX/UI architectural mapping and functional block synchronization.',
     category: 'Systems Architecture',
     nodes: [
         { id: 'n1', type: 'grid', position: { x: 0, y: 0 }, data: { label: 'Layout Grid' } },
@@ -322,8 +322,8 @@ export const system_architecture_blueprint: WorkflowTemplate = {
 
 export const market_expansion_terminal: WorkflowTemplate = {
     id: 'market_expansion_terminal',
-    label: 'Market Expansion Terminal',
-    description: 'Rivals + Link Ref + CMS Sync + Distro -> New region readiness.',
+    label: 'Regional Expansion Terminal',
+    description: 'Localized intelligence + CMS sync -> Multi-region market readiness and distribution.',
     category: 'Growth & Ads',
     nodes: [
         { id: 'n1', type: 'competitor', position: { x: 0, y: 50 }, data: { label: 'Local Rival' } },

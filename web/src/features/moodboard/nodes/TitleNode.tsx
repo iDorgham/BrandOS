@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { NodeResizer } from '@xyflow/react';
 import { Heading1 } from 'lucide-react';
 import { MoodNodeData } from '../types';
-import { NodeContainer, NodeHandles } from '../components/NodeComponents';
+import { NodeContainer, TypedHandles } from '../components/NodeComponents';
 import { useMoodBoard } from '../MoodBoardContext';
 
 export const TitleNode = React.memo(({ id, data, selected }: { id: string; data: MoodNodeData; selected: boolean }) => {
@@ -10,6 +10,18 @@ export const TitleNode = React.memo(({ id, data, selected }: { id: string; data:
     const [tempContent, setTempContent] = useState(data.content || '');
 
     const { isShiftPressed } = useMoodBoard();
+
+    const typographyStyle: React.CSSProperties = {
+        fontFamily: data.fontFamily || 'Inter',
+        fontSize: data.fontSize ? `${data.fontSize}pt` : '30px',
+        fontWeight: data.fontWeight || '900',
+        fontStyle: data.fontStyle || 'inherit',
+        textDecoration: data.textDecoration || 'none',
+        textTransform: (data.textTransform as React.CSSProperties['textTransform']) || 'none',
+        letterSpacing: data.letterSpacing || 'inherit',
+        lineHeight: data.lineHeight || '1',
+        textAlign: data.textAlign || 'left',
+    };
 
     return (
         <NodeContainer
@@ -19,7 +31,7 @@ export const TitleNode = React.memo(({ id, data, selected }: { id: string; data:
             typeColor="bg-indigo-600"
             onEdit={() => setIsEditing(!isEditing)}
             isEditing={isEditing}
-            handles={<NodeHandles nodeColor="bg-indigo-600" />}
+            handles={<TypedHandles nodeType="title" />}
             data={{ ...data, id, type: 'title' }}
             id={id}
             resizer={
@@ -39,7 +51,8 @@ export const TitleNode = React.memo(({ id, data, selected }: { id: string; data:
                         value={tempContent}
                         onChange={(e) => setTempContent(e.target.value)}
                         onBlur={() => { data.onChange?.(id, { content: tempContent }); setIsEditing(false); }}
-                        className="w-full bg-zinc-50 dark:bg-zinc-900 px-4 py-2 text-2xl font-black outline-none border border-primary text-zinc-900 dark:text-zinc-100 uppercase tracking-tight"
+                        style={typographyStyle}
+                        className="w-full bg-zinc-50 dark:bg-zinc-900 px-4 py-2 font-black outline-none border border-primary text-zinc-900 dark:text-zinc-100 uppercase"
                         placeholder="ENTER_TITLE"
                         autoFocus
                     />
@@ -50,7 +63,10 @@ export const TitleNode = React.memo(({ id, data, selected }: { id: string; data:
                         <div className="w-6 h-[1px] bg-primary" />
                         <span className="text-[7px] font-mono font-bold tracking-[0.3em] text-zinc-500 uppercase">SECTION_HEADER</span>
                     </div>
-                    <h1 className={`text-3xl font-black tracking-tighter transition-all duration-300 uppercase leading-[1] ${data.content ? 'text-zinc-900 dark:text-zinc-100' : 'text-zinc-200 dark:text-zinc-800'}`}>
+                    <h1
+                        style={typographyStyle}
+                        className={`font-black transition-all duration-300 uppercase ${data.content ? 'text-zinc-900 dark:text-zinc-100' : 'text-zinc-200 dark:text-zinc-800'}`}
+                    >
                         {data.content || 'ADD_TITLE'}
                     </h1>
                 </div>

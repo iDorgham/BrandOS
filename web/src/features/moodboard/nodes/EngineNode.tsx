@@ -2,7 +2,7 @@ import React from 'react';
 import { NodeResizer } from '@xyflow/react';
 import { Cpu, Database, Sparkles, Brain, Shrink } from 'lucide-react';
 import { MoodNodeData } from '../types';
-import { NodeContainer, NodeHandles } from '../components/NodeComponents';
+import { NodeContainer, TypedHandles } from '../components/NodeComponents';
 
 export const EngineNode = ({ id, data, selected }: { id: string; data: MoodNodeData; selected: boolean }) => {
     return (
@@ -11,7 +11,7 @@ export const EngineNode = ({ id, data, selected }: { id: string; data: MoodNodeD
             title="Engine"
             icon={Cpu}
             typeColor="bg-violet-600"
-            handles={<NodeHandles nodeColor="bg-violet-600" />}
+            handles={<TypedHandles nodeType="engine" />}
             data={{ ...data, id, type: 'engine' }}
             id={id}
             resizer={

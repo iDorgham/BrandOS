@@ -2,7 +2,7 @@ import React from 'react';
 import { NodeResizer } from '@xyflow/react';
 import { X } from 'lucide-react';
 import { MoodNodeData } from '../types';
-import { NodeContainer, NodeHandles } from '../components/NodeComponents';
+import { NodeContainer, TypedHandles } from '../components/NodeComponents';
 import { Input } from '@/components/ui';
 
 export const NegativeNode = ({ id, data, selected }: { id: string; data: MoodNodeData; selected: boolean }) => (
@@ -11,7 +11,7 @@ export const NegativeNode = ({ id, data, selected }: { id: string; data: MoodNod
         title="Anti_DNA"
         icon={X}
         typeColor="bg-rose-600"
-        handles={<NodeHandles nodeColor="bg-rose-600" />}
+        handles={<TypedHandles nodeType="negative" />}
         data={{ ...data, id, type: 'negative' }}
         id={id}
         resizer={

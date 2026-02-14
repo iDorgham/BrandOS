@@ -2,8 +2,8 @@ import { WorkflowTemplate } from './types';
 
 export const blog_mastery: WorkflowTemplate = {
     id: 'blog_mastery',
-    label: 'Blog_Mastery',
-    description: 'Ultra-complex pipeline: Research -> Copy -> Image AI -> Cloud Distribution.',
+    label: 'Content Authority Suite',
+    description: 'Advanced long-form content strategy and multi-format archival for global brand positioning.',
     category: 'Content Engine',
     nodes: [
         { id: 't1', type: 'trigger', position: { x: 0, y: 100 }, data: { label: 'Manual_Start', type: 'trigger' } },

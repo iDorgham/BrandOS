@@ -6,8 +6,9 @@
 
 [![Version](https://img.shields.io/badge/version-2.0-blue.svg)](https://github.com/iDorgham/BrandOS)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
-[![TypeScript](https://img.shields.io/badge/TypeScript-5.9-blue.svg)](https://www.typescriptlang.org/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.8-blue.svg)](https://www.typescriptlang.org/)
 [![React](https://img.shields.io/badge/React-19-61dafb.svg)](https://reactjs.org/)
+[![Vite](https://img.shields.io/badge/Vite-6.2-646CFF.svg)](https://vitejs.dev/)
 [![Supabase](https://img.shields.io/badge/Supabase-Backend-3ecf8e.svg)](https://supabase.com/)
 
 **A cloud-native SaaS platform that empowers designers and brand teams to generate infinite, on-brand visual assets through AI-assisted workflows—while preserving human creative direction.**
@@ -144,8 +145,9 @@ VITE_GOOGLE_AI_API_KEY=your-gemini-api-key
 | Layer | Technology | Purpose |
 |-------|-----------|---------|
 | **Frontend** | React 19 + TypeScript | UI framework with type safety |
-| **Build Tool** | Vite 7.3 | Lightning-fast dev server |
+| **Build Tool** | Vite 6.2 | Lightning-fast dev server |
 | **Styling** | Tailwind CSS 3.4 | Utility-first CSS framework |
+| **AI Ops** | .agents / AGENTS.md | Unified AI workspace & protocols |
 | **Backend** | Supabase (PostgreSQL) | Managed database with RLS |
 | **Auth** | Google OAuth 2.0 | Secure authentication |
 | **Storage** | Supabase Storage | Asset management |

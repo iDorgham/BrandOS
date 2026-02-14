@@ -2,7 +2,7 @@ import React, { memo } from 'react';
 import { Handle, Position, NodeResizer } from '@xyflow/react';
 import { MoodNodeData } from '../types';
 import { HardDrive, Layers } from 'lucide-react';
-import { NodeContainer } from '../components/NodeComponents';
+import { NodeContainer, TypedHandles } from '../components/NodeComponents';
 
 export const CheckpointNode = memo(({ id, data, selected, isConnectable }: { id: string; data: MoodNodeData; isConnectable?: boolean; selected: boolean }) => {
     return (
@@ -22,45 +22,7 @@ export const CheckpointNode = memo(({ id, data, selected, isConnectable }: { id:
                     handleClassName="!w-3 !h-3 !bg-blue-600 !border-background !rounded-full shadow-sm hover:scale-150 transition-transform"
                 />
             }
-            handles={
-                <>
-                    {/* Left input handle */}
-                    <Handle
-                        type="target"
-                        position={Position.Left}
-                        id="l"
-                        isConnectable={isConnectable}
-                        className="!w-3 !h-3 !-left-[7px] !bg-orange-500 !border-transparent transition-all hover:scale-150 z-50 shadow-md rounded-full top-1/2 -translate-y-1/2"
-                    />
-                    {/* MODEL Output */}
-                    <Handle
-                        type="source"
-                        position={Position.Right}
-                        id="model_output"
-                        isConnectable={isConnectable}
-                        className="!w-3 !h-3 !-right-[7px] !bg-blue-500 !border-2 !border-background transition-all hover:scale-150 z-50 shadow-md rounded-full"
-                        style={{ top: '35%' }}
-                    />
-                    {/* CLIP Output */}
-                    <Handle
-                        type="source"
-                        position={Position.Right}
-                        id="clip_output"
-                        isConnectable={isConnectable}
-                        className="!w-3 !h-3 !-right-[7px] !bg-yellow-500 !border-2 !border-background transition-all hover:scale-150 z-50 shadow-md rounded-full"
-                        style={{ top: '55%' }}
-                    />
-                    {/* VAE Output */}
-                    <Handle
-                        type="source"
-                        position={Position.Right}
-                        id="vae_output"
-                        isConnectable={isConnectable}
-                        className="!w-3 !h-3 !-right-[7px] !bg-red-500 !border-2 !border-background transition-all hover:scale-150 z-50 shadow-md rounded-full"
-                        style={{ top: '75%' }}
-                    />
-                </>
-            }
+            handles={<TypedHandles nodeType="checkpoint" />}
         >
             <div className="p-4 space-y-3">
                 {/* Model Preview */}

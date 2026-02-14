@@ -47,7 +47,7 @@ const LiveAuditTerminal: React.FC = () => {
     }, []);
 
     return (
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-8 border-t border-[var(--cds-layer-02)] pt-12">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-8 border-t border-[var(--cds-layer-02)] pt-12">
             {[
                 { label: "Growth", value: "30% Faster", sub: "For 1,247 brands" },
                 { label: "Efficiency", value: "8 Hours/Wk", sub: "Saved on reviews" },
@@ -56,8 +56,8 @@ const LiveAuditTerminal: React.FC = () => {
             ].map((stat, i) => (
                 <div key={i} className="flex flex-col">
                     <span className="text-[10px] font-black uppercase tracking-[0.2em] text-[var(--cds-text-secondary)] mb-2">{stat.label}</span>
-                    <span className="text-3xl font-black uppercase tracking-tighter text-foreground overflow-visible whitespace-nowrap">{stat.value}</span>
-                    <span className="text-sm text-[var(--cds-text-secondary)] mt-1">{stat.sub}</span>
+                    <span className="text-xl md:text-3xl font-black uppercase tracking-tighter text-foreground overflow-visible whitespace-nowrap">{stat.value}</span>
+                    <span className="text-[12px] text-[var(--cds-text-secondary)] mt-1 leading-tight">{stat.sub}</span>
                 </div>
             ))}
         </div>
@@ -104,25 +104,25 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onLoginClick, onInfoCl
                         <span className="text-[10px] font-black uppercase tracking-[0.4em] text-[var(--cds-support-warning)]">SYSTEM_UPDATE: BRAND_EQUITY_OPTIMIZATION_ACTIVE</span>
                     </div>
 
-                    <h1 className="text-[clamp(3.5rem,8vw,9rem)] font-black tracking-tighter leading-[0.9] uppercase mb-12">
+                    <h1 className="text-[clamp(2.5rem,10vw,9rem)] font-black tracking-tighter leading-[0.9] uppercase mb-8 md:mb-12">
                         Your Brand Looks <br />
                         <span className="text-transparent bg-clip-text bg-gradient-to-r from-[var(--cds-support-warning)] to-[var(--cds-interactive-01)]">Different Every Time.</span> <br />
                         You're Losing Velocity.
                     </h1>
 
-                    <p className="text-xl md:text-3xl font-light text-[var(--cds-text-secondary)] max-w-4xl leading-tight mb-16">
+                    <p className="text-lg md:text-3xl font-light text-[var(--cds-text-secondary)] max-w-4xl leading-tight mb-12 md:mb-16">
                         Brand OS guarantees <span className="text-foreground font-bold">92%+ visual consistency</span> across every asset—automatically.
                         Stop confusing customers. Start building trust that converts.
                     </p>
 
-                    <div className="flex flex-col md:flex-row items-start md:items-center gap-8 mb-24">
-                        <Button onClick={onCalculatorClick} variant="primary" size="lg" className="bg-[var(--cds-interactive-01)] hover:bg-[var(--cds-interactive-01)]/90 text-[var(--cds-text-on-color)] h-16 px-8 rounded-none text-sm font-black uppercase tracking-widest shadow-[0_0_30px_rgba(15,98,254,0.4)] transition-all hover:scale-105 active:scale-95">
+                    <div className="flex flex-col md:flex-row items-stretch md:items-center gap-4 md:gap-8 mb-24">
+                        <Button onClick={onCalculatorClick} variant="primary" size="lg" className="bg-[var(--cds-interactive-01)] hover:bg-[var(--cds-interactive-01)]/90 text-[var(--cds-text-on-color)] h-14 md:h-16 px-8 rounded-none text-xs md:text-sm font-black uppercase tracking-widest shadow-[0_0_30px_rgba(15,98,254,0.4)] transition-all hover:scale-105 active:scale-95">
                             Calculate Your Brand Velocity <ArrowRight className="ml-2" />
                         </Button>
                         <Button
                             onClick={() => window.location.href = '/demo'}
                             variant="ghost"
-                            className="h-20 px-12 rounded-none text-xl font-black uppercase tracking-widest border border-[var(--cds-text-primary)]/20 hover:bg-[var(--cds-text-primary)] hover:text-[var(--cds-ui-background)] transition-all"
+                            className="h-14 md:h-20 px-8 md:px-12 rounded-none text-lg md:text-xl font-black uppercase tracking-widest border border-[var(--cds-text-primary)]/20 hover:bg-[var(--cds-text-primary)] hover:text-[var(--cds-ui-background)] transition-all"
                         >
                             Watch 60-Second Demo
                         </Button>
@@ -423,29 +423,29 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onLoginClick, onInfoCl
             </section>
 
             {/* NEW: ROI / IMPACT SECTION */}
-            <section className="py-64 px-8 border-t border-[var(--cds-layer-02)]">
+            <section className="py-24 md:py-64 px-8 border-t border-[var(--cds-layer-02)]">
                 <div className="max-w-[1800px] mx-auto">
-                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-16">
-                        <div className="bg-[var(--cds-support-warning)] p-12 text-black relative overflow-hidden group">
+                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 md:gap-16">
+                        <div className="bg-[var(--cds-support-warning)] p-8 md:p-12 text-black relative overflow-hidden group">
                             <div className="relative z-10">
-                                <h3 className="text-6xl font-black tracking-tighter mb-4">60%</h3>
-                                <div className="text-xl font-bold uppercase tracking-widest mb-8 border-b-2 border-black/10 pb-4 inline-block">Velocity</div>
-                                <p className="font-medium text-lg leading-tight opacity-80">Faster campaign concept-to-delivery time for global teams.</p>
+                                <h3 className="text-5xl md:text-6xl font-black tracking-tighter mb-4">60%</h3>
+                                <div className="text-lg md:text-xl font-bold uppercase tracking-widest mb-6 md:mb-8 border-b-2 border-black/10 pb-4 inline-block">Velocity</div>
+                                <p className="font-medium text-base md:text-lg leading-tight opacity-80">Faster campaign concept-to-delivery time for global teams.</p>
                             </div>
                             <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-500 ease-[0.16,1,0.3,1]" />
                         </div>
-                        <div className="bg-[var(--cds-layer-01)] p-12 text-[var(--cds-text-primary)] relative overflow-hidden group border border-[var(--cds-layer-02)]">
+                        <div className="bg-[var(--cds-layer-01)] p-8 md:p-12 text-[var(--cds-text-primary)] relative overflow-hidden group border border-[var(--cds-layer-02)]">
                             <div className="relative z-10">
-                                <h3 className="text-6xl font-black tracking-tighter mb-4 text-[var(--cds-interactive-01)]">100%</h3>
-                                <div className="text-xl font-bold uppercase tracking-widest mb-8 border-b-2 border-foreground/10 pb-4 inline-block">Consistency</div>
-                                <p className="font-medium text-lg leading-tight opacity-60">Eliminate "Brand Drift" across all channels and external partners.</p>
+                                <h3 className="text-5xl md:text-6xl font-black tracking-tighter mb-4 text-[var(--cds-interactive-01)]">100%</h3>
+                                <div className="text-lg md:text-xl font-bold uppercase tracking-widest mb-6 md:mb-8 border-b-2 border-foreground/10 pb-4 inline-block">Consistency</div>
+                                <p className="font-medium text-base md:text-lg leading-tight opacity-60">Eliminate "Brand Drift" across all channels and external partners.</p>
                             </div>
                         </div>
-                        <div className="bg-[var(--cds-layer-02)] p-12 text-[var(--cds-text-primary)] relative overflow-hidden group">
+                        <div className="bg-[var(--cds-layer-02)] p-8 md:p-12 text-[var(--cds-text-primary)] relative overflow-hidden group">
                             <div className="relative z-10">
-                                <h3 className="text-6xl font-black tracking-tighter mb-4">$2.4M</h3>
-                                <div className="text-xl font-bold uppercase tracking-widest mb-8 border-b-2 border-foreground/10 pb-4 inline-block">Savings</div>
-                                <p className="font-medium text-lg leading-tight opacity-80">Recovered annual revenue lost to fragmented creative workflows.</p>
+                                <h3 className="text-5xl md:text-6xl font-black tracking-tighter mb-4">$2.4M</h3>
+                                <div className="text-lg md:text-xl font-bold uppercase tracking-widest mb-6 md:mb-8 border-b-2 border-foreground/10 pb-4 inline-block">Savings</div>
+                                <p className="font-medium text-base md:text-lg leading-tight opacity-80">Recovered annual revenue lost to fragmented creative workflows.</p>
                             </div>
                         </div>
                     </div>
@@ -508,34 +508,34 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onLoginClick, onInfoCl
             </section>
 
             {/* 8. FINAL CTA: RISK REVERSAL */}
-            <section className="py-80 px-8 relative overflow-hidden flex flex-col items-center text-center hardware-accelerated">
+            <section className="py-32 md:py-80 px-8 relative overflow-hidden flex flex-col items-center text-center hardware-accelerated">
                 <div className="absolute inset-0 bg-[var(--cds-interactive-01)] aura-glow z-0" />
                 <div className="mesh-gradient opacity-100 rotate-12 scale-150 relative z-0" />
 
-                <div className="relative z-10 max-w-[1200px]">
+                <div className="relative z-10 max-w-[1200px] w-full">
                     <motion.div
                         initial={{ scale: 0.9, opacity: 0 }}
                         whileInView={{ scale: 1, opacity: 1 }}
                         transition={{ duration: 0.8 }}
                     >
-                        <h2 className="text-[clamp(4rem,10vw,12rem)] font-black tracking-[-0.04em] leading-[0.8] uppercase mb-12 italic text-[var(--cds-text-on-color)]">
+                        <h2 className="text-[clamp(2.5rem,10vw,12rem)] font-black tracking-[-0.04em] leading-[0.8] uppercase mb-8 md:mb-12 italic text-[var(--cds-text-on-color)]">
                             Stop Losing <br /> Money.
                         </h2>
-                        <p className="text-3xl md:text-5xl font-light mb-16 opacity-90 max-w-4xl mx-auto leading-tight text-[var(--cds-text-on-color)]/90">
+                        <p className="text-xl md:text-5xl font-light mb-12 md:mb-16 opacity-90 max-w-4xl mx-auto leading-tight text-[var(--cds-text-on-color)]/90">
                             Start Scaling Your Brand Today.
                         </p>
 
-                        <div className="flex flex-col md:flex-row items-center justify-center gap-8 mb-12">
-                            <Button onClick={onCalculatorClick} variant="primary" size="lg" className="bg-[var(--cds-ui-background)] !text-[var(--cds-text-primary)] hover:bg-[var(--cds-ui-background)]/90 h-20 px-12 rounded-none text-xl font-black uppercase tracking-widest shadow-[0_0_50px_rgba(255,255,255,0.2)] transition-all hover:scale-105 active:scale-95">
+                        <div className="flex flex-col md:flex-row items-stretch md:items-center justify-center gap-4 md:gap-8 mb-12">
+                            <Button onClick={onCalculatorClick} variant="primary" size="lg" className="bg-[var(--cds-ui-background)] !text-[var(--cds-text-primary)] hover:bg-[var(--cds-ui-background)]/90 h-16 md:h-20 px-8 md:px-12 rounded-none text-lg md:text-xl font-black uppercase tracking-widest shadow-[0_0_50px_rgba(255,255,255,0.2)] transition-all hover:scale-105 active:scale-95">
                                 Calculate ROI (Free)
                             </Button>
-                            <Button onClick={onLoginClick} variant="ghost" size="lg" className="border-2 border-[var(--cds-text-on-color)] text-[var(--cds-text-on-color)] hover:bg-[var(--cds-text-on-color)] hover:text-[var(--cds-interactive-01)] h-20 px-12 rounded-none text-xl font-black uppercase tracking-widest transition-all">
+                            <Button onClick={onLoginClick} variant="ghost" size="lg" className="border-2 border-[var(--cds-text-on-color)] text-[var(--cds-text-on-color)] hover:bg-[var(--cds-text-on-color)] hover:text-[var(--cds-interactive-01)] h-16 md:h-20 px-8 md:px-12 rounded-none text-lg md:text-xl font-black uppercase tracking-widest transition-all">
                                 Start Free Trial
                             </Button>
                         </div>
 
-                        <div className="flex items-center justify-center gap-2 text-[var(--cds-text-on-color)]/80 text-sm font-medium tracking-wide">
-                            <Shield size={16} />
+                        <div className="flex items-center justify-center gap-2 text-[var(--cds-text-on-color)]/80 text-[10px] md:text-sm font-medium tracking-wide">
+                            <Shield size={16} className="shrink-0" />
                             <span>30-Day Money-Back Guarantee. Save 10 hours or full refund.</span>
                         </div>
                     </motion.div>

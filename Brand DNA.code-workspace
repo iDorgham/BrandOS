@@ -1,0 +1,36 @@
+{
+  "folders": [
+    {
+      "path": ".",
+      "name": "Brand DNA"
+    },
+    {
+      "path": "web",
+      "name": "Web App"
+    },
+    {
+      "path": "ai-workspace",
+      "name": "AI Workspace"
+    }
+  ],
+  "settings": {
+    "files.exclude": {
+      "**/node_modules": true,
+      "**/dist": true,
+      "**/.git": true
+    },
+    "search.exclude": {
+      "**/node_modules": true,
+      "**/dist": true
+    }
+  },
+  "extensions": {
+    "recommendations": [
+      "dbaeumer.vscode-eslint",
+      "esbenp.prettier-vscode",
+      "bradlc.vscode-tailwindcss",
+      "vscodium.vscode-typescript-next",
+      "github.copilot-chat"
+    ]
+  }
+}

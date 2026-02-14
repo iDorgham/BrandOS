@@ -2,11 +2,23 @@ import React, { useState } from 'react';
 import { NodeResizer } from '@xyflow/react';
 import { AlignLeft } from 'lucide-react';
 import { MoodNodeData } from '../types';
-import { NodeContainer, NodeHandles } from '../components/NodeComponents';
+import { NodeContainer, TypedHandles } from '../components/NodeComponents';
 
 export const ParagraphNode = React.memo(({ id, data, selected }: { id: string; data: MoodNodeData; selected: boolean }) => {
     const [isEditing, setIsEditing] = useState(false);
     const [tempContent, setTempContent] = useState(data.content || '');
+
+    const typographyStyle: React.CSSProperties = {
+        fontFamily: data.fontFamily || 'inherit',
+        fontSize: data.fontSize ? `${data.fontSize}pt` : '13px',
+        fontWeight: data.fontWeight || 'inherit',
+        fontStyle: data.fontStyle || 'inherit',
+        textDecoration: data.textDecoration || 'none',
+        textTransform: (data.textTransform as React.CSSProperties['textTransform']) || 'none',
+        letterSpacing: data.letterSpacing || 'inherit',
+        lineHeight: data.lineHeight || '1.8',
+        textAlign: data.textAlign || 'left',
+    };
 
     return (
         <NodeContainer
@@ -16,7 +28,7 @@ export const ParagraphNode = React.memo(({ id, data, selected }: { id: string; d
             typeColor="bg-blue-600"
             onEdit={() => setIsEditing(!isEditing)}
             isEditing={isEditing}
-            handles={<NodeHandles nodeColor="bg-blue-600" />}
+            handles={<TypedHandles nodeType="paragraph" />}
             data={{ ...data, id, type: 'paragraph' }}
             id={id}
             resizer={
@@ -34,7 +46,8 @@ export const ParagraphNode = React.memo(({ id, data, selected }: { id: string; d
                     value={tempContent}
                     onChange={(e) => setTempContent(e.target.value)}
                     onBlur={() => { data.onChange?.(id, { content: tempContent }); setIsEditing(false); }}
-                    className="w-full h-full bg-zinc-50 dark:bg-zinc-900/50 p-6 text-[13px] leading-relaxed font-sans outline-none border-0 resize-none text-zinc-900 dark:text-zinc-100 focus:bg-white dark:focus:bg-zinc-900 transition-all"
+                    style={typographyStyle}
+                    className="w-full h-full bg-zinc-50 dark:bg-zinc-900/50 p-6 outline-none border-0 resize-none text-zinc-900 dark:text-zinc-100 focus:bg-white dark:focus:bg-zinc-900 transition-all font-sans"
                     placeholder="Enter detailed narrative..."
                     autoFocus
                 />
@@ -43,7 +56,10 @@ export const ParagraphNode = React.memo(({ id, data, selected }: { id: string; d
                     <div className="flex items-center gap-2 mb-4 border-b border-zinc-100 dark:border-zinc-800 pb-2">
                         <span className="text-[8px] font-bold font-mono tracking-widest text-zinc-400 uppercase">COPY_BLOCK / STREAM_A</span>
                     </div>
-                    <p className={`text-[13px] leading-[1.8] font-sans transition-all duration-300 ${data.content ? 'text-zinc-700 dark:text-zinc-300' : 'text-zinc-300 dark:text-zinc-700 italic'}`}>
+                    <p
+                        style={typographyStyle}
+                        className={`font-sans transition-all duration-300 ${data.content ? 'text-zinc-700 dark:text-zinc-300' : 'text-zinc-300 dark:text-zinc-700 italic'}`}
+                    >
                         {data.content || 'Awaiting doctrinal flow components...'}
                     </p>
                     {data.content && (

@@ -2,7 +2,7 @@ import React from 'react';
 import { NodeResizer } from '@xyflow/react';
 import { Link2, Globe, ExternalLink } from 'lucide-react';
 import { MoodNodeData } from '../types';
-import { NodeContainer, NodeHandles } from '../components/NodeComponents';
+import { NodeContainer, TypedHandles } from '../components/NodeComponents';
 
 export const ReferenceNode = ({ id, data, selected }: { id: string; data: MoodNodeData; selected: boolean }) => (
     <NodeContainer
@@ -10,7 +10,7 @@ export const ReferenceNode = ({ id, data, selected }: { id: string; data: MoodNo
         title="Metadata"
         icon={Link2}
         typeColor="bg-emerald-600"
-        handles={<NodeHandles nodeColor="bg-emerald-600" />}
+        handles={<TypedHandles nodeType="reference" />}
         data={{ ...data, id, type: 'reference' }}
         id={id}
         resizer={

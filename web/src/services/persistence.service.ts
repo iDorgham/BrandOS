@@ -194,10 +194,14 @@ export const brandService = {
 
   // Delete a brand (soft delete)
   async deleteBrand(brandId: string): Promise<void> {
+    const user = await getCurrentUser();
+    if (!user) throw new Error('User not authenticated');
+
     const { error } = await supabase
       .from('brands')
       .update({ is_active: false })
-      .eq('id', brandId);
+      .eq('id', brandId)
+      .eq('user_id', user.id);
 
     if (error) throw error;
   },
@@ -291,10 +295,14 @@ export const assetService = {
 
   // Delete an asset
   async deleteAsset(assetId: string): Promise<void> {
+    const user = await getCurrentUser();
+    if (!user) throw new Error('User not authenticated');
+
     const { error } = await supabase
       .from('assets')
       .delete()
-      .eq('id', assetId);
+      .eq('id', assetId)
+      .eq('user_id', user.id);
 
     if (error) throw error;
   },
@@ -463,6 +471,9 @@ export const moodboardService = {
 
   // Update an existing moodboard
   async updateMoodboard(moodboard: Moodboard): Promise<Moodboard> {
+    const user = await getCurrentUser();
+    if (!user) throw new Error('User not authenticated');
+
     const { data, error } = await supabase
       .from('moodboards')
       .update({
@@ -473,6 +484,7 @@ export const moodboardService = {
         edges: moodboard.edges,
       })
       .eq('id', moodboard.id)
+      .eq('user_id', user.id)
       .select()
       .single();
 
@@ -609,10 +621,14 @@ export const deploymentService = {
 
   // Delete a deployment request
   async deleteDeploymentRequest(id: string): Promise<void> {
+    const user = await getCurrentUser();
+    if (!user) throw new Error('User not authenticated');
+
     const { error } = await supabase
       .from('deployments')
       .delete()
-      .eq('id', id);
+      .eq('id', id)
+      .eq('user_id', user.id);
 
     if (error) throw error;
   },

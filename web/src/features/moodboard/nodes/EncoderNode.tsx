@@ -2,7 +2,7 @@ import React from 'react';
 import { NodeResizer } from '@xyflow/react';
 import { FileVideo, Image, Share2, Download, Zap } from 'lucide-react';
 import { MoodNodeData } from '../types';
-import { NodeContainer, NodeHandles } from '../components/NodeComponents';
+import { NodeContainer, TypedHandles } from '../components/NodeComponents';
 
 export const EncoderNode = ({ id, data, selected }: { id: string; data: MoodNodeData; selected: boolean }) => {
     return (
@@ -11,7 +11,7 @@ export const EncoderNode = ({ id, data, selected }: { id: string; data: MoodNode
             title="Encoder"
             icon={Zap}
             typeColor="bg-slate-700"
-            handles={<NodeHandles nodeColor="bg-slate-700" />}
+            handles={<TypedHandles nodeType="encoder" />}
             data={{ ...data, id, type: 'encoder' }}
             id={id}
             resizer={

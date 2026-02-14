@@ -33,10 +33,27 @@ import {
     LayoutGrid,
     Type,
     Box,
-    GitBranch
+    GitBranch,
+    PenTool,
+    Heading,
+    Search,
+    Hash,
+    RefreshCw,
+    Send,
+    CalendarClock,
+    Film,
+    Mail,
+    Webhook,
+    Globe2,
+    Sheet,
+    MessageCircle,
+    ClipboardList,
+    Megaphone,
+    Target
 } from 'lucide-react';
 
-export type NodeCategory = 'CORE' | 'AI_GEN' | 'SIGNAL' | 'SYSTEM' | 'REFINEMENT' | 'EXTRAS';
+export type NodeCategory = 'CORE' | 'AI_GEN' | 'SIGNAL' | 'SYSTEM' | 'REFINEMENT' | 'EXTRAS'
+    | 'TEXT_PROCESSING' | 'SOCIAL_MEDIA' | 'INTEGRATIONS';
 
 export interface MoodNodeDefinition {
     id: string;
@@ -376,5 +393,205 @@ export const NODE_REGISTRY: MoodNodeDefinition[] = [
         category: 'EXTRAS',
         defaultColor: 'bg-orange-500',
         isCore: false
+    },
+
+    // --- TEXT_PROCESSING (Content Creation) ---
+    {
+        id: 'content_gen',
+        label: 'Writer',
+        description: 'LLM content generation (blog, captions, ad copy).',
+        icon: PenTool,
+        category: 'TEXT_PROCESSING',
+        defaultColor: 'bg-teal-600',
+        isCore: false,
+        isBeta: true
+    },
+    {
+        id: 'headline_gen',
+        label: 'Headlines',
+        description: 'Generate multiple headline options.',
+        icon: Heading,
+        category: 'TEXT_PROCESSING',
+        defaultColor: 'bg-teal-500',
+        isCore: false,
+        isBeta: true
+    },
+    {
+        id: 'seo_optimizer',
+        label: 'SEO',
+        description: 'Optimize text for search engines.',
+        icon: Search,
+        category: 'TEXT_PROCESSING',
+        defaultColor: 'bg-teal-400',
+        isCore: false,
+        isBeta: true
+    },
+    {
+        id: 'hashtag_gen',
+        label: 'Tags',
+        description: 'Generate relevant hashtags.',
+        icon: Hash,
+        category: 'TEXT_PROCESSING',
+        defaultColor: 'bg-cyan-500',
+        isCore: false,
+        isBeta: true
+    },
+    {
+        id: 'content_rewriter',
+        label: 'Rewriter',
+        description: 'Rewrite content in different tones.',
+        icon: RefreshCw,
+        category: 'TEXT_PROCESSING',
+        defaultColor: 'bg-cyan-600',
+        isCore: false,
+        isBeta: true
+    },
+
+    // --- SOCIAL_MEDIA (Publishing & Scheduling) ---
+    {
+        id: 'social_poster',
+        label: 'Publisher',
+        description: 'Multi-platform social posting.',
+        icon: Send,
+        category: 'SOCIAL_MEDIA',
+        defaultColor: 'bg-orange-500',
+        isCore: false,
+        isBeta: true
+    },
+    {
+        id: 'scheduler',
+        label: 'Schedule',
+        description: 'Content scheduling and calendar.',
+        icon: CalendarClock,
+        category: 'SOCIAL_MEDIA',
+        defaultColor: 'bg-orange-400',
+        isCore: false,
+        isBeta: true
+    },
+    {
+        id: 'story_creator',
+        label: 'Stories',
+        description: 'Instagram/TikTok story creation.',
+        icon: Film,
+        category: 'SOCIAL_MEDIA',
+        defaultColor: 'bg-orange-600',
+        isCore: false,
+        isBeta: true
+    },
+
+    // --- INTEGRATIONS (External Services) ---
+    {
+        id: 'email_sender',
+        label: 'Email',
+        description: 'Email campaign sender.',
+        icon: Mail,
+        category: 'INTEGRATIONS',
+        defaultColor: 'bg-rose-500',
+        isCore: false,
+        isBeta: true
+    },
+    {
+        id: 'webhook',
+        label: 'Webhook',
+        description: 'HTTP webhook trigger/receiver.',
+        icon: Webhook,
+        category: 'INTEGRATIONS',
+        defaultColor: 'bg-rose-600',
+        isCore: false,
+        isBeta: true
+    },
+    {
+        id: 'api_request',
+        label: 'API',
+        description: 'Generic REST API calls.',
+        icon: Globe2,
+        category: 'INTEGRATIONS',
+        defaultColor: 'bg-rose-400',
+        isCore: false,
+        isBeta: true
+    },
+    {
+        id: 'google_sheet',
+        label: 'Sheets',
+        description: 'Google Sheets read/write.',
+        icon: Sheet,
+        category: 'INTEGRATIONS',
+        defaultColor: 'bg-emerald-500',
+        isCore: false,
+        isBeta: true
+    },
+    {
+        id: 'slack',
+        label: 'Slack',
+        description: 'Slack messaging & channels.',
+        icon: Hash,
+        category: 'INTEGRATIONS',
+        defaultColor: 'bg-purple-500',
+        isCore: false,
+        isBeta: true
+    },
+    {
+        id: 'telegram',
+        label: 'Telegram',
+        description: 'Telegram Bot messaging.',
+        icon: Send,
+        category: 'INTEGRATIONS',
+        defaultColor: 'bg-sky-500',
+        isCore: false,
+        isBeta: true
+    },
+    {
+        id: 'whatsapp',
+        label: 'WhatsApp',
+        description: 'WhatsApp Business messaging.',
+        icon: MessageCircle,
+        category: 'INTEGRATIONS',
+        defaultColor: 'bg-green-600',
+        isCore: false,
+        isBeta: true
+    },
+
+    // --- AI & CONTENT PLANNING ---
+    {
+        id: 'research',
+        label: 'Research',
+        description: 'Market research & analysis.',
+        icon: Search,
+        category: 'AI_GEN',
+        defaultColor: 'bg-indigo-500',
+        isCore: false,
+        isBeta: true
+    },
+    {
+        id: 'content_plan',
+        label: 'Content Plan',
+        description: 'Editorial planning & strategy.',
+        icon: ClipboardList,
+        category: 'AI_GEN',
+        defaultColor: 'bg-teal-500',
+        isCore: false,
+        isBeta: true
+    },
+
+    // --- ADS ---
+    {
+        id: 'meta_ads',
+        label: 'Meta Ads',
+        description: 'Facebook & Instagram campaigns.',
+        icon: Megaphone,
+        category: 'INTEGRATIONS',
+        defaultColor: 'bg-blue-600',
+        isCore: false,
+        isBeta: true
+    },
+    {
+        id: 'google_ads',
+        label: 'Google Ads',
+        description: 'Search, Display & Shopping campaigns.',
+        icon: Target,
+        category: 'INTEGRATIONS',
+        defaultColor: 'bg-amber-500',
+        isCore: false,
+        isBeta: true
     }
 ];

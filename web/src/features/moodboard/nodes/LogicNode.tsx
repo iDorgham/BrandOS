@@ -2,7 +2,7 @@ import React from 'react';
 import { NodeResizer } from '@xyflow/react';
 import { GitBranch, Maximize } from 'lucide-react';
 import { MoodNodeData } from '../types';
-import { NodeContainer, NodeHandles } from '../components/NodeComponents';
+import { NodeContainer, TypedHandles } from '../components/NodeComponents';
 
 export const LogicNode = ({ id, data, selected }: { id: string; data: MoodNodeData; selected: boolean }) => (
     <NodeContainer
@@ -10,7 +10,7 @@ export const LogicNode = ({ id, data, selected }: { id: string; data: MoodNodeDa
         title="Logic Gate"
         icon={GitBranch}
         typeColor="bg-amber-500"
-        handles={<NodeHandles nodeColor="bg-amber-500" />}
+        handles={<TypedHandles nodeType="logic" />}
         data={{ ...data, id, type: 'logic' }}
         id={id}
         resizer={

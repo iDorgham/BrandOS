@@ -85,7 +85,7 @@ export const MoodboardSelector: React.FC<MoodboardSelectorProps> = ({
                             onClick={() => setIsCreating(true)}
                             className="gap-3 h-11 px-6 text-[10px] font-black tracking-[0.15em] uppercase shadow-[0_0_20px_rgba(var(--primary-rgb),0.2)]"
                         >
-                            <Plus size={16} />
+                            <Plus size={14} strokeWidth={2.5} />
                             New
                         </Button>
                     )
@@ -96,10 +96,10 @@ export const MoodboardSelector: React.FC<MoodboardSelectorProps> = ({
 
                 {/* Create Form */}
                 {isCreating && (
-                    <Card className="p-8 border-primary/30 bg-card/40 backdrop-blur-xl rounded-none animate-in fade-in slide-in-from-top-4 duration-500 shadow-2xl">
+                    <Card className="p-8 border-primary/30 bg-card/90 backdrop-blur-xl rounded-none animate-in fade-in slide-in-from-top-4 duration-500 shadow-2xl">
                         <div className="flex items-start gap-6">
                             <div className="p-3 bg-primary/20 border border-primary/40 rounded-none">
-                                <Sparkles size={24} className="text-primary" />
+                                <Sparkles size={14} strokeWidth={2.5} className="text-primary" />
                             </div>
                             <div className="flex-1 space-y-6">
                                 <div>
@@ -129,7 +129,7 @@ export const MoodboardSelector: React.FC<MoodboardSelectorProps> = ({
                                         {createLoading ? (
                                             <div className="w-4 h-4 border-2 border-primary-foreground border-t-transparent rounded-full animate-spin" />
                                         ) : (
-                                            <Plus size={16} />
+                                            <Plus size={14} strokeWidth={2.5} />
                                         )}
                                         Create
                                     </Button>
@@ -161,7 +161,7 @@ export const MoodboardSelector: React.FC<MoodboardSelectorProps> = ({
                             No visual orchestration boards detected in the current brand context.
                         </p>
                         <Button onClick={() => setIsCreating(true)} className="gap-3 h-11 px-10 text-[10px] font-black tracking-widest uppercase">
-                            <Plus size={16} />
+                            <Plus size={14} strokeWidth={2.5} />
                             Create First Board
                         </Button>
                     </div>
@@ -172,7 +172,7 @@ export const MoodboardSelector: React.FC<MoodboardSelectorProps> = ({
                                 key={moodboard.id}
                                 className={`
                                   group relative h-20 overflow-hidden cursor-pointer transition-all duration-300 rounded-none
-                                  bg-card/30 backdrop-blur-sm border-border/40
+                                  bg-card/90 backdrop-blur-xl border-border/40
                                   hover:bg-muted/10 hover:border-primary/40 hover:translate-x-1
                                   ${!moodboard.isActive ? 'opacity-50 grayscale' : ''}
                                 `}
@@ -206,14 +206,14 @@ export const MoodboardSelector: React.FC<MoodboardSelectorProps> = ({
                                         <div className="flex flex-col gap-1">
                                             <span className="text-[7px] text-muted-foreground/30">Created</span>
                                             <div className="flex items-center gap-2 text-muted-foreground/70">
-                                                <Calendar size={10} className="opacity-40" />
+                                                <Calendar size={14} strokeWidth={2.5} className="opacity-40" />
                                                 {formatDate(moodboard.createdAt)}
                                             </div>
                                         </div>
                                         <div className="flex flex-col gap-1 w-24">
                                             <span className="text-[7px] text-muted-foreground/30">Elements</span>
                                             <div className="flex items-center gap-2 text-muted-foreground/70">
-                                                <Layers size={10} className="opacity-40" />
+                                                <Layers size={14} strokeWidth={2.5} className="opacity-40" />
                                                 {moodboard.nodes?.length || 0} Nodes
                                             </div>
                                         </div>
@@ -238,12 +238,12 @@ export const MoodboardSelector: React.FC<MoodboardSelectorProps> = ({
                                                 className="w-10 h-10 flex items-center justify-center bg-muted/5 hover:bg-rose-500/10 hover:text-rose-500 border border-border/20 hover:border-rose-500/30 transition-all rounded-none opacity-40 hover:opacity-100"
                                                 title="Delete Moodboard"
                                             >
-                                                <Trash2 size={14} />
+                                                <Trash2 size={14} strokeWidth={2.5} />
                                             </button>
                                         </div>
 
                                         <div className="w-8 h-8 flex items-center justify-center bg-primary/5 border border-primary/20 group-hover:bg-primary transition-all duration-300">
-                                            <ChevronRight size={14} className="group-hover:text-primary-foreground group-hover:translate-x-0.5 transition-all" />
+                                            <ChevronRight size={14} strokeWidth={2.5} className="group-hover:text-primary-foreground group-hover:translate-x-0.5 transition-all" />
                                         </div>
                                     </div>
                                 </div>

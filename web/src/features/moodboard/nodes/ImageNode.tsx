@@ -3,7 +3,7 @@ import { NodeResizer } from '@xyflow/react';
 import { Image as ImageIcon, Upload } from 'lucide-react';
 import { toast } from 'sonner';
 import { MoodNodeData } from '../types';
-import { NodeContainer, NodeHandles } from '../components/NodeComponents';
+import { NodeContainer, TypedHandles } from '../components/NodeComponents';
 import { useMoodBoard } from '../MoodBoardContext';
 
 export const ImageNode = React.memo(({ id, data, selected }: { id: string; data: MoodNodeData; selected: boolean }) => {
@@ -52,7 +52,7 @@ export const ImageNode = React.memo(({ id, data, selected }: { id: string; data:
             typeColor="bg-blue-600"
             onEdit={() => setIsEditing(!isEditing)}
             isEditing={isEditing}
-            handles={<NodeHandles nodeColor="bg-blue-600" />}
+            handles={<TypedHandles nodeType="image" />}
             data={{ ...data, id, type: 'image' }}
             id={id}
             resizer={

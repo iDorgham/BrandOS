@@ -13,8 +13,9 @@ Brand OS is a cloud-native SaaS platform that transforms static brand guidelines
 - **State**: React Context API (AuthContext, SettingsContext, ThemeContext) - no Redux/Zustand
 - **Backend**: Supabase (PostgreSQL with Row-Level Security, Realtime, Storage)
 - **Auth**: Google OAuth 2.0 via Supabase Auth
-- **AI**: Google Gemini (`@google/genai`), optional OpenAI DALL-E support
+- **AI**: Google Gemini (`@google/genai`), multi-model routing (Gemini, Anthropic, OpenAI)
 - **Canvas**: `@xyflow/react` for node-based moodboard editor
+- **Optimization**: Debounced search/sliders, throttled resize handlers
 - **Deployment**: Vercel (static SPA with rewrites)
 
 ## Repository Structure
@@ -24,78 +25,24 @@ BrandOS/
 ├── web/                        # Main application (all dev happens here)
 │   ├── src/
 │   │   ├── App.tsx             # Root component, tab-based routing (no react-router)
-│   │   ├── main.tsx            # React entry point
-│   │   ├── components/
-│   │   │   ├── ui/             # Base UI kit (EmptyState, LazyImage, Popover, Switch, ThemeToggle)
-│   │   │   ├── layout/         # Sidebar, Header, SiteHeader, BottomNav
-│   │   │   ├── auth/           # AuthGuard, login flows
-│   │   │   ├── brand/          # Brand visualizer components
-│   │   │   ├── ai/             # AI interaction components
-│   │   │   ├── collaboration/  # Real-time collaboration UI
-│   │   │   └── common/         # ErrorBoundary, CookiesPolicyPopup
-│   │   ├── features/           # Feature modules (lazy-loaded via React.lazy)
-│   │   │   ├── dashboard/      # Main dashboard
-│   │   │   ├── doctrine/       # Brand DNA / rules engine
-│   │   │   ├── studio/         # AI generation studio
-│   │   │   ├── library/        # Asset vault
-│   │   │   ├── moodboard/      # Node-based creative canvas
-│   │   │   ├── deployment/     # Deployment hub
-│   │   │   ├── team/           # Team collaboration
-│   │   │   ├── training/       # AI training interface
-│   │   │   ├── audit/          # Compliance audit
-│   │   │   ├── analytics/      # Analytics dashboard
-│   │   │   ├── identity/       # Brand identity management
-│   │   │   ├── profile/        # User profile
-│   │   │   ├── settings/       # App settings
-│   │   │   ├── onboarding/     # New user wizard
-│   │   │   ├── calculator/     # ROI calculator
-│   │   │   ├── landing/        # Public landing page
-│   │   │   └── info/           # Static info/marketing pages
-│   │   ├── services/           # Service layer (all external calls go through here)
-│   │   │   ├── ai.service.ts           # Multi-model AI routing
-│   │   │   ├── gemini.service.ts       # Google Gemini integration
-│   │   │   ├── agent.service.ts        # AI agent orchestration
-│   │   │   ├── brand.service.ts        # Brand CRUD
-│   │   │   ├── skills.service.ts       # Agent skills
-│   │   │   ├── rules.service.ts        # Business rules & compliance
-│   │   │   ├── persistence.service.ts  # State management & sync
-│   │   │   ├── promptBatch.service.ts  # Batch generation
-│   │   │   ├── supabase.service.ts     # Database operations
-│   │   │   ├── system-integration.service.ts
-│   │   │   └── dna-version-control.service.ts
-│   │   ├── hooks/              # Custom React hooks
-│   │   │   ├── useSupabaseData.ts      # Data fetching from Supabase
-│   │   │   ├── useMoodboards.ts        # Moodboard state
-│   │   │   ├── usePresence.ts          # Real-time presence
-│   │   │   ├── useNodeManager.ts       # XYFlow node management
-│   │   │   ├── useDebounce.ts
-│   │   │   ├── useThrottle.ts
-│   │   │   ├── useLocalStorage.ts
-│   │   │   └── useIntersectionObserver.ts
-│   │   ├── contexts/           # React Context providers
-│   │   │   ├── AuthContext.tsx          # Auth, user, brands, assets, workspaces
-│   │   │   ├── SettingsContext.tsx      # App preferences, visible tabs
-│   │   │   └── ThemeContext.tsx         # Light/dark mode
-│   │   ├── agents/             # AI agent definitions (8 agents)
-│   │   ├── skills/             # Agent skill definitions & learning paths
-│   │   ├── rules/              # Business rules & constraints
-│   │   ├── types/              # TypeScript type definitions
-│   │   ├── constants/          # Application constants
-│   │   ├── utils/              # Utility functions
-│   │   ├── styles/             # Global CSS
-│   │   ├── integrations/supabase/  # Supabase client init
+│   │   ├── ...
+│   │   ├── services/           # Service layer
+│   │   ├── ...
 │   │   └── test/               # Test setup (vitest)
-│   ├── public/                 # Static assets
-│   ├── vite.config.ts          # Build config
-│   ├── tsconfig.json           # TS config (path alias: @/ -> ./src/)
-│   ├── tailwind.config.js      # Tailwind + Carbon design tokens
-│   └── package.json
-├── supabase/
-│   ├── migrations/             # 23 SQL migration files
-│   ├── performance/            # Performance reports
-│   └── security/               # Security audit reports
-├── database/                   # Schema definitions (6 SQL files)
-├── docs/                       # Project documentation
+├── .agents/                    # Unified AI Workspace (Source of Truth)
+│   ├── agents/                 # Specialized agent personas (Markdown)
+│   ├── skills/                 # Atomic agent capabilities (SKILL.md)
+│   ├── rules/                  # Governance and safety rules
+│   ├── workflows/              # Multi-agent orchestration
+│   ├── docs/                   # AI protocols and documentation
+│   └── config/                 # Governance matrix and tool configs
+├── .agent/                     # Junction to .agents (for Antigravity)
+├── .claude/                    # Junction to .agents (for Claude Code)
+├── supabase/                   # Migrations and security-audit
+├── database/                   # Schema definitions
+├── docs/                       # Project documentation (moved from root)
+├── Trash/                      # Temporary storage for redundant files
+├── AGENTS.md                   # AI Agent entry point (Context & Rules)
 ├── vercel.json                 # Vercel deployment config
 ├── CONTRIBUTING.md             # Contributing guidelines
 └── README.md
@@ -211,10 +158,12 @@ All client-side env vars must be prefixed with `VITE_`.
 3. **Service layer**: Never make direct Supabase calls from components. Use or create services in `web/src/services/`.
 4. **TypeScript**: Use explicit types. Avoid `any`. Define interfaces for component props.
 5. **Styling**: Use Tailwind utilities with CSS variable tokens. Prefer `var(--cds-*)` tokens for colors in custom CSS. No box shadows or rounded corners by design.
-6. **Path alias**: Use `@/` to import from `web/src/` (e.g., `import { Button } from '@/components/ui'`).
-7. **Lazy loading**: New feature views should be lazy-loaded with `React.lazy()` in `App.tsx`.
-8. **No linter config**: There is no ESLint or Prettier configuration. Follow existing code style.
-9. **Build validation**: Run `npm run build` from `web/` to verify changes compile. Production builds strip `console.log` and `console.info`.
-10. **Testing**: Vitest is configured but test coverage is minimal. Test files go in `web/src/test/` or colocated with source files.
-11. **Security**: Never commit `.env` files. Supabase RLS is the primary security boundary - schema changes must preserve RLS policies.
-12. **Deployment**: Vercel deploys from `web/dist`. The `vercel.json` at root handles build commands and SPA rewrites.
+6. **Path alias**: Use `@/` to import from `web/src/`.
+7. **AI Workspace**: Use `.agents/` for all agent personas (MD), skills (SKILL.md), and workflows.
+8. **Lazy loading**: New feature views should be lazy-loaded with `React.lazy()` in `App.tsx`.
+9. **No linter config**: There is no ESLint or Prettier configuration. Follow existing code style.
+10. **Build validation**: Run `npm run build` from `web/` to verify changes compile.
+11. **Testing**: Vitest is configured but test coverage is minimal.
+12. **Performance**: Use `useDebounce` for search inputs and `useThrottle` for window resize events to minimize re-renders.
+13. **Security**: Never commit `.env` files. Supabase RLS is the primary security boundary.
+14. **Deployment**: Vercel deploys from `web/dist`. The `vercel.json` at root handles build commands and SPA rewrites.
