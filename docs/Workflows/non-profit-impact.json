@@ -1,0 +1,52 @@
+{
+    "id": "non_profit_impact",
+    "label": "Non-Profit Impact Report",
+    "description": "Data-to-storytelling automation for donor reporting.",
+    "category": "Content Engine",
+    "nodes": [
+        {
+            "id": "1",
+            "type": "google_sheet",
+            "position": {
+                "x": 100,
+                "y": 200
+            },
+            "data": {
+                "label": "Impact Data"
+            }
+        },
+        {
+            "id": "2",
+            "type": "content_gen",
+            "position": {
+                "x": 400,
+                "y": 200
+            },
+            "data": {
+                "label": "Story Draft"
+            }
+        },
+        {
+            "id": "3",
+            "type": "email_sender",
+            "position": {
+                "x": 700,
+                "y": 200
+            },
+            "data": {
+                "label": "Donor Report"
+            }
+        }
+    ],
+    "edges": [
+        {
+            "id": "e1-2",
+            "source": "1",
+            "target": "2"
+        },
+        {
+            "id": "e2-3", "source": "2",
+            "target": "3"
+        }
+    ]
+}

@@ -1,0 +1,85 @@
+{
+    "id": "multi_channel_distribution",
+    "label": "Multi-Channel Distribution",
+    "description": "Distribute a master asset to all channels simultaneously.",
+    "category": "Automations",
+    "nodes": [
+        {
+            "id": "1",
+            "type": "content",
+            "position": {
+                "x": 100,
+                "y": 200
+            },
+            "data": {
+                "label": "Master Asset"
+            }
+        },
+        {
+            "id": "2",
+            "type": "switch",
+            "position": {
+                "x": 400,
+                "y": 200
+            },
+            "data": {
+                "label": "Channel Router"
+            }
+        },
+        {
+            "id": "3",
+            "type": "social_poster",
+            "position": {
+                "x": 700,
+                "y": 100
+            },
+            "data": {
+                "label": "Socials"
+            }
+        },
+        {
+            "id": "4",
+            "type": "email_sender",
+            "position": {
+                "x": 700,
+                "y": 300
+            },
+            "data": {
+                "label": "Email"
+            }
+        },
+        {
+            "id": "5",
+            "type": "cms_sync",
+            "position": {
+                "x": 700,
+                "y": 500
+            },
+            "data": {
+                "label": "Blog"
+            }
+        }
+    ],
+    "edges": [
+        {
+            "id": "e1-2",
+            "source": "1",
+            "target": "2"
+        },
+        {
+            "id": "e2-3",
+            "source": "2",
+            "target": "3"
+        },
+        {
+            "id": "e2-4",
+            "source": "2",
+            "target": "4"
+        },
+        {
+            "id": "e2-5",
+            "source": "2",
+            "target": "5"
+        }
+    ]
+}

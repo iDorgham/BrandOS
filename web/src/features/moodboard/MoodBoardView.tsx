@@ -45,15 +45,15 @@ import { useNodeBrowser } from './hooks/useNodeBrowser';
 import { useNodeGroups } from './hooks/useNodeGroups';
 import { useGraphExecution } from './hooks/useGraphExecution';
 import { useConnectionValidator } from './hooks/useConnectionValidator';
-import { NodeGroupOverlay } from './components/NodeGroupOverlay';
 import { StatusBar } from './components/StatusBar';
 
-const MoodBoardViewContent = React.memo<MoodBoardViewProps>(({
+const MoodBoardViewContent = React.memo<MoodBoardViewProps & { isShiftPressed: boolean }>(({
   brand,
   setHeaderActions,
   setIsAppSidebarCollapsed,
   isZenMode,
-  onToggleZenMode
+  onToggleZenMode,
+  isShiftPressed
 }) => {
   const { isAuthInitialized } = useAuth();
   const { activeWorkspace, isDataInitialized } = useData();
@@ -113,8 +113,7 @@ const MoodBoardViewContent = React.memo<MoodBoardViewProps>(({
   } = boardActions;
 
   // 5. Node Groups
-  const nodeGroups = useNodeGroups(nodes, setNodes, edges, setEdges, saveToHistory);
-  const { groups, setGroups, createGroup, ungroupNodes, toggleCollapse, updateGroup, deleteGroup, refreshGroupBounds } = nodeGroups;
+  const { groups, setGroups, createGroup, ungroupNodes, toggleCollapse, updateGroup, deleteGroup, refreshGroupBounds, moveGroup, getGroupBounds } = useNodeGroups(nodes, setNodes, edges, setEdges, saveToHistory);
 
   // 6. Node Browser
   const nodeBrowser = useNodeBrowser();
@@ -137,12 +136,7 @@ const MoodBoardViewContent = React.memo<MoodBoardViewProps>(({
     nodeBrowser.addToRecent(type);
   }, [addNode, nodeBrowser]);
 
-  // Refresh group bounds when nodes move
-  useEffect(() => {
-    if (groups.length > 0) {
-      refreshGroupBounds();
-    }
-  }, [nodes, groups.length, refreshGroupBounds]);
+  // No automatic effect to prevent lag during high-frequency updates
 
   // 6. Local UI State
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
@@ -321,12 +315,19 @@ const MoodBoardViewContent = React.memo<MoodBoardViewProps>(({
 
   const onNodesChangeCustom = useCallback((changes: any) => {
     onNodesChange(changes);
+
+    // Manual trigger for group bounds refresh on node interactions
+    if (nodes.some(n => n.type === 'groupNode')) {
+      const needsRefresh = changes.some((c: any) => c.type === 'position' || c.type === 'dimensions');
+      if (needsRefresh) refreshGroupBounds();
+    }
+
     changes.forEach((change: any) => {
       if (change.type === 'dimensions' && change.dimensions) {
         updateNodeData(change.id, {}, { width: change.dimensions.width, height: change.dimensions.height });
       }
     });
-  }, [onNodesChange, updateNodeData]);
+  }, [onNodesChange, updateNodeData, groups.length, refreshGroupBounds]);
 
   if (!isAuthInitialized || !isDataInitialized || !activeWorkspace) {
     return (
@@ -350,9 +351,10 @@ const MoodBoardViewContent = React.memo<MoodBoardViewProps>(({
   }
 
   return (
-    <div className="w-full h-full bg-background overflow-hidden font-mono relative" onPointerMove={handlePointerMove}>
-      <style>
-        {`
+    <MoodBoardContext.Provider value={{ brand, isShiftPressed, onToggleCollapse: toggleCollapse }}>
+      <div className="w-full h-full bg-background overflow-hidden font-mono relative" onPointerMove={handlePointerMove}>
+        <style>
+          {`
                 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&family=IBM+Plex+Mono:wght@400;700&family=Space+Grotesk:wght@400;700&family=Roboto:wght@400;700&family=Playfair+Display:wght@400;900&family=Outfit:wght@400;700&display=swap');
                 
                 .custom-scrollbar::-webkit-scrollbar { width: 4px; height: 4px; }
@@ -360,232 +362,239 @@ const MoodBoardViewContent = React.memo<MoodBoardViewProps>(({
                 .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(var(--primary-rgb), 0.1); border-radius: 10px; }
                 .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: rgba(var(--primary-rgb), 0.3); }
                 `}
-      </style>
+        </style>
 
-      <MoodBoardHeader
-        flowName={selectedMoodboard?.name || 'Untitled Flow'}
-        onRenameFlow={(name) => updateMoodboard({ name } as any)}
-        onDuplicateFlow={() => {
-          if (selectedMoodboard) {
-            createMoodboard(`${selectedMoodboard.name} (Copy)`, selectedMoodboard.description);
-          }
-        }}
-        onDeleteFlow={() => {
-          if (selectedMoodboard) deleteMoodboard(selectedMoodboard.id);
-        }}
-        onExportJSON={onExportJSON}
+        <MoodBoardHeader
+          flowName={selectedMoodboard?.name || 'Untitled Flow'}
+          onRenameFlow={(name) => updateMoodboard({ name } as any)}
+          onDuplicateFlow={() => {
+            if (selectedMoodboard) {
+              createMoodboard(`${selectedMoodboard.name} (Copy)`, selectedMoodboard.description);
+            }
+          }}
+          onDeleteFlow={() => {
+            if (selectedMoodboard) deleteMoodboard(selectedMoodboard.id);
+          }}
+          onExportJSON={onExportJSON}
 
-        selectedNode={singleSelectedNode}
-        selectedNodesCount={selectedNodesCount}
-        updateNodeData={updateNodeData}
-        onDeleteNode={(ids) => onNodesDelete(ids.map(id => ({ id }) as any))}
-        onDuplicateNode={(nodesToDup) => nodesToDup.forEach(n => duplicateNode(n))}
-        onAlignNodes={onAlignNodes}
-        onCreateGroup={(nodeIds) => createGroup(nodeIds)}
-        snapToGrid={snapToGrid}
-        setSnapToGrid={setSnapToGrid}
-        onReorganizeNodes={onReorganizeNodes}
-        allNodes={nodes}
+          selectedNode={singleSelectedNode}
+          selectedNodesCount={selectedNodesCount}
+          updateNodeData={updateNodeData}
+          onDeleteNode={(ids) => onNodesDelete(ids.map(id => ({ id }) as any))}
+          onDuplicateNode={(nodesToDup) => nodesToDup.forEach(n => duplicateNode(n))}
+          onAlignNodes={onAlignNodes}
+          onCreateGroup={(nodeIds) => createGroup(nodeIds)}
+          snapToGrid={snapToGrid}
+          setSnapToGrid={setSnapToGrid}
+          onReorganizeNodes={onReorganizeNodes}
+          allNodes={nodes}
 
-        undo={undo}
-        redo={redo}
-        canUndo={canUndo}
-        canRedo={canRedo}
-        onOpenWorkflowLibrary={() => setIsWorkflowLibraryOpen(true)}
-        onRun={() => graphExecution.isRunning ? graphExecution.abort() : graphExecution.execute()}
-        isRunning={graphExecution.isRunning}
-        onSave={handleManualSave}
-        hasUnsavedChanges={hasUnsavedChanges}
-        isSaving={isSaving}
-      />
+          undo={undo}
+          redo={redo}
+          canUndo={canUndo}
+          canRedo={canRedo}
+          onOpenWorkflowLibrary={() => setIsWorkflowLibraryOpen(true)}
+          onRun={() => graphExecution.isRunning ? graphExecution.abort() : graphExecution.execute()}
+          isRunning={graphExecution.isRunning}
+          onSave={handleManualSave}
+          hasUnsavedChanges={hasUnsavedChanges}
+          isSaving={isSaving}
+        />
 
-      <BoardCanvas
-        nodes={nodes}
-        edges={edges}
-        onNodesChange={onNodesChangeCustom}
-        onEdgesChange={onEdgesChange}
-        onConnect={onConnect}
-        onNodesDelete={onNodesDelete}
-        onEdgesDelete={onEdgesDelete}
-        onNodeContextMenu={(event, node) => {
-          event.preventDefault();
-          setContextMenu({ id: node.id, x: event.clientX, y: event.clientY });
-        }}
-        onPaneClick={() => { setContextMenu(null); setQuickAddMenu(null); }}
-        onPaneMouseDown={(e) => {
-          if (activeTool === 'section') {
+        <BoardCanvas
+          nodes={nodes}
+          edges={edges}
+          onNodesChange={onNodesChangeCustom}
+          onEdgesChange={onEdgesChange}
+          onConnect={onConnect}
+          onNodesDelete={onNodesDelete}
+          onEdgesDelete={onEdgesDelete}
+          onNodeContextMenu={(event, node) => {
+            event.preventDefault();
+            setContextMenu({ id: node.id, x: event.clientX, y: event.clientY });
+          }}
+          onPaneClick={() => { setContextMenu(null); setQuickAddMenu(null); }}
+          onPaneMouseDown={(e) => {
+            if (activeTool === 'section') {
+              const flowPos = screenToFlowPosition({ x: e.clientX, y: e.clientY });
+              setDrawingState({ active: true, start: flowPos, current: flowPos });
+            }
+          }}
+          onPaneMouseMove={(e) => {
+            if (drawingState.active) {
+              const flowPos = screenToFlowPosition({ x: e.clientX, y: e.clientY });
+              setDrawingState(prev => ({ ...prev, current: flowPos }));
+            }
+          }}
+          onPaneMouseUp={() => {
+            if (drawingState.active) {
+              const { start, current } = drawingState;
+              const x = Math.min(start.x, current.x);
+              const y = Math.min(start.y, current.y);
+              const width = Math.abs(current.x - start.x);
+              const height = Math.abs(current.y - start.y);
+              if (width > 20 && height > 20) addNodeWithTracking('section', { x, y }, { width, height });
+              setDrawingState({ active: false, start: { x: 0, y: 0 }, current: { x: 0, y: 0 } });
+              setActiveTool('pointer');
+            }
+          }}
+          onPaneContextMenu={(e) => {
+            e.preventDefault();
+            setContextMenu({ id: 'pane', x: e.clientX, y: e.clientY });
+            setQuickAddMenu(null);
+          }}
+          onPaneDoubleClick={(e) => {
             const flowPos = screenToFlowPosition({ x: e.clientX, y: e.clientY });
-            setDrawingState({ active: true, start: flowPos, current: flowPos });
-          }
-        }}
-        onPaneMouseMove={(e) => {
-          if (drawingState.active) {
-            const flowPos = screenToFlowPosition({ x: e.clientX, y: e.clientY });
-            setDrawingState(prev => ({ ...prev, current: flowPos }));
-          }
-        }}
-        onPaneMouseUp={() => {
-          if (drawingState.active) {
-            const { start, current } = drawingState;
-            const x = Math.min(start.x, current.x);
-            const y = Math.min(start.y, current.y);
-            const width = Math.abs(current.x - start.x);
-            const height = Math.abs(current.y - start.y);
-            if (width > 20 && height > 20) addNodeWithTracking('section', { x, y }, { width, height });
-            setDrawingState({ active: false, start: { x: 0, y: 0 }, current: { x: 0, y: 0 } });
-            setActiveTool('pointer');
-          }
-        }}
-        onPaneContextMenu={(e) => { e.preventDefault(); setQuickAddMenu(null); }}
-        onPaneDoubleClick={(e) => {
-          const flowPos = screenToFlowPosition({ x: e.clientX, y: e.clientY });
-          addNodeWithTracking('label', flowPos);
-        }}
-        onDragOver={(e) => { e.preventDefault(); e.dataTransfer.dropEffect = 'copy'; }}
-        onDrop={onDrop}
-        nodeTypes={nodeTypes}
-        activeTool={activeTool}
-        snapToGrid={snapToGrid}
-        resolvedTheme={resolvedTheme}
-        drawingState={drawingState}
-        isValidConnection={isValidConnection}
-      />
+            addNodeWithTracking('label', flowPos);
+          }}
+          onDragOver={(e) => { e.preventDefault(); e.dataTransfer.dropEffect = 'copy'; }}
+          onDrop={onDrop}
+          nodeTypes={nodeTypes}
+          activeTool={activeTool}
+          snapToGrid={snapToGrid}
+          resolvedTheme={resolvedTheme}
+          drawingState={drawingState}
+          isValidConnection={isValidConnection}
+        />
 
-      <CollaborativeCursors presences={presences} />
+        <CollaborativeCursors presences={presences} />
 
-      <NodeGroupOverlay
-        groups={groups}
-        onToggleCollapse={toggleCollapse}
-        onUngroupNodes={ungroupNodes}
-        onUpdateGroup={updateGroup}
-        onDeleteGroup={deleteGroup}
-      />
+        <StatusBar
+          nodeCount={nodes.length}
+          edgeCount={edges.length}
+          groupCount={groups.length}
+          canvasName={canvasSettings.name}
+          snapToGrid={snapToGrid}
+          hasUnsavedChanges={hasUnsavedChanges}
+          isSaving={isSaving}
+        />
 
-      <StatusBar
-        nodeCount={nodes.length}
-        edgeCount={edges.length}
-        groupCount={groups.length}
-        canvasName={canvasSettings.name}
-        snapToGrid={snapToGrid}
-        hasUnsavedChanges={hasUnsavedChanges}
-        isSaving={isSaving}
-      />
+        <MoodBoardSidebar
+          isSidebarOpen={isSidebarOpen}
+          isSidebarMini={isSidebarMini}
+          setIsSidebarMini={setIsSidebarMini}
+          isZenMode={isZenMode}
+          setIsAppSidebarCollapsed={setIsAppSidebarCollapsed}
+          collapsedCategories={collapsedCategories}
+          toggleCategory={(category) => setCollapsedCategories(prev => {
+            const next = new Set(prev);
+            if (next.has(category)) next.delete(category); else next.add(category);
+            return next;
+          })}
+          addNode={(type) => addNodeWithTracking(type)}
+          setIsModulesManagerOpen={setIsModulesManagerOpen}
+          onShare={onShare}
+          onExport={onExport}
+          browserViewMode={nodeBrowser.viewMode}
+          setBrowserViewMode={nodeBrowser.setViewMode}
+          browserActiveTab={nodeBrowser.activeTab}
+          setBrowserActiveTab={nodeBrowser.setActiveTab}
+          browserSearchQuery={nodeBrowser.searchQuery}
+          setBrowserSearchQuery={nodeBrowser.setSearchQuery}
+          browserSortBy={nodeBrowser.sortBy}
+          setBrowserSortBy={nodeBrowser.setSortBy}
+          favorites={nodeBrowser.favorites}
+          toggleFavorite={nodeBrowser.toggleFavorite}
+          favoriteNodes={nodeBrowser.favoriteNodes}
+          recentNodes={nodeBrowser.recentNodes}
+          filteredNodes={nodeBrowser.filteredNodes}
+        />
 
-      <MoodBoardSidebar
-        isSidebarOpen={isSidebarOpen}
-        isSidebarMini={isSidebarMini}
-        setIsSidebarMini={setIsSidebarMini}
-        isZenMode={isZenMode}
-        setIsAppSidebarCollapsed={setIsAppSidebarCollapsed}
-        collapsedCategories={collapsedCategories}
-        toggleCategory={(category) => setCollapsedCategories(prev => {
-          const next = new Set(prev);
-          if (next.has(category)) next.delete(category); else next.add(category);
-          return next;
-        })}
-        addNode={(type) => addNodeWithTracking(type)}
-        setIsModulesManagerOpen={setIsModulesManagerOpen}
-        onShare={onShare}
-        onExport={onExport}
-        browserViewMode={nodeBrowser.viewMode}
-        setBrowserViewMode={nodeBrowser.setViewMode}
-        browserActiveTab={nodeBrowser.activeTab}
-        setBrowserActiveTab={nodeBrowser.setActiveTab}
-        browserSearchQuery={nodeBrowser.searchQuery}
-        setBrowserSearchQuery={nodeBrowser.setSearchQuery}
-        browserSortBy={nodeBrowser.sortBy}
-        setBrowserSortBy={nodeBrowser.setSortBy}
-        favorites={nodeBrowser.favorites}
-        toggleFavorite={nodeBrowser.toggleFavorite}
-        favoriteNodes={nodeBrowser.favoriteNodes}
-        recentNodes={nodeBrowser.recentNodes}
-        filteredNodes={nodeBrowser.filteredNodes}
-      />
+        <MoodBoardSettingsPanel
+          brand={brand}
+          canvasSettings={canvasSettings}
+          setCanvasSettings={setCanvasSettings}
+          snapToGrid={snapToGrid}
+          setSnapToGrid={setSnapToGrid}
+          onExport={onExport}
+          onGeneratePrompt={generateBrandPrompt}
+          updateNodeData={updateNodeData}
+          onDeleteNode={(id) => onNodesDelete([{ id } as any])}
+          onDuplicateNode={(id) => {
+            const node = nodes.find(n => n.id === id);
+            if (node) duplicateNode(node);
+          }}
+          onAddNode={(type) => {
+            const center = screenToFlowPosition({ x: window.innerWidth / 2, y: window.innerHeight / 2 });
+            addNodeWithTracking(type as any, center);
+          }}
+          onImageUpload={handleImageUpload}
+          isOpen={isSettingsPanelOpen}
+          onToggle={() => setIsSettingsPanelOpen(prev => !prev)}
+        />
 
-      <MoodBoardSettingsPanel
-        brand={brand}
-        canvasSettings={canvasSettings}
-        setCanvasSettings={setCanvasSettings}
-        snapToGrid={snapToGrid}
-        setSnapToGrid={setSnapToGrid}
-        onExport={onExport}
-        onGeneratePrompt={generateBrandPrompt}
-        updateNodeData={updateNodeData}
-        onDeleteNode={(id) => onNodesDelete([{ id } as any])}
-        onDuplicateNode={(id) => {
-          const node = nodes.find(n => n.id === id);
-          if (node) duplicateNode(node);
-        }}
-        onAddNode={(type) => {
-          const center = screenToFlowPosition({ x: window.innerWidth / 2, y: window.innerHeight / 2 });
-          addNodeWithTracking(type as any, center);
-        }}
-        onImageUpload={handleImageUpload}
-        isOpen={isSettingsPanelOpen}
-        onToggle={() => setIsSettingsPanelOpen(prev => !prev)}
-      />
+        <BoardModals
+          isNewWorkflowOpen={isNewWorkflowOpen}
+          setIsNewWorkflowOpen={setIsNewWorkflowOpen}
+          handleCreateNewWorkflow={(name, desc) => {
+            setNodes([]); setEdges([]); setIsSettingsPanelOpen(false);
+            console.log(`Workflow created: ${name}`);
+          }}
+          handleManualSave={handleManualSave}
+          hasUnsavedChanges={hasUnsavedChanges}
+          isUserWorkflowsOpen={isUserWorkflowsOpen}
+          setIsUserWorkflowsOpen={setIsUserWorkflowsOpen}
+          isWorkflowLibraryOpen={isWorkflowLibraryOpen}
+          setIsWorkflowLibraryOpen={setIsWorkflowLibraryOpen}
+          onInjectTemplate={onInjectTemplate}
+          isModulesManagerOpen={isModulesManagerOpen}
+          setIsModulesManagerOpen={setIsModulesManagerOpen}
+          isResetModalOpen={isResetModalOpen}
+          setIsResetModalOpen={setIsResetModalOpen}
+          clearCanvas={clearCanvas}
+          resetConfirmName={resetConfirmName}
+          setResetConfirmName={setResetConfirmName}
+        />
 
-      <BoardModals
-        isNewWorkflowOpen={isNewWorkflowOpen}
-        setIsNewWorkflowOpen={setIsNewWorkflowOpen}
-        handleCreateNewWorkflow={(name, desc) => {
-          setNodes([]); setEdges([]); setIsSettingsPanelOpen(false);
-          console.log(`Workflow created: ${name}`);
-        }}
-        handleManualSave={handleManualSave}
-        hasUnsavedChanges={hasUnsavedChanges}
-        isUserWorkflowsOpen={isUserWorkflowsOpen}
-        setIsUserWorkflowsOpen={setIsUserWorkflowsOpen}
-        isWorkflowLibraryOpen={isWorkflowLibraryOpen}
-        setIsWorkflowLibraryOpen={setIsWorkflowLibraryOpen}
-        onInjectTemplate={onInjectTemplate}
-        isModulesManagerOpen={isModulesManagerOpen}
-        setIsModulesManagerOpen={setIsModulesManagerOpen}
-        isResetModalOpen={isResetModalOpen}
-        setIsResetModalOpen={setIsResetModalOpen}
-        clearCanvas={clearCanvas}
-        resetConfirmName={resetConfirmName}
-        setResetConfirmName={setResetConfirmName}
-      />
+        <QuickAddMenu
+          quickAddMenu={quickAddMenu}
+          setQuickAddMenu={setQuickAddMenu}
+          getInstalledNodes={getInstalledNodes}
+          addNode={addNode}
+          screenToFlowPosition={screenToFlowPosition}
+        />
 
-      <QuickAddMenu
-        quickAddMenu={quickAddMenu}
-        setQuickAddMenu={setQuickAddMenu}
-        getInstalledNodes={getInstalledNodes}
-        addNode={addNode}
-        screenToFlowPosition={screenToFlowPosition}
-      />
+        <MoodBoardContextMenu
+          contextMenu={contextMenu}
+          setContextMenu={setContextMenu}
+          nodes={nodes}
+          setNodes={setNodes}
+          updateNodeData={updateNodeData}
+          onNodesDelete={onNodesDelete}
+          onAlignNodes={onAlignNodes}
+          groups={groups}
+          onCreateGroup={createGroup}
+          onUngroupNodes={ungroupNodes}
+          onToggleCollapse={toggleCollapse}
+          onUpdateGroup={updateGroup}
+          onDeleteGroup={deleteGroup}
+          onAddNode={(type) => {
+            const center = screenToFlowPosition({ x: window.innerWidth / 2, y: window.innerHeight / 2 });
+            addNodeWithTracking(type as any, center);
+          }}
+          onClearCanvas={clearCanvas}
+          onPaste={() => {
+            // Paste logic if needed
+          }}
+          canPaste={false} // Update based on actual paste capability
+        />
 
-      <MoodBoardContextMenu
-        contextMenu={contextMenu}
-        setContextMenu={setContextMenu}
-        nodes={nodes}
-        setNodes={setNodes}
-        updateNodeData={updateNodeData}
-        onNodesDelete={onNodesDelete}
-        onAlignNodes={onAlignNodes}
-        groups={groups}
-        onCreateGroup={createGroup}
-        onUngroupNodes={ungroupNodes}
-        onToggleCollapse={toggleCollapse}
-        onUpdateGroup={updateGroup}
-      />
-
-      <CommandPalette
-        isOpen={isCommandPaletteOpen}
-        onClose={() => setIsCommandPaletteOpen(false)}
-        onAddNode={(type) => {
-          const center = screenToFlowPosition({ x: window.innerWidth / 2, y: window.innerHeight / 2 });
-          addNodeWithTracking(type as any, center);
-        }}
-        onInjectTemplate={onInjectTemplate}
-        activeTool={activeTool}
-        setActiveTool={setActiveTool}
-        onSave={handleManualSave}
-        onExport={onExport}
-        onToggleZenMode={onToggleZenMode}
-      />
-    </div>
+        <CommandPalette
+          isOpen={isCommandPaletteOpen}
+          onClose={() => setIsCommandPaletteOpen(false)}
+          onAddNode={(type) => {
+            const center = screenToFlowPosition({ x: window.innerWidth / 2, y: window.innerHeight / 2 });
+            addNodeWithTracking(type as any, center);
+          }}
+          onInjectTemplate={onInjectTemplate}
+          activeTool={activeTool}
+          setActiveTool={setActiveTool}
+          onSave={handleManualSave}
+          onExport={onExport}
+          onToggleZenMode={onToggleZenMode}
+        />
+      </div>
+    </MoodBoardContext.Provider>
   );
 });
 
@@ -602,9 +611,7 @@ const MoodBoardView = React.memo<MoodBoardViewProps>((props) => {
 
   return (
     <ReactFlowProvider>
-      <MoodBoardContext.Provider value={{ brand: props.brand, isShiftPressed }}>
-        <MoodBoardViewContent {...props} />
-      </MoodBoardContext.Provider>
+      <MoodBoardViewContent {...props} isShiftPressed={isShiftPressed} />
     </ReactFlowProvider>
   );
 });

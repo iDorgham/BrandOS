@@ -1,0 +1,53 @@
+{
+    "id": "voice_of_customer",
+    "label": "Voice of Customer",
+    "description": "Convert raw feedback into empathetic brand messaging.",
+    "category": "Content Engine",
+    "nodes": [
+        {
+            "id": "1",
+            "type": "webhook",
+            "position": {
+                "x": 100,
+                "y": 200
+            },
+            "data": {
+                "label": "Raw Feedback"
+            }
+        },
+        {
+            "id": "2",
+            "type": "research",
+            "position": {
+                "x": 400,
+                "y": 200
+            },
+            "data": {
+                "label": "Analyze Need"
+            }
+        },
+        {
+            "id": "3",
+            "type": "content_gen",
+            "position": {
+                "x": 700,
+                "y": 200
+            },
+            "data": {
+                "label": "Empathic Copy"
+            }
+        }
+    ],
+    "edges": [
+        {
+            "id": "e1-2",
+            "source": "1",
+            "target": "2"
+        },
+        {
+            "id": "e2-3",
+            "source": "2",
+            "target": "3"
+        }
+    ]
+}

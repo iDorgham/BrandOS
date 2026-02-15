@@ -125,16 +125,29 @@ export class GraphRunner {
     private gatherInputs(nodeId: string, nodeOutputs: Map<string, PortValues>): PortValues {
         const inputs: PortValues = {};
 
+        // Get the spec for the current node to identify primary ports
+        const node = this.nodes.find(n => n.id === nodeId);
+        const nodeType = node?.type || '';
+        const targetSpec = PORT_SPECS[nodeType];
+
         // Find all edges that target this node
         const incomingEdges = this.edges.filter(e => e.target === nodeId);
 
         for (const edge of incomingEdges) {
+            const sourceNode = this.nodes.find(n => n.id === edge.source);
+            const sourceSpec = PORT_SPECS[sourceNode?.type || ''];
             const sourceOutputs = nodeOutputs.get(edge.source);
-            if (!sourceOutputs || !edge.sourceHandle || !edge.targetHandle) continue;
 
-            const value = sourceOutputs[edge.sourceHandle];
-            if (value !== undefined) {
-                inputs[edge.targetHandle] = value;
+            if (!sourceOutputs) continue;
+
+            const sHandle = edge.sourceHandle || (sourceSpec?.outputs?.[0]?.id);
+            const tHandle = edge.targetHandle || (targetSpec?.inputs?.[0]?.id);
+
+            if (sHandle && tHandle) {
+                const value = sourceOutputs[sHandle];
+                if (value !== undefined) {
+                    inputs[tHandle] = value;
+                }
             }
         }
 

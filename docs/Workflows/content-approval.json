@@ -1,0 +1,69 @@
+{
+    "id": "content_approval",
+    "label": "Multi-Step Content Approval",
+    "description": "Logic-gated flow that waits for Slack approval before publishing.",
+    "category": "Content Engine",
+    "nodes": [
+        {
+            "id": "1",
+            "type": "content_gen",
+            "position": {
+                "x": 100,
+                "y": 200
+            },
+            "data": {
+                "label": "Draft Content"
+            }
+        },
+        {
+            "id": "2",
+            "type": "slack",
+            "position": {
+                "x": 400,
+                "y": 100
+            },
+            "data": {
+                "label": "Request Approval"
+            }
+        },
+        {
+            "id": "3",
+            "type": "logic",
+            "position": {
+                "x": 400,
+                "y": 300
+            },
+            "data": {
+                "label": "Approved?"
+            }
+        },
+        {
+            "id": "4",
+            "type": "social_poster",
+            "position": {
+                "x": 700,
+                "y": 200
+            },
+            "data": {
+                "label": "Publish"
+            }
+        }
+    ],
+    "edges": [
+        {
+            "id": "e1-2",
+            "source": "1",
+            "target": "2"
+        },
+        {
+            "id": "e2-3",
+            "source": "2",
+            "target": "3"
+        },
+        {
+            "id": "e3-4",
+            "source": "3",
+            "target": "4"
+        }
+    ]
+}

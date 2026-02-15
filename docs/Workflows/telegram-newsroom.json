@@ -1,0 +1,53 @@
+{
+    "id": "telegram_newsroom",
+    "label": "24/7 Telegram Newsroom",
+    "description": "Scheduled research and automated news broadcasting to Telegram.",
+    "category": "Automations",
+    "nodes": [
+        {
+            "id": "1",
+            "type": "trigger",
+            "position": {
+                "x": 100,
+                "y": 200
+            },
+            "data": {
+                "label": "Hourly Run"
+            }
+        },
+        {
+            "id": "2",
+            "type": "research",
+            "position": {
+                "x": 400,
+                "y": 200
+            },
+            "data": {
+                "label": "Fetch News"
+            }
+        },
+        {
+            "id": "3",
+            "type": "telegram",
+            "position": {
+                "x": 700,
+                "y": 200
+            },
+            "data": {
+                "label": "Broadcast"
+            }
+        }
+    ],
+    "edges": [
+        {
+            "id": "e1-2",
+            "source": "1",
+            "target": "2"
+        },
+        {
+            "id": "e2-3",
+            "source": "2",
+            "target": "3"
+        }
+    ]
+}

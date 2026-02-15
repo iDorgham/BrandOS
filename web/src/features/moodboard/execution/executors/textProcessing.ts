@@ -3,8 +3,8 @@ import { PortValues } from '../types';
 
 registerExecutor('content_gen', {
     async execute(inputs: PortValues, context): Promise<PortValues> {
-        const prompt = (inputs.prompt as string) || '';
-        const tone = (inputs.tone as string) || (context.nodeSettings.tone as string) || 'professional';
+        const prompt = (inputs.prompt as string) || (context.nodeSettings.prompt as string) || '';
+        const tone = (inputs.tone as string) || (inputs.variant as string) || (context.nodeSettings.tone as string) || (context.nodeSettings.variant as string) || 'professional';
         // Stub: would call AI service
         return {
             content_out: `[Generated content for: "${prompt.slice(0, 50)}..." in ${tone} tone]`,
@@ -17,8 +17,8 @@ registerExecutor('content_gen', {
 });
 
 registerExecutor('headline_gen', {
-    async execute(inputs: PortValues): Promise<PortValues> {
-        const topic = (inputs.topic as string) || '';
+    async execute(inputs: PortValues, context): Promise<PortValues> {
+        const topic = (inputs.topic as string) || (inputs.content as string) || (inputs.prompt as string) || (context.nodeSettings.content as string) || (context.nodeSettings.prompt as string) || '';
         const headlines = [
             `Breaking: ${topic}`,
             `Why ${topic} Matters Now`,

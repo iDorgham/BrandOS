@@ -1,0 +1,67 @@
+{
+    "id": "lead_lifecycle_ai",
+    "label": "Lead Lifecycle AI",
+    "description": "Automated nurturing based on lead scoring and behavior.",
+    "category": "Growth & Ads",
+    "nodes": [
+        {
+            "id": "1",
+            "type": "api_request",
+            "position": {
+                "x": 100,
+                "y": 200
+            },
+            "data": {
+                "label": "Leads"
+            }
+        },
+        {
+            "id": "2",
+            "type": "logic",
+            "position": {
+                "x": 400,
+                "y": 200
+            },
+            "data": {
+                "label": "Router"
+            }
+        },
+        {
+            "id": "3",
+            "type": "whatsapp",
+            "position": {
+                "x": 700,
+                "y": 100
+            },
+            "data": {
+                "label": "High Priority"
+            }
+        },
+        {
+            "id": "4",
+            "type": "email_sender",
+            "position": {
+                "x": 700,
+                "y": 300
+            },
+            "data": {
+                "label": "Slow Burn"
+            }
+        }
+    ],
+    "edges": [
+        {
+            "id": "e1-2",
+            "source": "1",
+            "target": "2"
+        },
+        {
+            "id": "e2-3", "source": "2",
+            "target": "3"
+        },
+        {
+            "id": "e2-4", "source": "2",
+            "target": "4"
+        }
+    ]
+}

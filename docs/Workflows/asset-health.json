@@ -1,0 +1,52 @@
+{
+    "id": "asset_health",
+    "label": "Asset Health Monitor",
+    "description": "Automated broken-link and visual asset audit.",
+    "category": "Automations",
+    "nodes": [
+        {
+            "id": "1",
+            "type": "web_ref",
+            "position": {
+                "x": 100,
+                "y": 200
+            },
+            "data": {
+                "label": "URL List"
+            }
+        },
+        {
+            "id": "2",
+            "type": "logic",
+            "position": {
+                "x": 400,
+                "y": 200
+            },
+            "data": {
+                "label": "Checker"
+            }
+        },
+        {
+            "id": "3",
+            "type": "email_sender",
+            "position": {
+                "x": 700,
+                "y": 200
+            },
+            "data": {
+                "label": "Status Report"
+            }
+        }
+    ],
+    "edges": [
+        {
+            "id": "e1-2",
+            "source": "1",
+            "target": "2"
+        },
+        {
+            "id": "e2-3", "source": "2",
+            "target": "3"
+        }
+    ]
+}

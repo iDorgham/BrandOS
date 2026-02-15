@@ -1,0 +1,53 @@
+{
+    "id": "lead_magnet_gen",
+    "label": "Lead Magnet Generator",
+    "description": "Automated content creation and delivery for new signups.",
+    "category": "Growth & Ads",
+    "nodes": [
+        {
+            "id": "1",
+            "type": "api_request",
+            "position": {
+                "x": 100,
+                "y": 200
+            },
+            "data": {
+                "label": "New Lead Webhook"
+            }
+        },
+        {
+            "id": "2",
+            "type": "content_gen",
+            "position": {
+                "x": 400,
+                "y": 200
+            },
+            "data": {
+                "label": "Custom Asset Gen"
+            }
+        },
+        {
+            "id": "3",
+            "type": "email_sender",
+            "position": {
+                "x": 700,
+                "y": 200
+            },
+            "data": {
+                "label": "Instant Delivery"
+            }
+        }
+    ],
+    "edges": [
+        {
+            "id": "e1-2",
+            "source": "1",
+            "target": "2"
+        },
+        {
+            "id": "e2-3",
+            "source": "2",
+            "target": "3"
+        }
+    ]
+}

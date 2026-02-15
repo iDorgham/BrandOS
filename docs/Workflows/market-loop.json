@@ -1,0 +1,69 @@
+{
+    "id": "market_loop",
+    "label": "Market Sentiment Loop",
+    "description": "Track sector sentiment history in Google Sheets.",
+    "category": "Intelligence Lab",
+    "nodes": [
+        {
+            "id": "1",
+            "type": "research",
+            "position": {
+                "x": 100,
+                "y": 200
+            },
+            "data": {
+                "label": "Sector Research"
+            }
+        },
+        {
+            "id": "2",
+            "type": "mood_gauge",
+            "position": {
+                "x": 400,
+                "y": 200
+            },
+            "data": {
+                "label": "Mood Score"
+            }
+        },
+        {
+            "id": "3",
+            "type": "text",
+            "position": {
+                "x": 700,
+                "y": 200
+            },
+            "data": {
+                "label": "Format Summary"
+            }
+        },
+        {
+            "id": "4",
+            "type": "google_sheet",
+            "position": {
+                "x": 1000,
+                "y": 200
+            },
+            "data": {
+                "label": "Append Log"
+            }
+        }
+    ],
+    "edges": [
+        {
+            "id": "e1-2",
+            "source": "1",
+            "target": "2"
+        },
+        {
+            "id": "e2-3",
+            "source": "2",
+            "target": "3"
+        },
+        {
+            "id": "e3-4",
+            "source": "3",
+            "target": "4"
+        }
+    ]
+}

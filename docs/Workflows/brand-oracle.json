@@ -1,0 +1,66 @@
+{
+    "id": "brand_oracle",
+    "label": "The Brand Oracle",
+    "description": "Advanced market-brand gap analysis and insights.",
+    "category": "Intelligence Lab",
+    "nodes": [
+        {
+            "id": "1",
+            "type": "research",
+            "position": {
+                "x": 100,
+                "y": 150
+            },
+            "data": {
+                "label": "Market"
+            }
+        },
+        {
+            "id": "2",
+            "type": "attribute",
+            "position": {
+                "x": 100,
+                "y": 300
+            },
+            "data": {
+                "label": "Brand"
+            }
+        },
+        {
+            "id": "3",
+            "type": "mood_gauge",
+            "position": {
+                "x": 400,
+                "y": 225
+            },
+            "data": {
+                "label": "Mismatch Engine"
+            }
+        },
+        {
+            "id": "4",
+            "type": "text",
+            "position": {
+                "x": 700,
+                "y": 225
+            },
+            "data": {
+                "label": "Strategy"
+            }
+        }
+    ],
+    "edges": [
+        {
+            "id": "e1-3", "source": "1",
+            "target": "3"
+        },
+        {
+            "id": "e2-3", "source": "2",
+            "target": "3"
+        },
+        {
+            "id": "e3-4", "source": "3",
+            "target": "4"
+        }
+    ]
+}

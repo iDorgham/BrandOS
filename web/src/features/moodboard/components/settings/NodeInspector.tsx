@@ -11,10 +11,15 @@ import {
     Hash, Type, Eye, EyeOff, Copy,
     Move, Maximize2, LetterText,
     CaseUpper, CaseLower, Baseline,
-    RotateCw, Settings2
+    RotateCw, Settings2, Image as ImageIcon,
+    Upload, Sun, Contrast, Droplets, Sparkles, CloudFog, RefreshCcw,
+    Swords, Activity, Layers, Grid3X3, Palette as PaletteIcon
 } from 'lucide-react';
+import { toast } from 'sonner';
+
 import { SETTINGS_REGISTRY } from '../../execution/settingsRegistry';
 import { DynamicSettingsRenderer } from './DynamicSettingsRenderer';
+import { useMoodBoard } from '../../MoodBoardContext';
 
 interface NodeInspectorProps {
     selectedNode: Node<MoodNodeData>;
@@ -96,14 +101,19 @@ export const NodeInspector: React.FC<NodeInspectorProps> = ({
     updateNodeData,
     onDeleteNode
 }) => {
-    const [sections, setSections] = useState({
+    const { brand } = useMoodBoard();
+    const [sections, setSections] = useState<Record<string, boolean>>({
         transform: true,
         content: true,
         typography: true,
         fill: true,
+        image: true,
+        values: true,
         nodeSettings: false,
-        advanced: false
+        metadata: false
     });
+
+    const [isDraggingInInspector, setIsDraggingInInspector] = useState(false);
 
     const toggle = (s: keyof typeof sections) =>
         setSections(prev => ({ ...prev, [s]: !prev[s] }));
@@ -163,6 +173,17 @@ export const NodeInspector: React.FC<NodeInspectorProps> = ({
                     >
                         <Trash2 size={11} />
                     </button>
+                    {selectedNode.data.linkUrl && (
+                        <a
+                            href={selectedNode.data.linkUrl as string}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="h-7 w-7 flex items-center justify-center text-primary/40 hover:text-primary transition-colors"
+                            title="Open Link"
+                        >
+                            <Link size={11} />
+                        </a>
+                    )}
                 </div>
             </div>
 
@@ -257,11 +278,11 @@ export const NodeInspector: React.FC<NodeInspectorProps> = ({
             </div>
 
             {/* ── Content ── */}
-            {(isTextNode || selectedNode.data.type === 'image') && (
+            {(isTextNode || selectedNode.data.type === 'image' || selectedNode.data.type === 'section' || selectedNode.data.type === 'competitor') && (
                 <div>
                     <SectionHeader
                         label="Content"
-                        icon={<Type size={10} className="text-muted-foreground/30" />}
+                        icon={selectedNode.data.type === 'competitor' ? <Swords size={10} className="text-muted-foreground/30" /> : <Type size={10} className="text-muted-foreground/30" />}
                         isOpen={sections.content}
                         onToggle={() => toggle('content')}
                     />
@@ -288,6 +309,17 @@ export const NodeInspector: React.FC<NodeInspectorProps> = ({
                                             placeholder="Enter label..."
                                         />
                                     )}
+                                </div>
+                            )}
+                            {selectedNode.data.competitorName !== undefined && (
+                                <div className="space-y-1">
+                                    <span className="text-[9px] font-medium text-muted-foreground/50 uppercase tracking-wider">Entity Name</span>
+                                    <Input
+                                        value={selectedNode.data.competitorName || ''}
+                                        onChange={(e) => update({ competitorName: e.target.value.toUpperCase() })}
+                                        className="h-7 text-[11px] rounded-none bg-muted/10 border-border/20 focus-visible:ring-0 focus-visible:border-primary/40 font-mono"
+                                        placeholder="AWAITING_ID..."
+                                    />
                                 </div>
                             )}
                             {selectedNode.data.description !== undefined && (
@@ -322,13 +354,13 @@ export const NodeInspector: React.FC<NodeInspectorProps> = ({
                             <div className="space-y-1">
                                 <span className="text-[9px] font-medium text-muted-foreground/50 uppercase tracking-wider">Family</span>
                                 <select
-                                    className="w-full h-7 bg-muted/10 border border-border/20 text-[11px] px-2 outline-none focus:border-primary/40 transition-colors appearance-none cursor-pointer"
+                                    className="w-full h-7 bg-muted/10 border border-border/20 text-[11px] px-2 outline-none focus:border-primary/40 transition-colors cursor-pointer text-foreground"
                                     value={fontFamily}
                                     onChange={(e) => update({ fontFamily: e.target.value })}
                                     style={{ fontFamily }}
                                 >
                                     {FONT_LIST.map(f => (
-                                        <option key={f.value} value={f.value} style={{ fontFamily: f.value }}>{f.label}</option>
+                                        <option key={f.value} value={f.value} style={{ fontFamily: f.value }} className="bg-[#161616] text-[#f4f4f4]">{f.label}</option>
                                     ))}
                                 </select>
                             </div>
@@ -338,12 +370,12 @@ export const NodeInspector: React.FC<NodeInspectorProps> = ({
                                 <div className="space-y-1">
                                     <span className="text-[9px] font-medium text-muted-foreground/50 uppercase tracking-wider">Weight</span>
                                     <select
-                                        className="w-full h-7 bg-muted/10 border border-border/20 text-[11px] px-2 outline-none focus:border-primary/40 transition-colors appearance-none cursor-pointer"
+                                        className="w-full h-7 bg-muted/10 border border-border/20 text-[11px] px-2 outline-none focus:border-primary/40 transition-colors cursor-pointer text-foreground"
                                         value={fontWeight}
                                         onChange={(e) => update({ fontWeight: e.target.value })}
                                     >
                                         {FONT_WEIGHTS.map(w => (
-                                            <option key={w.value} value={w.value}>{w.label}</option>
+                                            <option key={w.value} value={w.value} className="bg-[#161616] text-[#f4f4f4]">{w.label}</option>
                                         ))}
                                     </select>
                                 </div>
@@ -479,6 +511,22 @@ export const NodeInspector: React.FC<NodeInspectorProps> = ({
                 />
                 {sections.fill && (
                     <div className="px-3 pb-3 space-y-3 animate-in fade-in duration-150">
+                        {/* Brand Palette Quick Picker */}
+                        <div className="space-y-1.5">
+                            <span className="text-[9px] font-medium text-muted-foreground/50 uppercase tracking-wider">Brand Palette</span>
+                            <div className="grid grid-cols-7 gap-1">
+                                {brand.palette.map(c => (
+                                    <button
+                                        key={c.id}
+                                        onClick={() => update({ color: c.hex, label: c.label })}
+                                        className={`aspect-square border border-border/20 transition-all ${selectedNode.data.color === c.hex ? 'ring-1 ring-primary scale-110 z-10' : 'hover:scale-105'}`}
+                                        title={c.label}
+                                        style={{ backgroundColor: c.hex }}
+                                    />
+                                ))}
+                            </div>
+                        </div>
+
                         {/* Color */}
                         <div className="flex items-center gap-2">
                             <div className="relative">
@@ -520,53 +568,273 @@ export const NodeInspector: React.FC<NodeInspectorProps> = ({
                             </div>
                         </div>
 
-                        {/* Intensity (if applicable) */}
-                        {selectedNode.data.intensity !== undefined && (
-                            <div className="space-y-1.5">
-                                <div className="flex items-center justify-between">
-                                    <span className="text-[9px] font-medium text-muted-foreground/50 uppercase tracking-wider">Intensity</span>
-                                    <span className="text-[9px] font-mono text-muted-foreground/40">{selectedNode.data.intensity}%</span>
-                                </div>
-                                <div className="flex items-center gap-2">
-                                    <input
-                                        type="range"
-                                        min={0}
-                                        max={100}
-                                        value={selectedNode.data.intensity}
-                                        onChange={(e) => update({ intensity: Number(e.target.value) })}
-                                        className="flex-1 h-1 bg-muted/30 appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-2.5 [&::-webkit-slider-thumb]:h-2.5 [&::-webkit-slider-thumb]:bg-primary [&::-webkit-slider-thumb]:cursor-pointer"
-                                    />
-                                    <span className="text-[10px] font-mono text-foreground/60 w-8 text-right">{selectedNode.data.intensity}</span>
-                                </div>
-                            </div>
-                        )}
                     </div>
                 )}
             </div>
 
+            {/* ── Values & Metrics ── */}
+            {(selectedNode.data.intensity !== undefined ||
+                selectedNode.data.toneValue !== undefined ||
+                selectedNode.data.moodLevel !== undefined ||
+                selectedNode.data.marketShare !== undefined ||
+                selectedNode.data.gridCols !== undefined ||
+                selectedNode.data.gap !== undefined) && (
+                    <div>
+                        <SectionHeader
+                            label="Values & Metrics"
+                            icon={<Activity size={10} className="text-muted-foreground/30" />}
+                            isOpen={sections.values}
+                            onToggle={() => toggle('values')}
+                        />
+                        {sections.values && (
+                            <div className="px-3 pb-3 space-y-3 animate-in fade-in duration-150">
+                                {/* Intensity Slider */}
+                                {selectedNode.data.intensity !== undefined && (
+                                    <div className="space-y-1.5">
+                                        <div className="flex items-center justify-between">
+                                            <span className="text-[9px] font-medium text-muted-foreground/50 uppercase tracking-wider">Intensity</span>
+                                            <span className="text-[9px] font-mono text-muted-foreground/40">{selectedNode.data.intensity}%</span>
+                                        </div>
+                                        <input
+                                            type="range" min={0} max={100}
+                                            value={Number(selectedNode.data.intensity)}
+                                            onChange={(e) => update({ intensity: Number(e.target.value) })}
+                                            className="w-full h-1 bg-muted/30 appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-2 [&::-webkit-slider-thumb]:h-2 [&::-webkit-slider-thumb]:bg-primary"
+                                        />
+                                    </div>
+                                )}
+
+                                {/* Frequency / Tone Slider */}
+                                {selectedNode.data.toneValue !== undefined && (
+                                    <div className="space-y-1.5">
+                                        <div className="flex items-center justify-between">
+                                            <span className="text-[9px] font-medium text-muted-foreground/50 uppercase tracking-wider">Frequency (Tone)</span>
+                                            <span className="text-[9px] font-mono text-muted-foreground/40">{selectedNode.data.toneValue}%</span>
+                                        </div>
+                                        <input
+                                            type="range" min={0} max={100}
+                                            value={Number(selectedNode.data.toneValue)}
+                                            onChange={(e) => update({ toneValue: Number(e.target.value) })}
+                                            className="w-full h-1 bg-muted/30 appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-2 [&::-webkit-slider-thumb]:h-2 [&::-webkit-slider-thumb]:bg-orange-500"
+                                        />
+                                    </div>
+                                )}
+
+                                {/* Mood / Pressure Slider */}
+                                {selectedNode.data.moodLevel !== undefined && (
+                                    <div className="space-y-1.5">
+                                        <div className="flex items-center justify-between">
+                                            <span className="text-[9px] font-medium text-muted-foreground/50 uppercase tracking-wider">Atmos Pressure</span>
+                                            <span className="text-[9px] font-mono text-muted-foreground/40">{selectedNode.data.moodLevel}%</span>
+                                        </div>
+                                        <input
+                                            type="range" min={0} max={100}
+                                            value={Number(selectedNode.data.moodLevel)}
+                                            onChange={(e) => update({ moodLevel: Number(e.target.value) })}
+                                            className="w-full h-1 bg-muted/30 appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-2 [&::-webkit-slider-thumb]:h-2 [&::-webkit-slider-thumb]:bg-lime-500"
+                                        />
+                                    </div>
+                                )}
+
+                                {/* Market Share Slider */}
+                                {selectedNode.data.marketShare !== undefined && (
+                                    <div className="space-y-1.5">
+                                        <div className="flex items-center justify-between">
+                                            <span className="text-[9px] font-medium text-muted-foreground/50 uppercase tracking-wider">Market Saturation</span>
+                                            <span className="text-[9px] font-mono text-muted-foreground/40">{selectedNode.data.marketShare}%</span>
+                                        </div>
+                                        <input
+                                            type="range" min={1} max={100}
+                                            value={Number(selectedNode.data.marketShare)}
+                                            onChange={(e) => update({ marketShare: Number(e.target.value) })}
+                                            className="w-full h-1 bg-muted/30 appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-2 [&::-webkit-slider-thumb]:h-2 [&::-webkit-slider-thumb]:bg-stone-500"
+                                        />
+                                    </div>
+                                )}
+
+                                {/* Grid Configuration */}
+                                {selectedNode.data.gridCols !== undefined && (
+                                    <div className="grid grid-cols-2 gap-2">
+                                        <ScrubbableInput
+                                            label="Cols"
+                                            value={Number(selectedNode.data.gridCols)}
+                                            unit=""
+                                            min={1} max={12}
+                                            onChange={(val) => update({ gridCols: val })}
+                                        />
+                                        <ScrubbableInput
+                                            label="Gap"
+                                            value={Number(selectedNode.data.gap)}
+                                            unit="px"
+                                            min={0} max={100}
+                                            onChange={(val) => update({ gap: val })}
+                                        />
+                                    </div>
+                                )}
+                            </div>
+                        )}
+                    </div>
+                )}
+
+            {/* ── Image Settings ── */}
+            {
+                selectedNode.data.type === 'image' && (
+                    <div>
+                        <SectionHeader
+                            label="Image"
+                            icon={<ImageIcon size={10} className="text-muted-foreground/30" />}
+                            isOpen={sections.image}
+                            onToggle={() => toggle('image')}
+                        />
+                        {sections.image && (
+                            <div className="px-3 pb-3 space-y-4 animate-in fade-in duration-150">
+                                {/* Source Update */}
+                                <div className="space-y-2">
+                                    <span className="text-[9px] font-medium text-muted-foreground/50 uppercase tracking-wider">Source Asset</span>
+                                    <div
+                                        className={`relative aspect-video bg-muted/20 border border-border/20 overflow-hidden group/thumb cursor-pointer hover:border-primary/40 transition-all flex items-center justify-center ${isDraggingInInspector ? 'ring-2 ring-primary ring-inset bg-primary/5' : ''}`}
+                                        onDragOver={(e) => {
+                                            e.preventDefault();
+                                            if (e.dataTransfer.types.includes('Files')) {
+                                                setIsDraggingInInspector(true);
+                                            }
+                                        }}
+                                        onDragLeave={() => setIsDraggingInInspector(false)}
+                                        onDrop={(e) => {
+                                            e.preventDefault();
+                                            setIsDraggingInInspector(false);
+                                            const file = e.dataTransfer.files?.[0];
+                                            if (file && file.type.startsWith('image/')) {
+                                                const reader = new FileReader();
+                                                reader.onload = (re: any) => {
+                                                    const imageUrl = re.target.result;
+                                                    const img = new Image();
+                                                    img.onload = () => {
+                                                        update({ imageUrl, width: img.width, height: img.height });
+                                                        toast.success('Inspector asset hot-swapped');
+                                                    };
+                                                    img.src = imageUrl;
+                                                };
+                                                reader.readAsDataURL(file);
+                                            }
+                                        }}
+                                        onClick={() => {
+                                            const input = document.createElement('input');
+                                            input.type = 'file';
+                                            input.accept = 'image/*';
+                                            input.onchange = (e: any) => {
+                                                const file = e.target.files?.[0];
+                                                if (file) {
+                                                    const reader = new FileReader();
+                                                    reader.onload = (re: any) => {
+                                                        const imageUrl = re.target.result;
+                                                        const img = new Image();
+                                                        img.onload = () => {
+                                                            update({ imageUrl, width: img.width, height: img.height });
+                                                        };
+                                                        img.src = imageUrl;
+                                                    };
+                                                    reader.readAsDataURL(file);
+                                                }
+                                            };
+                                            input.click();
+                                        }}
+                                    >
+                                        {selectedNode.data.imageUrl ? (
+                                            <img
+                                                src={selectedNode.data.imageUrl as string}
+                                                className="w-full h-full object-cover opacity-60 group-hover/thumb:opacity-40 transition-opacity"
+                                                style={{
+                                                    filter: `contrast(${(selectedNode.data.contrast as number) ?? 100}%) saturate(${(selectedNode.data.saturation as number) ?? 100}%) brightness(${(selectedNode.data.brightness as number) ?? 100}%)`
+                                                }}
+                                            />
+                                        ) : (
+                                            <ImageIcon size={20} className="text-muted-foreground/20" />
+                                        )}
+                                        <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover/thumb:opacity-100 transition-opacity bg-background/20 backdrop-blur-sm">
+                                            <div className="flex items-center gap-2 px-3 py-1.5 bg-background border border-border/40 shadow-xl scale-90 group-hover/thumb:scale-100 transition-transform">
+                                                <Upload size={10} className="text-primary" />
+                                                <span className="text-[9px] font-bold uppercase tracking-widest text-foreground">Upload</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* Filters Grid */}
+                                <div className="space-y-3">
+                                    <div className="flex items-center justify-between">
+                                        <span className="text-[9px] font-medium text-muted-foreground/50 uppercase tracking-wider">Filters</span>
+                                        <button
+                                            onClick={() => update({
+                                                contrast: 100, saturation: 100, brightness: 100,
+                                                grayscale: 0, sepia: 0, blur: 0,
+                                                hueRotate: 0, invert: 0
+                                            })}
+                                            className="text-[8px] font-bold uppercase tracking-widest text-primary hover:text-primary/70 transition-colors"
+                                        >
+                                            Reset
+                                        </button>
+                                    </div>
+                                    <div className="grid grid-cols-1 gap-x-4 gap-y-3">
+                                        {[
+                                            { label: 'Contrast', key: 'contrast', icon: Contrast, min: 0, max: 200, def: 100, unit: '%' },
+                                            { label: 'Saturation', key: 'saturation', icon: Droplets, min: 0, max: 200, def: 100, unit: '%' },
+                                            { label: 'Brightness', key: 'brightness', icon: Sun, min: 0, max: 200, def: 100, unit: '%' },
+                                            { label: 'Blur', key: 'blur', icon: CloudFog, min: 0, max: 50, def: 0, unit: 'px' },
+                                            { label: 'Grayscale', key: 'grayscale', icon: Sparkles, min: 0, max: 100, def: 0, unit: '%' },
+                                            { label: 'Hue', key: 'hueRotate', icon: RefreshCcw, min: 0, max: 360, def: 0, unit: '°' },
+                                        ].map((f) => (
+                                            <div key={f.key} className="space-y-1">
+                                                <div className="flex items-center justify-between">
+                                                    <div className="flex items-center gap-1.5">
+                                                        <f.icon size={9} className="text-muted-foreground/40" />
+                                                        <span className="text-[8px] font-medium text-muted-foreground/60 uppercase tracking-widest">{f.label}</span>
+                                                    </div>
+                                                    <span className="text-[9px] font-mono text-muted-foreground/40">{(selectedNode.data[f.key] as number) ?? f.def}{f.unit}</span>
+                                                </div>
+                                                <input
+                                                    type="range"
+                                                    min={f.min}
+                                                    max={f.max}
+                                                    value={(selectedNode.data[f.key] as number) ?? f.def}
+                                                    onChange={(e) => update({ [f.key]: Number(e.target.value) })}
+                                                    className="w-full h-1 bg-muted/30 appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-2 [&::-webkit-slider-thumb]:h-2 [&::-webkit-slider-thumb]:bg-primary [&::-webkit-slider-thumb]:rounded-none"
+                                                />
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+                    </div>
+                )
+            }
+
             {/* ── Node Settings (per-type) ── */}
-            {SETTINGS_REGISTRY[selectedNode.data.type || ''] && (
-                <div>
-                    <SectionHeader
-                        label="Node Settings"
-                        icon={<Settings2 size={10} className="text-muted-foreground/30" />}
-                        isOpen={sections.nodeSettings}
-                        onToggle={() => toggle('nodeSettings')}
-                    />
-                    {sections.nodeSettings && (
-                        <div className="pb-3 animate-in fade-in duration-150">
-                            <DynamicSettingsRenderer
-                                schema={SETTINGS_REGISTRY[selectedNode.data.type || '']}
-                                values={(selectedNode.data.nodeSettings as Record<string, unknown>) || {}}
-                                onChange={(key, value) => {
-                                    const currentSettings = (selectedNode.data.nodeSettings as Record<string, unknown>) || {};
-                                    update({ nodeSettings: { ...currentSettings, [key]: value } });
-                                }}
-                            />
-                        </div>
-                    )}
-                </div>
-            )}
+            {
+                SETTINGS_REGISTRY[selectedNode.data.type || ''] && (
+                    <div>
+                        <SectionHeader
+                            label="Node Settings"
+                            icon={<Settings2 size={10} className="text-muted-foreground/30" />}
+                            isOpen={sections.nodeSettings}
+                            onToggle={() => toggle('nodeSettings')}
+                        />
+                        {sections.nodeSettings && (
+                            <div className="pb-3 animate-in fade-in duration-150">
+                                <DynamicSettingsRenderer
+                                    schema={SETTINGS_REGISTRY[selectedNode.data.type || '']}
+                                    values={(selectedNode.data.nodeSettings as Record<string, unknown>) || {}}
+                                    onChange={(key, value) => {
+                                        const currentSettings = (selectedNode.data.nodeSettings as Record<string, unknown>) || {};
+                                        update({ nodeSettings: { ...currentSettings, [key]: value } });
+                                    }}
+                                />
+                            </div>
+                        )}
+                    </div>
+                )
+            }
 
             {/* ── Node Metadata ── */}
             <div>
@@ -616,6 +884,6 @@ export const NodeInspector: React.FC<NodeInspectorProps> = ({
                     </div>
                 )}
             </div>
-        </div>
+        </div >
     );
 };

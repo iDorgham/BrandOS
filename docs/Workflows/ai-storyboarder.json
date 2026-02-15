@@ -1,0 +1,69 @@
+{
+    "id": "ai_storyboarder",
+    "label": "AI Storyboarder",
+    "description": "Transform video concepts into visual storyboards using Midjourney.",
+    "category": "Content Engine",
+    "nodes": [
+        {
+            "id": "1",
+            "type": "text",
+            "position": {
+                "x": 100,
+                "y": 200
+            },
+            "data": {
+                "label": "Concept"
+            }
+        },
+        {
+            "id": "2",
+            "type": "story_creator",
+            "position": {
+                "x": 400,
+                "y": 200
+            },
+            "data": {
+                "label": "Shot List"
+            }
+        },
+        {
+            "id": "3",
+            "type": "midjourney",
+            "position": {
+                "x": 700,
+                "y": 200
+            },
+            "data": {
+                "label": "Visual Ref"
+            }
+        },
+        {
+            "id": "4",
+            "type": "image",
+            "position": {
+                "x": 1000,
+                "y": 200
+            },
+            "data": {
+                "label": "Storyboard Frame"
+            }
+        }
+    ],
+    "edges": [
+        {
+            "id": "e1-2",
+            "source": "1",
+            "target": "2"
+        },
+        {
+            "id": "e2-3",
+            "source": "2",
+            "target": "3"
+        },
+        {
+            "id": "e3-4",
+            "source": "3",
+            "target": "4"
+        }
+    ]
+}

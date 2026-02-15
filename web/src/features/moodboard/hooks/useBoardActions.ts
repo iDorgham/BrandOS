@@ -187,6 +187,53 @@ export const useBoardActions = (
         (event: React.DragEvent) => {
             event.preventDefault();
 
+            // Handle Files (Local Image Drop)
+            if (event.dataTransfer.files && event.dataTransfer.files.length > 0) {
+                const file = event.dataTransfer.files[0];
+                if (file.type.startsWith('image/')) {
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        const imageUrl = e.target?.result as string;
+                        const position = screenToFlowPosition({
+                            x: event.clientX,
+                            y: event.clientY,
+                        });
+
+                        const img = new Image();
+                        img.onload = () => {
+                            const maxWidth = 500;
+                            const aspectRatio = img.height / img.width;
+                            const width = Math.min(img.width, maxWidth);
+                            const height = width * aspectRatio;
+                            const finalWidth = width;
+                            const finalHeight = height + 40 + 20;
+
+                            const newNode: Node<MoodNodeData> = {
+                                id: generateId(),
+                                type: 'image',
+                                position,
+                                style: { width: finalWidth, height: finalHeight },
+                                data: {
+                                    label: file.name.split('.')[0] || 'Local Image',
+                                    type: 'image',
+                                    isActive: true,
+                                    imageUrl,
+                                    width: img.width,
+                                    height: img.height,
+                                    onChange: updateNodeData
+                                },
+                            };
+                            setNodes((nds) => nds.concat(newNode));
+                            toast.success('Local asset integrated');
+                        };
+                        img.src = imageUrl;
+                    };
+                    reader.readAsDataURL(file);
+                }
+                return;
+            }
+
+            // Handle Sidebar Nodes
             const type = event.dataTransfer.getData('application/reactflow/type');
             const url = event.dataTransfer.getData('application/reactflow/url');
 
@@ -199,12 +246,58 @@ export const useBoardActions = (
                 y: event.clientY,
             });
 
+            // If it's a Sidebar Node, use addNode logic for proper dimensions
+            const getInitialDimensions = (nodeType: MoodNodeData['type']) => {
+                switch (nodeType) {
+                    case 'title': return { width: STANDARD_NODE_WIDTH, height: 180 };
+                    case 'label': return { width: STANDARD_NODE_WIDTH, height: 80 };
+                    case 'section': return { width: STANDARD_NODE_WIDTH * 2, height: STANDARD_NODE_WIDTH };
+                    case 'image':
+                    case 'text':
+                    case 'negative':
+                    case 'spotify':
+                    case 'weather':
+                    case 'reference':
+                    case 'cms_sync':
+                    case 'logic':
+                    case 'tone':
+                    case 'texture':
+                    case 'icons':
+                    case 'grid':
+                    case 'mood_gauge':
+                        return { width: STANDARD_NODE_WIDTH, height: STANDARD_NODE_WIDTH };
+                    case 'competitor': return { width: STANDARD_NODE_WIDTH, height: 420 };
+                    case 'web_ref': return { width: STANDARD_NODE_WIDTH, height: 420 };
+                    case 'midjourney': return { width: STANDARD_NODE_WIDTH, height: 480 };
+                    case 'typography': return { width: STANDARD_NODE_WIDTH, height: 460 };
+                    case 'palette': return { width: STANDARD_NODE_WIDTH, height: 420 };
+                    case 'paragraph': return { width: STANDARD_NODE_WIDTH, height: 480 };
+                    case 'preset': return { width: STANDARD_NODE_WIDTH, height: 200 };
+                    case 'attribute': return { width: STANDARD_NODE_WIDTH, height: 240 };
+                    case 'content_gen': return { width: STANDARD_NODE_WIDTH, height: 480 };
+                    case 'content_rewriter': return { width: STANDARD_NODE_WIDTH, height: 480 };
+                    case 'headline_gen': return { width: STANDARD_NODE_WIDTH, height: 400 };
+                    case 'seo_optimizer': return { width: STANDARD_NODE_WIDTH, height: 400 };
+                    case 'hashtag_gen': return { width: STANDARD_NODE_WIDTH, height: 400 };
+                    case 'social_poster': return { width: STANDARD_NODE_WIDTH, height: 400 };
+                    case 'scheduler': return { width: STANDARD_NODE_WIDTH, height: 400 };
+                    case 'story_creator': return { width: STANDARD_NODE_WIDTH, height: 400 };
+                    case 'email_sender': return { width: STANDARD_NODE_WIDTH, height: 400 };
+                    case 'webhook': return { width: STANDARD_NODE_WIDTH, height: 400 };
+                    case 'api_request': return { width: STANDARD_NODE_WIDTH, height: 400 };
+                    default: return { width: STANDARD_NODE_WIDTH, height: STANDARD_NODE_WIDTH };
+                }
+            };
+
+            const dims = getInitialDimensions(type as any);
+
             const newNode: Node<MoodNodeData> = {
                 id: generateId(),
                 type: type as any,
                 position,
+                style: { width: dims.width, height: dims.height },
                 data: {
-                    label: type === 'image' ? 'Dropped Asset' : `${type} node`,
+                    label: type === 'image' && url ? 'External Asset' : `${type.charAt(0).toUpperCase() + type.slice(1)} Module`,
                     type: type as any,
                     isActive: true,
                     imageUrl: url,
@@ -213,7 +306,7 @@ export const useBoardActions = (
             };
 
             setNodes((nds) => nds.concat(newNode));
-            toast.success('Asset added to canvas');
+            toast.success(`${type} module active at coordinate`);
         },
         [screenToFlowPosition, setNodes, updateNodeData],
     );

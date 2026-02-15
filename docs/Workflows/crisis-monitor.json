@@ -1,0 +1,69 @@
+{
+    "id": "crisis_monitor",
+    "label": "Brand Crisis Monitor",
+    "description": "Real-time sentiment alerting for brand mentions.",
+    "category": "Intelligence Lab",
+    "nodes": [
+        {
+            "id": "1",
+            "type": "webhook",
+            "position": {
+                "x": 100,
+                "y": 200
+            },
+            "data": {
+                "label": "Social Mentions"
+            }
+        },
+        {
+            "id": "2",
+            "type": "mood_gauge",
+            "position": {
+                "x": 400,
+                "y": 200
+            },
+            "data": {
+                "label": "Vibe Check"
+            }
+        },
+        {
+            "id": "3",
+            "type": "logic",
+            "position": {
+                "x": 700,
+                "y": 200
+            },
+            "data": {
+                "label": "Crisis Trigger"
+            }
+        },
+        {
+            "id": "4",
+            "type": "slack",
+            "position": {
+                "x": 1000,
+                "y": 200
+            },
+            "data": {
+                "label": "Action Alert"
+            }
+        }
+    ],
+    "edges": [
+        {
+            "id": "e1-2",
+            "source": "1",
+            "target": "2"
+        },
+        {
+            "id": "e2-3",
+            "source": "2",
+            "target": "3"
+        },
+        {
+            "id": "e3-4",
+            "source": "3",
+            "target": "4"
+        }
+    ]
+}

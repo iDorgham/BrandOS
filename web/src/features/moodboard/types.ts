@@ -65,6 +65,16 @@ export interface MoodNodeData extends Record<string, unknown> {
     samplerName?: string; // KSampler Scheduler
     scheduler?: string; // KSampler Scheduler Type
     denoise?: number; // KSampler Denoise
+
+    // Image Filters
+    contrast?: number;   // 0-200
+    saturation?: number; // 0-200
+    brightness?: number; // 0-200
+    grayscale?: number;  // 0-100
+    sepia?: number;      // 0-100
+    blur?: number;       // 0-50
+    hueRotate?: number;  // 0-360
+    invert?: number;     // 0-100
 }
 
 export interface NodeGroup {

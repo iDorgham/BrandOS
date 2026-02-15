@@ -1,0 +1,69 @@
+{
+    "id": "self_tuning_promoter",
+    "label": "Self-Tuning Promoter",
+    "description": "Performance data drives automated creative adaptation.",
+    "category": "Growth & Ads",
+    "nodes": [
+        {
+            "id": "1",
+            "type": "google_ads",
+            "position": {
+                "x": 100,
+                "y": 200
+            },
+            "data": {
+                "label": "Ad Performance"
+            }
+        },
+        {
+            "id": "2",
+            "type": "logic",
+            "position": {
+                "x": 400,
+                "y": 200
+            },
+            "data": {
+                "label": "Tuning Engine"
+            }
+        },
+        {
+            "id": "3",
+            "type": "content_gen",
+            "position": {
+                "x": 700,
+                "y": 200
+            },
+            "data": {
+                "label": "Refined Copy"
+            }
+        },
+        {
+            "id": "4",
+            "type": "google_ads",
+            "position": {
+                "x": 1000,
+                "y": 200
+            },
+            "data": {
+                "label": "Update Ad"
+            }
+        }
+    ],
+    "edges": [
+        {
+            "id": "e1-2",
+            "source": "1",
+            "target": "2"
+        },
+        {
+            "id": "e2-3",
+            "source": "2",
+            "target": "3"
+        },
+        {
+            "id": "e3-4",
+            "source": "3",
+            "target": "4"
+        }
+    ]
+}

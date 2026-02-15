@@ -1,0 +1,52 @@
+{
+    "id": "restaurant_menu",
+    "label": "Restaurant Menu AI",
+    "description": "Dynamic menu adaptation based on supply and vibes.",
+    "category": "Brand Architecture",
+    "nodes": [
+        {
+            "id": "1",
+            "type": "google_sheet",
+            "position": {
+                "x": 100,
+                "y": 200
+            },
+            "data": {
+                "label": "Stock Levels"
+            }
+        },
+        {
+            "id": "2",
+            "type": "palette",
+            "position": {
+                "x": 400,
+                "y": 200
+            },
+            "data": {
+                "label": "Menu Aesthetic"
+            }
+        },
+        {
+            "id": "3",
+            "type": "cms_sync",
+            "position": {
+                "x": 700,
+                "y": 200
+            },
+            "data": {
+                "label": "Live Menu"
+            }
+        }
+    ],
+    "edges": [
+        {
+            "id": "e1-2",
+            "source": "1",
+            "target": "2"
+        },
+        {
+            "id": "e2-3", "source": "2",
+            "target": "3"
+        }
+    ]
+}

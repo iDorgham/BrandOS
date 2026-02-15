@@ -5,6 +5,7 @@ import { BrandProfile } from '@/types';
 export interface MoodBoardContextType {
     brand: BrandProfile;
     isShiftPressed: boolean;
+    onToggleCollapse?: (groupId: string) => void;
 }
 
 export const MoodBoardContext = createContext<MoodBoardContextType | null>(null);

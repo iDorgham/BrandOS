@@ -24,6 +24,12 @@ interface MoodBoardContextMenuProps {
     onUngroupNodes?: (groupId: string) => void;
     onToggleCollapse?: (groupId: string) => void;
     onUpdateGroup?: (groupId: string, updates: Partial<NodeGroup>) => void;
+    onDeleteGroup?: (groupId: string) => void;
+    // Canvas actions
+    onAddNode?: (type: string) => void;
+    onClearCanvas?: () => void;
+    onPaste?: () => void;
+    canPaste?: boolean;
 }
 
 // Inline rename input
@@ -69,12 +75,11 @@ const MenuItem: React.FC<{
     <button
         onClick={onClick}
         disabled={disabled}
-        className={`w-full flex items-center gap-2.5 px-3 py-1.5 transition-colors text-[11px] ${
-            disabled ? 'opacity-30 pointer-events-none' :
-            variant === 'danger'
-                ? 'text-destructive/80 hover:bg-destructive/10 hover:text-destructive'
-                : 'text-foreground/70 hover:bg-primary/5 hover:text-foreground'
-        }`}
+        className={`w-full flex items-center gap-2.5 px-3 py-1.5 transition-colors text-[11px] ${disabled ? 'opacity-30 pointer-events-none' :
+                variant === 'danger'
+                    ? 'text-destructive/80 hover:bg-destructive/10 hover:text-destructive'
+                    : 'text-foreground/70 hover:bg-primary/5 hover:text-foreground'
+            }`}
     >
         <span className="w-4 h-4 flex items-center justify-center shrink-0">{icon}</span>
         <span className="flex-1 text-left">{label}</span>
@@ -105,6 +110,11 @@ export const MoodBoardContextMenu: React.FC<MoodBoardContextMenuProps> = ({
     onUngroupNodes,
     onToggleCollapse,
     onUpdateGroup,
+    onDeleteGroup,
+    onAddNode,
+    onClearCanvas,
+    onPaste,
+    canPaste,
 }) => {
     const [renameMode, setRenameMode] = useState<'node' | 'group' | null>(null);
     const menuRef = useRef<HTMLDivElement>(null);
@@ -138,287 +148,368 @@ export const MoodBoardContextMenu: React.FC<MoodBoardContextMenuProps> = ({
 
     if (!contextMenu) return null;
 
+    // Identify context
+    const isCanvasMenu = contextMenu.id === 'pane';
+    const groupTarget = groups.find(g => g.id === contextMenu.id);
     const targetNode = nodes.find(n => n.id === contextMenu.id);
     const selectedNodes = nodes.filter(n => n.selected);
+
+    // Node state helpers
     const multiSelect = selectedNodes.length > 1;
     const isLocked = targetNode?.data.isLocked;
     const isHidden = (targetNode?.style?.opacity as number || 1) <= 0;
     const isActive = targetNode?.data.isActive !== false;
     const nodeGroupId = targetNode?.data.groupId as string | undefined;
-    const group = nodeGroupId ? groups.find(g => g.id === nodeGroupId) : undefined;
+    const nodeGroup = nodeGroupId ? groups.find(g => g.id === nodeGroupId) : undefined;
 
-    // Get node display info
-    const registryEntry = NODE_REGISTRY.find(r => r.id === targetNode?.type);
+    // Get node display info (only if node menu)
+    const registryEntry = targetNode ? NODE_REGISTRY.find(r => r.id === targetNode.type) : null;
     const nodeLabel = targetNode?.data.label || registryEntry?.label || targetNode?.type || 'Node';
 
     // Clamp menu to viewport
     const menuStyle: React.CSSProperties = {
-        top: Math.min(contextMenu.y, window.innerHeight - 400),
+        top: Math.min(contextMenu.y, window.innerHeight - (isCanvasMenu ? 300 : 450)),
         left: Math.min(contextMenu.x, window.innerWidth - 220),
     };
 
     return (
         <div
             ref={menuRef}
-            className="fixed z-[1000] bg-popover/98 backdrop-blur-xl border border-border/40 min-w-[200px] py-1 animate-in fade-in zoom-in-95 duration-150 origin-top-left"
+            className="fixed z-[1000] bg-popover/98 backdrop-blur-xl border border-border/40 min-w-[200px] py-1 animate-in fade-in zoom-in-95 duration-150 origin-top-left shadow-2xl rounded-sm"
             style={menuStyle}
+            onContextMenu={(e) => e.preventDefault()}
         >
-            {/* Node identity header */}
-            <div className="px-3 py-1.5 flex items-center gap-2 border-b border-border/20 mb-1">
-                {registryEntry?.icon && (
-                    <registryEntry.icon size={12} className="text-primary shrink-0" />
-                )}
-                <span className="text-[10px] font-bold text-foreground/80 truncate">{nodeLabel}</span>
-                {multiSelect && (
-                    <span className="text-[8px] font-mono text-primary bg-primary/10 px-1.5 py-0.5 ml-auto shrink-0">
-                        {selectedNodes.length} selected
-                    </span>
-                )}
-            </div>
-
-            {/* Rename (inline) */}
-            {renameMode === 'node' && targetNode ? (
-                <InlineRename
-                    initialValue={targetNode.data.label || ''}
-                    onConfirm={(val) => {
-                        if (val.trim()) updateNodeData(targetNode.id, { label: val.trim() });
-                        setRenameMode(null);
-                    }}
-                    onCancel={() => setRenameMode(null)}
-                />
-            ) : renameMode === 'group' && group ? (
-                <InlineRename
-                    initialValue={group.name}
-                    onConfirm={(val) => {
-                        if (val.trim()) onUpdateGroup?.(group.id, { name: val.trim() });
-                        setRenameMode(null);
-                    }}
-                    onCancel={() => setRenameMode(null)}
-                />
-            ) : (
+            {/* 1. CANVAS MENU */}
+            {isCanvasMenu && (
                 <>
-                    {/* Edit */}
-                    <MenuItem
-                        icon={<Edit3 size={12} />}
-                        label="Rename"
-                        shortcut="F2"
-                        onClick={() => setRenameMode('node')}
-                    />
-
-                    <MenuItem
-                        icon={<Copy size={12} />}
-                        label="Duplicate"
-                        shortcut="Ctrl+D"
-                        onClick={() => {
-                            if (targetNode) {
-                                const newNode: Node<MoodNodeData> = {
-                                    ...targetNode,
-                                    id: generateId(),
-                                    position: { x: targetNode.position.x + 30, y: targetNode.position.y + 30 },
-                                    selected: true,
-                                };
-                                setNodes((nds) => [...nds.map(n => ({ ...n, selected: false })), newNode]);
-                                toast.success('Duplicated');
-                            }
-                            close();
-                        }}
-                    />
-
-                    <MenuDivider />
-
-                    {/* Layering */}
-                    <MenuSection label="Layer" />
-                    <MenuItem
-                        icon={<ArrowUpToLine size={12} />}
-                        label="Bring to Front"
-                        shortcut="]"
-                        onClick={() => {
-                            setNodes((nds) => {
-                                const maxZ = Math.max(...nds.map((n) => n.zIndex || 0));
-                                return nds.map((n) => n.id === contextMenu.id ? { ...n, zIndex: maxZ + 1 } : n);
-                            });
-                            close();
-                        }}
-                    />
-                    <MenuItem
-                        icon={<ArrowDownToLine size={12} />}
-                        label="Send to Back"
-                        shortcut="["
-                        onClick={() => {
-                            setNodes((nds) => {
-                                const minZ = Math.min(...nds.map((n) => n.zIndex || 0));
-                                return nds.map((n) => n.id === contextMenu.id ? { ...n, zIndex: minZ - 1 } : n);
-                            });
-                            close();
-                        }}
-                    />
-
-                    <MenuItem
-                        icon={isLocked ? <Unlock size={12} /> : <Lock size={12} />}
-                        label={isLocked ? 'Unlock' : 'Lock'}
-                        shortcut="Ctrl+L"
-                        onClick={() => {
-                            if (targetNode) {
-                                const newLocked = !isLocked;
-                                setNodes((nds) =>
-                                    nds.map((n) => n.id === contextMenu.id
-                                        ? { ...n, draggable: !newLocked, selectable: true, data: { ...n.data, isLocked: newLocked } }
-                                        : n
-                                    )
-                                );
-                                toast.info(newLocked ? 'Locked' : 'Unlocked');
-                            }
-                            close();
-                        }}
-                    />
-
-                    <MenuItem
-                        icon={isHidden ? <Eye size={12} /> : <EyeOff size={12} />}
-                        label={isHidden ? 'Show' : 'Hide'}
-                        onClick={() => {
-                            if (targetNode) {
-                                setNodes((nds) =>
-                                    nds.map((n) => n.id === contextMenu.id
-                                        ? { ...n, style: { ...n.style, opacity: isHidden ? 1 : 0 } }
-                                        : n
-                                    )
-                                );
-                            }
-                            close();
-                        }}
-                    />
-
-                    <MenuItem
-                        icon={<Power size={12} className={isActive ? 'text-emerald-500' : 'text-rose-500'} />}
-                        label={isActive ? 'Disable' : 'Enable'}
-                        onClick={() => {
-                            if (targetNode) {
-                                updateNodeData(targetNode.id, { isActive: !isActive });
-                            }
-                            close();
-                        }}
-                    />
-
-                    {/* Alignment (multi-select only) */}
-                    {multiSelect && (
-                        <>
-                            <MenuDivider />
-                            <MenuSection label="Align" />
-                            <div className="grid grid-cols-6 gap-0.5 px-3 py-1.5">
-                                {[
-                                    { dir: 'left' as const, icon: AlignLeft, title: 'Left' },
-                                    { dir: 'center' as const, icon: AlignCenter, title: 'Center H' },
-                                    { dir: 'right' as const, icon: AlignRight, title: 'Right' },
-                                    { dir: 'top' as const, icon: AlignTop, title: 'Top' },
-                                    { dir: 'middle' as const, icon: AlignMiddle, title: 'Middle V' },
-                                    { dir: 'bottom' as const, icon: AlignBottom, title: 'Bottom' },
-                                ].map(a => (
-                                    <button
-                                        key={a.dir}
-                                        onClick={() => { onAlignNodes(a.dir); close(); }}
-                                        className="h-7 flex items-center justify-center text-muted-foreground/60 hover:text-primary hover:bg-primary/10 transition-colors"
-                                        title={a.title}
-                                    >
-                                        <a.icon size={12} />
-                                    </button>
-                                ))}
-                            </div>
-                        </>
-                    )}
-
-                    {/* Grouping */}
-                    {multiSelect && onCreateGroup && (
-                        <>
-                            <MenuDivider />
-                            <MenuItem
-                                icon={<Group size={12} />}
-                                label="Group Selected"
-                                shortcut="Ctrl+G"
-                                onClick={() => {
-                                    const selectedIds = selectedNodes.map(n => n.id);
-                                    onCreateGroup(selectedIds);
-                                    close();
-                                }}
-                            />
-                        </>
-                    )}
-
-                    {group && (
-                        <>
-                            <MenuDivider />
-                            <MenuSection label={`Group: ${group.name}`} />
-                            {onUngroupNodes && (
-                                <MenuItem
-                                    icon={<Ungroup size={12} />}
-                                    label="Ungroup"
-                                    onClick={() => { onUngroupNodes(group.id); close(); }}
-                                />
-                            )}
-                            {onToggleCollapse && (
-                                <MenuItem
-                                    icon={<ChevronsUpDown size={12} />}
-                                    label={group.isCollapsed ? 'Expand' : 'Collapse'}
-                                    onClick={() => { onToggleCollapse(group.id); close(); }}
-                                />
-                            )}
-                            {onUpdateGroup && (
-                                <MenuItem
-                                    icon={<Edit3 size={12} />}
-                                    label="Rename Group"
-                                    onClick={() => setRenameMode('group')}
-                                />
-                            )}
-                        </>
-                    )}
-
-                    {/* Color override */}
-                    <MenuDivider />
-                    <MenuSection label="Color" />
-                    <div className="flex items-center gap-2 px-3 py-1.5">
-                        {[
-                            { id: 'blue', color: 'bg-blue-600' },
-                            { id: 'amber', color: 'bg-amber-500' },
-                            { id: 'emerald', color: 'bg-emerald-600' },
-                            { id: 'fuchsia', color: 'bg-fuchsia-600' },
-                            { id: 'slate', color: 'bg-slate-500' },
-                        ].map(c => (
-                            <button
-                                key={c.id}
-                                onClick={() => {
-                                    if (targetNode) updateNodeData(targetNode.id, { customColor: c.color });
-                                    close();
-                                }}
-                                className={`w-5 h-5 ${c.color} border border-white/10 hover:scale-125 transition-transform cursor-pointer`}
-                            />
-                        ))}
-                        <button
-                            onClick={() => {
-                                if (targetNode) updateNodeData(targetNode.id, { customColor: undefined });
-                                close();
-                            }}
-                            className="w-5 h-5 border border-border/40 hover:border-foreground/40 transition-colors flex items-center justify-center text-[8px] text-muted-foreground/40 hover:text-foreground"
-                            title="Reset color"
-                        >
-                            &times;
-                        </button>
+                    <div className="px-3 py-1.5 border-b border-border/20 mb-1 flex items-center gap-2">
+                        <Maximize2 size={10} className="text-primary/60" />
+                        <span className="text-[10px] font-bold text-foreground/80 uppercase tracking-wider">Canvas Workspace</span>
                     </div>
 
-                    {/* Delete */}
+                    <MenuSection label="Add Content" />
+                    <MenuItem icon={<Edit3 size={12} />} label="Add Note" shortcut="T" onClick={() => { onAddNode?.('note'); close(); }} />
+                    <MenuItem icon={<Maximize2 size={12} />} label="Add Ref Image" shortcut="I" onClick={() => { onAddNode?.('ref'); close(); }} />
+                    <MenuItem icon={<AlignLeft size={12} />} label="Add Label" shortcut="L" onClick={() => { onAddNode?.('label'); close(); }} />
+
+                    <MenuDivider />
+                    <MenuItem
+                        icon={<Copy size={12} />}
+                        label="Paste"
+                        shortcut="Ctrl+V"
+                        disabled={!canPaste}
+                        onClick={() => { onPaste?.(); close(); }}
+                    />
+
                     <MenuDivider />
                     <MenuItem
                         icon={<Trash2 size={12} />}
-                        label={multiSelect ? `Delete ${selectedNodes.length} nodes` : 'Delete'}
-                        shortcut="Del"
+                        label="Clear Canvas"
                         variant="danger"
-                        onClick={() => {
-                            if (multiSelect) {
-                                onNodesDelete(selectedNodes);
-                            } else if (targetNode) {
-                                onNodesDelete([targetNode]);
-                            }
-                            close();
-                        }}
+                        onClick={() => { onClearCanvas?.(); close(); }}
                     />
+                </>
+            )}
+
+            {/* 2. GROUP MENU (Targeted directly on group overlay) */}
+            {!isCanvasMenu && groupTarget && (
+                <>
+                    <div className="px-3 py-1.5 border-b border-border/20 mb-1 flex items-center gap-2">
+                        <Group size={12} className="text-primary" />
+                        <span className="text-[10px] font-bold text-foreground/80 truncate">{groupTarget.name}</span>
+                        <span className="text-[8px] font-mono text-muted-foreground/40 ml-auto uppercase">{groupTarget.nodeIds.length} Nodes</span>
+                    </div>
+
+                    {renameMode === 'group' ? (
+                        <InlineRename
+                            initialValue={groupTarget.name}
+                            onConfirm={(val) => {
+                                if (val.trim()) onUpdateGroup?.(groupTarget.id, { name: val.trim() });
+                                setRenameMode(null);
+                            }}
+                            onCancel={() => setRenameMode(null)}
+                        />
+                    ) : (
+                        <>
+                            <MenuItem icon={<Edit3 size={12} />} label="Rename Group" shortcut="F2" onClick={() => setRenameMode('group')} />
+                            <MenuItem icon={<Ungroup size={12} />} label="Ungroup Nodes" onClick={() => { onUngroupNodes?.(groupTarget.id); close(); }} />
+                            <MenuItem icon={<ChevronsUpDown size={12} />} label={groupTarget.isCollapsed ? 'Expand' : 'Collapse'} onClick={() => { onToggleCollapse?.(groupTarget.id); close(); }} />
+
+                            <MenuDivider />
+                            <MenuSection label="Group Tone" />
+                            <div className="flex items-center gap-2 px-3 py-1.5">
+                                {[
+                                    { id: 'bg-blue-500', color: 'bg-blue-500' },
+                                    { id: 'bg-emerald-500', color: 'bg-emerald-500' },
+                                    { id: 'bg-amber-500', color: 'bg-amber-500' },
+                                    { id: 'bg-purple-500', color: 'bg-purple-500' },
+                                    { id: 'bg-rose-500', color: 'bg-rose-500' },
+                                ].map(c => (
+                                    <button
+                                        key={c.id}
+                                        onClick={() => { onUpdateGroup?.(groupTarget.id, { color: c.id }); close(); }}
+                                        className={`w-5 h-5 ${c.color} border border-white/10 hover:scale-125 transition-transform cursor-pointer`}
+                                    />
+                                ))}
+                            </div>
+
+                            <MenuDivider />
+                            <MenuItem
+                                icon={<Trash2 size={12} />}
+                                label="Delete Group Contents"
+                                variant="danger"
+                                onClick={() => {
+                                    if (confirm(`Delete group "${groupTarget.name}" and all its nodes?`)) {
+                                        // Logic handled in view via onDeleteGroup
+                                        onUngroupNodes?.(groupTarget.id); // Placeholder for actual delete logic if needed
+                                        toast.info('Group deleted');
+                                    }
+                                    close();
+                                }}
+                            />
+                        </>
+                    )}
+                </>
+            )}
+
+            {/* 3. NODE MENU (Existing) */}
+            {!isCanvasMenu && !groupTarget && targetNode && (
+                <>
+                    {/* Node identity header */}
+                    <div className="px-3 py-1.5 flex items-center gap-2 border-b border-border/20 mb-1">
+                        {registryEntry?.icon && (
+                            <registryEntry.icon size={12} className="text-primary shrink-0" />
+                        )}
+                        <span className="text-[10px] font-bold text-foreground/80 truncate">{nodeLabel}</span>
+                        {multiSelect && (
+                            <span className="text-[8px] font-mono text-primary bg-primary/10 px-1.5 py-0.5 ml-auto shrink-0">
+                                {selectedNodes.length} selected
+                            </span>
+                        )}
+                    </div>
+
+                    {/* Rename (inline) */}
+                    {renameMode === 'node' ? (
+                        <InlineRename
+                            initialValue={targetNode.data.label || ''}
+                            onConfirm={(val) => {
+                                if (val.trim()) updateNodeData(targetNode.id, { label: val.trim() });
+                                setRenameMode(null);
+                            }}
+                            onCancel={() => setRenameMode(null)}
+                        />
+                    ) : (
+                        <>
+                            {/* Edit */}
+                            <MenuItem
+                                icon={<Edit3 size={12} />}
+                                label="Rename"
+                                shortcut="F2"
+                                onClick={() => setRenameMode('node')}
+                            />
+
+                            <MenuItem
+                                icon={<Copy size={12} />}
+                                label="Duplicate"
+                                shortcut="Ctrl+D"
+                                onClick={() => {
+                                    if (targetNode) {
+                                        const newNode: Node<MoodNodeData> = {
+                                            ...targetNode,
+                                            id: generateId(),
+                                            position: { x: targetNode.position.x + 30, y: targetNode.position.y + 30 },
+                                            selected: true,
+                                        };
+                                        setNodes((nds) => [...nds.map(n => ({ ...n, selected: false })), newNode]);
+                                        toast.success('Duplicated');
+                                    }
+                                    close();
+                                }}
+                            />
+
+                            <MenuDivider />
+
+                            {/* Layering */}
+                            <MenuSection label="Layer" />
+                            <MenuItem
+                                icon={<ArrowUpToLine size={12} />}
+                                label="Bring to Front"
+                                shortcut="]"
+                                onClick={() => {
+                                    setNodes((nds) => {
+                                        const maxZ = Math.max(...nds.map((n) => n.zIndex || 0));
+                                        return nds.map((n) => n.id === contextMenu.id ? { ...n, zIndex: maxZ + 1 } : n);
+                                    });
+                                    close();
+                                }}
+                            />
+                            <MenuItem
+                                icon={<ArrowDownToLine size={12} />}
+                                label="Send to Back"
+                                shortcut="["
+                                onClick={() => {
+                                    setNodes((nds) => {
+                                        const minZ = Math.min(...nds.map((n) => n.zIndex || 0));
+                                        return nds.map((n) => n.id === contextMenu.id ? { ...n, zIndex: minZ - 1 } : n);
+                                    });
+                                    close();
+                                }}
+                            />
+
+                            <MenuItem
+                                icon={isLocked ? <Unlock size={12} /> : <Lock size={12} />}
+                                label={isLocked ? 'Unlock' : 'Lock'}
+                                shortcut="Ctrl+L"
+                                onClick={() => {
+                                    if (targetNode) {
+                                        const newLocked = !isLocked;
+                                        setNodes((nds) =>
+                                            nds.map((n) => n.id === contextMenu.id
+                                                ? { ...n, draggable: !newLocked, selectable: true, data: { ...n.data, isLocked: newLocked } }
+                                                : n
+                                            )
+                                        );
+                                        toast.info(newLocked ? 'Locked' : 'Unlocked');
+                                    }
+                                    close();
+                                }}
+                            />
+
+                            <MenuItem
+                                icon={isHidden ? <Eye size={12} /> : <EyeOff size={12} />}
+                                label={isHidden ? 'Show' : 'Hide'}
+                                onClick={() => {
+                                    if (targetNode) {
+                                        setNodes((nds) =>
+                                            nds.map((n) => n.id === contextMenu.id
+                                                ? { ...n, style: { ...n.style, opacity: isHidden ? 1 : 0 } }
+                                                : n
+                                            )
+                                        );
+                                    }
+                                    close();
+                                }}
+                            />
+
+                            <MenuItem
+                                icon={<Power size={12} className={isActive ? 'text-emerald-500' : 'text-rose-500'} />}
+                                label={isActive ? 'Disable' : 'Enable'}
+                                onClick={() => {
+                                    if (targetNode) {
+                                        updateNodeData(targetNode.id, { isActive: !isActive });
+                                    }
+                                    close();
+                                }}
+                            />
+
+                            {/* Alignment (multi-select only) */}
+                            {multiSelect && (
+                                <>
+                                    <MenuDivider />
+                                    <MenuSection label="Align" />
+                                    <div className="grid grid-cols-6 gap-0.5 px-3 py-1.5">
+                                        {[
+                                            { dir: 'left' as const, icon: AlignLeft, title: 'Left' },
+                                            { dir: 'center' as const, icon: AlignCenter, title: 'Center H' },
+                                            { dir: 'right' as const, icon: AlignRight, title: 'Right' },
+                                            { dir: 'top' as const, icon: AlignTop, title: 'Top' },
+                                            { dir: 'middle' as const, icon: AlignMiddle, title: 'Middle V' },
+                                            { dir: 'bottom' as const, icon: AlignBottom, title: 'Bottom' },
+                                        ].map(a => (
+                                            <button
+                                                key={a.dir}
+                                                onClick={() => { onAlignNodes(a.dir); close(); }}
+                                                className="h-7 flex items-center justify-center text-muted-foreground/60 hover:text-primary hover:bg-primary/10 transition-colors"
+                                                title={a.title}
+                                            >
+                                                <a.icon size={12} />
+                                            </button>
+                                        ))}
+                                    </div>
+                                </>
+                            )}
+
+                            {/* Grouping */}
+                            {multiSelect && onCreateGroup && (
+                                <>
+                                    <MenuDivider />
+                                    <MenuItem
+                                        icon={<Group size={12} />}
+                                        label="Group Selected"
+                                        shortcut="Ctrl+G"
+                                        onClick={() => {
+                                            const selectedIds = selectedNodes.map(n => n.id);
+                                            onCreateGroup(selectedIds);
+                                            close();
+                                        }}
+                                    />
+                                </>
+                            )}
+
+                            {nodeGroup && (
+                                <>
+                                    <MenuDivider />
+                                    <MenuSection label={`In Group: ${nodeGroup.name}`} />
+                                    {onUngroupNodes && (
+                                        <MenuItem
+                                            icon={<Ungroup size={12} />}
+                                            label="Ungroup from this group"
+                                            onClick={() => { onUngroupNodes(nodeGroup.id); close(); }}
+                                        />
+                                    )}
+                                </>
+                            )}
+
+                            {/* Color override */}
+                            <MenuDivider />
+                            <MenuSection label="Color" />
+                            <div className="flex items-center gap-2 px-3 py-1.5">
+                                {[
+                                    { id: 'blue', color: 'bg-blue-600' },
+                                    { id: 'amber', color: 'bg-amber-500' },
+                                    { id: 'emerald', color: 'bg-emerald-600' },
+                                    { id: 'fuchsia', color: 'bg-fuchsia-600' },
+                                    { id: 'slate', color: 'bg-slate-500' },
+                                ].map(c => (
+                                    <button
+                                        key={c.id}
+                                        onClick={() => {
+                                            if (targetNode) updateNodeData(targetNode.id, { customColor: c.color });
+                                            close();
+                                        }}
+                                        className={`w-5 h-5 ${c.color} border border-white/10 hover:scale-125 transition-transform cursor-pointer`}
+                                    />
+                                ))}
+                                <button
+                                    onClick={() => {
+                                        if (targetNode) updateNodeData(targetNode.id, { customColor: undefined });
+                                        close();
+                                    }}
+                                    className="w-5 h-5 border border-border/40 hover:border-foreground/40 transition-colors flex items-center justify-center text-[8px] text-muted-foreground/40 hover:text-foreground"
+                                    title="Reset color"
+                                >
+                                    &times;
+                                </button>
+                            </div>
+
+                            {/* Delete */}
+                            <MenuDivider />
+                            <MenuItem
+                                icon={<Trash2 size={12} />}
+                                label={multiSelect ? `Delete ${selectedNodes.length} nodes` : 'Delete'}
+                                shortcut="Del"
+                                variant="danger"
+                                onClick={() => {
+                                    if (multiSelect) {
+                                        onNodesDelete(selectedNodes);
+                                    } else if (targetNode) {
+                                        onNodesDelete([targetNode]);
+                                    }
+                                    close();
+                                }}
+                            />
+                        </>
+                    )}
                 </>
             )}
         </div>

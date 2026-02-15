@@ -1,0 +1,52 @@
+{
+    "id": "audio_visual_sync",
+    "label": "Audio-Visual Sync",
+    "description": "Spotify track analysis to visual identity transformation.",
+    "category": "Brand Architecture",
+    "nodes": [
+        {
+            "id": "1",
+            "type": "spotify",
+            "position": {
+                "x": 100,
+                "y": 200
+            },
+            "data": {
+                "label": "Track Analysis"
+            }
+        },
+        {
+            "id": "2",
+            "type": "palette",
+            "position": {
+                "x": 400,
+                "y": 200
+            },
+            "data": {
+                "label": "Mood Colors"
+            }
+        },
+        {
+            "id": "3",
+            "type": "midjourney",
+            "position": {
+                "x": 700,
+                "y": 200
+            },
+            "data": {
+                "label": "Visualizer"
+            }
+        }
+    ],
+    "edges": [
+        {
+            "id": "e1-2",
+            "source": "1",
+            "target": "2"
+        },
+        {
+            "id": "e2-3", "source": "2",
+            "target": "3"
+        }
+    ]
+}

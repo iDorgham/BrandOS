@@ -1,0 +1,74 @@
+{
+    "id": "dynamic_style_guide",
+    "label": "Dynamic Style Guide",
+    "description": "Update brand assets based on real-time market trends.",
+    "category": "Brand Architecture",
+    "nodes": [
+        {
+            "id": "1",
+            "type": "attribute",
+            "position": {
+                "x": 100,
+                "y": 200
+            },
+            "data": {
+                "label": "Trending Vibes"
+            }
+        },
+        {
+            "id": "2",
+            "type": "palette",
+            "position": {
+                "x": 400,
+                "y": 150
+            },
+            "data": {
+                "label": "Trend Palette"
+            }
+        },
+        {
+            "id": "3",
+            "type": "typography",
+            "position": {
+                "x": 400,
+                "y": 300
+            },
+            "data": {
+                "label": "Trend Fonts"
+            }
+        },
+        {
+            "id": "4",
+            "type": "midjourney",
+            "position": {
+                "x": 700,
+                "y": 200
+            },
+            "data": {
+                "label": "Refresh Assets"
+            }
+        }
+    ],
+    "edges": [
+        {
+            "id": "e1-2",
+            "source": "1",
+            "target": "2"
+        },
+        {
+            "id": "e1-3",
+            "source": "1",
+            "target": "3"
+        },
+        {
+            "id": "e2-4",
+            "source": "2",
+            "target": "4"
+        },
+        {
+            "id": "e3-4",
+            "source": "3",
+            "target": "4"
+        }
+    ]
+}

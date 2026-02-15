@@ -22,6 +22,7 @@ export * from './MidjourneyNode';
 export * from './CMSSyncNode';
 export * from './LabelNode';
 export * from './SectionNode';
+export * from './GroupNode';
 export * from './TriggerNode';
 export * from './EngineNode';
 export * from './SwitchNode';
@@ -103,6 +104,7 @@ import { GoogleSheetNode } from './GoogleSheetNode';
 import { SlackNode } from './SlackNode';
 import { TelegramNode } from './TelegramNode';
 import { WhatsAppNode } from './WhatsAppNode';
+import { GroupNode } from './GroupNode';
 import { ResearchNode } from './ResearchNode';
 import { ContentPlanNode } from './ContentPlanNode';
 import { MetaAdsNode } from './MetaAdsNode';
@@ -133,6 +135,7 @@ export const nodeTypes = {
     cms_sync: CMSSyncNode,
     label: LabelNode,
     section: SectionNode,
+    groupNode: GroupNode,
     trigger: TriggerNode,
     engine: EngineNode,
     switch: SwitchNode,

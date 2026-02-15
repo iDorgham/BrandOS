@@ -1,0 +1,52 @@
+{
+    "id": "seo_performance_loop",
+    "label": "SEO Performance Loop",
+    "description": "Search-engine-integrated content refresh loop.",
+    "category": "Content Engine",
+    "nodes": [
+        {
+            "id": "1",
+            "type": "research",
+            "position": {
+                "x": 100,
+                "y": 200
+            },
+            "data": {
+                "label": "Search Ranks"
+            }
+        },
+        {
+            "id": "2",
+            "type": "content_gen",
+            "position": {
+                "x": 400,
+                "y": 200
+            },
+            "data": {
+                "label": "SEO Update"
+            }
+        },
+        {
+            "id": "3",
+            "type": "cms_sync",
+            "position": {
+                "x": 700,
+                "y": 200
+            },
+            "data": {
+                "label": "Publish"
+            }
+        }
+    ],
+    "edges": [
+        {
+            "id": "e1-2",
+            "source": "1",
+            "target": "2"
+        },
+        {
+            "id": "e2-3", "source": "2",
+            "target": "3"
+        }
+    ]
+}

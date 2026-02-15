@@ -1,0 +1,90 @@
+{
+    "id": "multi_language_engine",
+    "label": "Multi-Language Content Engine",
+    "description": "Scale content across languages with automated rewriting.",
+    "category": "Content Engine",
+    "nodes": [
+        {
+            "id": "1",
+            "type": "research",
+            "position": {
+                "x": 100,
+                "y": 200
+            },
+            "data": {
+                "label": "Base Research"
+            }
+        },
+        {
+            "id": "2",
+            "type": "content_gen",
+            "position": {
+                "x": 400,
+                "y": 200
+            },
+            "data": {
+                "label": "Master Copy"
+            }
+        },
+        {
+            "id": "3",
+            "type": "content_gen",
+            "position": {
+                "x": 700,
+                "y": 100
+            },
+            "data": {
+                "label": "ES Translation"
+            }
+        },
+        {
+            "id": "4",
+            "type": "content_gen",
+            "position": {
+                "x": 700,
+                "y": 300
+            },
+            "data": {
+                "label": "FR Translation"
+            }
+        },
+        {
+            "id": "5",
+            "type": "social_poster",
+            "position": {
+                "x": 1000,
+                "y": 200
+            },
+            "data": {
+                "label": "Multi-Post"
+            }
+        }
+    ],
+    "edges": [
+        {
+            "id": "e1-2",
+            "source": "1",
+            "target": "2"
+        },
+        {
+            "id": "e2-3",
+            "source": "2",
+            "target": "3"
+        },
+        {
+            "id": "e2-4",
+            "source": "2",
+            "target": "4"
+        },
+        {
+            "id": "e3-5",
+            "source": "3",
+            "target": "5"
+        },
+        {
+            "id": "e4-5",
+            "source": "4",
+            "target": "5"
+        }
+    ]
+}

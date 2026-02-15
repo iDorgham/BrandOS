@@ -21,7 +21,21 @@ export const useNodeGroups = (
     setEdges: React.Dispatch<React.SetStateAction<Edge[]>>,
     saveToHistory: () => void
 ) => {
-    const [groups, setGroups] = useState<NodeGroup[]>([]);
+    // Derived groups from nodes for backward compatibility with UI
+    const groups = nodes
+        .filter(n => n.type === 'groupNode')
+        .map(n => ({
+            id: n.id,
+            name: n.data.label || 'Untitled Group',
+            color: (n.data.color as string) || 'bg-slate-800',
+            nodeIds: nodes.filter(child => child.parentId === n.id).map(c => c.id),
+            isCollapsed: !!n.data.isCollapsed,
+            position: n.position,
+            size: {
+                width: parseInt(n.style?.width as string) || 400,
+                height: parseInt(n.style?.height as string) || 300
+            }
+        })) as NodeGroup[];
 
     const getGroupBounds = useCallback((nodeIds: string[]) => {
         const memberNodes = nodes.filter(n => nodeIds.includes(n.id));
@@ -41,7 +55,7 @@ export const useNodeGroups = (
 
         return {
             x: minX - PADDING,
-            y: minY - PADDING - 30, // Extra space for header
+            y: minY - PADDING - 30,
             width: maxX - minX + PADDING * 2,
             height: maxY - minY + PADDING * 2 + 30,
         };
@@ -54,131 +68,149 @@ export const useNodeGroups = (
         }
 
         const bounds = getGroupBounds(nodeIds);
-        const colorIndex = groups.length % GROUP_COLORS.length;
         const groupId = generateId();
+        const color = GROUP_COLORS[nodes.filter(n => n.type === 'groupNode').length % GROUP_COLORS.length];
 
-        const newGroup: NodeGroup = {
+        const groupNode: Node<MoodNodeData> = {
             id: groupId,
-            name: name || `Group ${groups.length + 1}`,
-            color: GROUP_COLORS[colorIndex],
-            nodeIds: [...nodeIds],
-            isCollapsed: false,
+            type: 'groupNode',
             position: { x: bounds.x, y: bounds.y },
-            size: { width: bounds.width, height: bounds.height },
+            style: { width: bounds.width, height: bounds.height },
+            data: {
+                label: name || `Group ${nodes.filter(n => n.type === 'groupNode').length + 1}`,
+                color,
+                isCollapsed: false,
+                groupId,
+            },
+            zIndex: 0,
         };
 
-        setGroups(prev => [...prev, newGroup]);
-
-        // Tag nodes with group membership
-        setNodes(nds => nds.map(n =>
-            nodeIds.includes(n.id)
-                ? { ...n, data: { ...n.data, groupId } }
-                : n
-        ));
+        setNodes(nds => {
+            const children = nds.map(n => {
+                if (nodeIds.includes(n.id)) {
+                    return {
+                        ...n,
+                        parentId: groupId,
+                        position: {
+                            x: n.position.x - bounds.x,
+                            y: n.position.y - bounds.y
+                        },
+                        extent: 'parent' as const,
+                    };
+                }
+                return n;
+            });
+            return [...children, groupNode];
+        });
 
         saveToHistory();
-        toast.success(`Grouped ${nodeIds.length} nodes`);
+        toast.success(`Group node initialized with ${nodeIds.length} members`);
         return groupId;
-    }, [groups, getGroupBounds, setNodes, saveToHistory]);
+    }, [nodes, getGroupBounds, setNodes, saveToHistory]);
 
     const ungroupNodes = useCallback((groupId: string) => {
-        const group = groups.find(g => g.id === groupId);
-        if (!group) return;
+        const groupNode = nodes.find(n => n.id === groupId);
+        if (!groupNode) return;
 
-        // Clear group membership from nodes
-        setNodes(nds => nds.map(n =>
-            n.data.groupId === groupId
-                ? { ...n, data: { ...n.data, groupId: undefined } }
-                : n
-        ));
+        setNodes(nds => {
+            const nextNodes = nds.map(n => {
+                if (n.parentId === groupId) {
+                    return {
+                        ...n,
+                        parentId: undefined,
+                        position: {
+                            x: n.position.x + groupNode.position.x,
+                            y: n.position.y + groupNode.position.y
+                        },
+                        extent: undefined,
+                        hidden: false,
+                    };
+                }
+                return n;
+            });
+            return nextNodes.filter(n => n.id !== groupId);
+        });
 
-        // Show hidden nodes if collapsed
-        if (group.isCollapsed) {
-            setNodes(nds => nds.map(n =>
-                group.nodeIds.includes(n.id)
-                    ? { ...n, hidden: false }
-                    : n
-            ));
-        }
-
-        setGroups(prev => prev.filter(g => g.id !== groupId));
         saveToHistory();
-        toast.info('Group dissolved');
-    }, [groups, setNodes, saveToHistory]);
+        toast.info('Group container dissolved');
+    }, [nodes, setNodes, saveToHistory]);
 
     const toggleCollapse = useCallback((groupId: string) => {
-        setGroups(prev => prev.map(g => {
-            if (g.id !== groupId) return g;
-
-            const willCollapse = !g.isCollapsed;
-
-            // Hide/show member nodes
-            setNodes(nds => nds.map(n =>
-                g.nodeIds.includes(n.id)
-                    ? { ...n, hidden: willCollapse }
-                    : n
-            ));
-
-            // Hide/show edges connected to member nodes
-            setEdges(eds => eds.map(e =>
-                g.nodeIds.includes(e.source) || g.nodeIds.includes(e.target)
-                    ? { ...e, hidden: willCollapse }
-                    : e
-            ));
-
-            return { ...g, isCollapsed: willCollapse };
+        setNodes(nds => nds.map(n => {
+            if (n.id === groupId) {
+                const willCollapse = !n.data.isCollapsed;
+                return {
+                    ...n,
+                    data: { ...n.data, isCollapsed: willCollapse },
+                    style: {
+                        ...n.style,
+                        width: willCollapse ? 240 : n.style?.width,
+                        height: willCollapse ? 160 : n.style?.height,
+                    }
+                };
+            }
+            if (n.parentId === groupId) {
+                const parent = nds.find(p => p.id === groupId);
+                const willCollapse = !parent?.data.isCollapsed;
+                return { ...n, hidden: willCollapse };
+            }
+            return n;
         }));
-    }, [setNodes, setEdges]);
+
+        // Hide edges connected to children
+        const groupNodeIds = nodes.filter(n => n.parentId === groupId).map(n => n.id);
+        setEdges(eds => eds.map(e =>
+            groupNodeIds.includes(e.source) || groupNodeIds.includes(e.target)
+                ? { ...e, hidden: !nodes.find(n => n.id === groupId)?.data.isCollapsed }
+                : e
+        ));
+    }, [nodes, setNodes, setEdges]);
 
     const updateGroup = useCallback((groupId: string, updates: Partial<NodeGroup>) => {
-        setGroups(prev => prev.map(g =>
-            g.id === groupId ? { ...g, ...updates } : g
-        ));
-    }, []);
+        setNodes(nds => nds.map(n => {
+            if (n.id === groupId) {
+                const dataUpdates: Partial<MoodNodeData> = {};
+                if (updates.name) dataUpdates.label = updates.name;
+                if (updates.color) dataUpdates.color = updates.color;
+                if (updates.isCollapsed !== undefined) dataUpdates.isCollapsed = updates.isCollapsed;
+
+                return {
+                    ...n,
+                    data: { ...n.data, ...dataUpdates }
+                };
+            }
+            return n;
+        }));
+    }, [setNodes]);
 
     const deleteGroup = useCallback((groupId: string) => {
-        // Keep nodes, just remove group
-        setNodes(nds => nds.map(n =>
-            n.data.groupId === groupId
-                ? { ...n, data: { ...n.data, groupId: undefined }, hidden: false }
-                : n
-        ));
-
-        // Unhide edges
-        const group = groups.find(g => g.id === groupId);
-        if (group) {
-            setEdges(eds => eds.map(e =>
-                group.nodeIds.includes(e.source) || group.nodeIds.includes(e.target)
-                    ? { ...e, hidden: false }
-                    : e
-            ));
-        }
-
-        setGroups(prev => prev.filter(g => g.id !== groupId));
-        saveToHistory();
-        toast.info('Group deleted');
-    }, [groups, setNodes, setEdges, saveToHistory]);
+        ungroupNodes(groupId); // For now, delete just dissolves the group but keeps nodes
+    }, [ungroupNodes]);
 
     const refreshGroupBounds = useCallback(() => {
-        setGroups(prev => prev.map(g => {
-            if (g.isCollapsed) return g;
-            const bounds = getGroupBounds(g.nodeIds);
-            return {
-                ...g,
-                position: { x: bounds.x, y: bounds.y },
-                size: { width: bounds.width, height: bounds.height },
-            };
-        }));
-    }, [getGroupBounds]);
+        // With parentId, relative positions handle most of this, 
+        // but we might need to adjust parent size if children move outside.
+        // For now, React Flow handles the movement coordination.
+    }, []);
+
+    const moveGroup = useCallback((groupId: string, dx: number, dy: number) => {
+        setNodes(nds => nds.map(n =>
+            n.id === groupId
+                ? { ...n, position: { x: n.position.x + dx, y: n.position.y + dy } }
+                : n
+        ));
+    }, [setNodes]);
 
     return {
         groups,
-        setGroups,
+        setGroups: () => { }, // No longer used as independent state
+        getGroupBounds,
         createGroup,
         ungroupNodes,
         toggleCollapse,
         updateGroup,
         deleteGroup,
         refreshGroupBounds,
+        moveGroup,
     };
 };

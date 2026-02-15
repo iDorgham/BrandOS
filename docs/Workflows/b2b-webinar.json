@@ -1,0 +1,69 @@
+{
+    "id": "b2b_webinar",
+    "label": "B2B Webinar Funnel",
+    "description": "Registration-to-nurture lead automation for events.",
+    "category": "Automations",
+    "nodes": [
+        {
+            "id": "1",
+            "type": "webhook",
+            "position": {
+                "x": 100,
+                "y": 200
+            },
+            "data": {
+                "label": "Reg Intake"
+            }
+        },
+        {
+            "id": "2",
+            "type": "email_sender",
+            "position": {
+                "x": 400,
+                "y": 100
+            },
+            "data": {
+                "label": "Confirm"
+            }
+        },
+        {
+            "id": "3",
+            "type": "slack",
+            "position": {
+                "x": 400,
+                "y": 300
+            },
+            "data": {
+                "label": "Notify Sales"
+            }
+        },
+        {
+            "id": "4",
+            "type": "email_sender",
+            "position": {
+                "x": 700,
+                "y": 200
+            },
+            "data": {
+                "label": "Nurture"
+            }
+        }
+    ],
+    "edges": [
+        {
+            "id": "e1-2",
+            "source": "1",
+            "target": "2"
+        },
+        {
+            "id": "e1-3",
+            "source": "1",
+            "target": "3"
+        },
+        {
+            "id": "e2-4",
+            "source": "2",
+            "target": "4"
+        }
+    ]
+}

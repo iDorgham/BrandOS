@@ -1,0 +1,53 @@
+{
+    "id": "ad_scaler",
+    "label": "Automatic Ad Scaler",
+    "description": "Automatically optimize and scale high-performing ad sets.",
+    "category": "Growth & Ads",
+    "nodes": [
+        {
+            "id": "1",
+            "type": "google_ads",
+            "position": {
+                "x": 100,
+                "y": 200
+            },
+            "data": {
+                "label": "Ad Performance"
+            }
+        },
+        {
+            "id": "2",
+            "type": "logic",
+            "position": {
+                "x": 400,
+                "y": 200
+            },
+            "data": {
+                "label": "Scaling Logic"
+            }
+        },
+        {
+            "id": "3",
+            "type": "google_ads",
+            "position": {
+                "x": 700,
+                "y": 200
+            },
+            "data": {
+                "label": "Adjust Budget"
+            }
+        }
+    ],
+    "edges": [
+        {
+            "id": "e1-2",
+            "source": "1",
+            "target": "2"
+        },
+        {
+            "id": "e2-3",
+            "source": "2",
+            "target": "3"
+        }
+    ]
+}

@@ -1,0 +1,69 @@
+{
+    "id": "hook_lab",
+    "label": "A/B Hook Laboratory",
+    "description": "Test and refine advertising hooks via Telegram feedback.",
+    "category": "Intelligence Lab",
+    "nodes": [
+        {
+            "id": "1",
+            "type": "headline_gen",
+            "position": {
+                "x": 100,
+                "y": 200
+            },
+            "data": {
+                "label": "Variant Gen"
+            }
+        },
+        {
+            "id": "2",
+            "type": "telegram",
+            "position": {
+                "x": 400,
+                "y": 200
+            },
+            "data": {
+                "label": "Poll Team"
+            }
+        },
+        {
+            "id": "3",
+            "type": "logic",
+            "position": {
+                "x": 700,
+                "y": 200
+            },
+            "data": {
+                "label": "Winner Logic"
+            }
+        },
+        {
+            "id": "4",
+            "type": "meta_ads",
+            "position": {
+                "x": 1000,
+                "y": 200
+            },
+            "data": {
+                "label": "Best Hook Ad"
+            }
+        }
+    ],
+    "edges": [
+        {
+            "id": "e1-2",
+            "source": "1",
+            "target": "2"
+        },
+        {
+            "id": "e2-3",
+            "source": "2",
+            "target": "3"
+        },
+        {
+            "id": "e3-4",
+            "source": "3",
+            "target": "4"
+        }
+    ]
+}

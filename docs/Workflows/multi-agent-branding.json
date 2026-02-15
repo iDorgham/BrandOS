@@ -1,0 +1,91 @@
+{
+    "id": "multi_agent_branding",
+    "label": "Multi-Agent Branding",
+    "description": "Full identity generation from a single brand attribute.",
+    "category": "Brand Architecture",
+    "nodes": [
+        {
+            "id": "1",
+            "type": "attribute",
+            "position": {
+                "x": 100,
+                "y": 300
+            },
+            "data": {
+                "label": "The Spark"
+            }
+        },
+        {
+            "id": "2",
+            "type": "palette",
+            "position": {
+                "x": 400,
+                "y": 100
+            },
+            "data": {
+                "label": "Colors"
+            }
+        },
+        {
+            "id": "3",
+            "type": "typography",
+            "position": {
+                "x": 400,
+                "y": 300
+            },
+            "data": {
+                "label": "Type"
+            }
+        },
+        {
+            "id": "4",
+            "type": "midjourney",
+            "position": {
+                "x": 400,
+                "y": 500
+            },
+            "data": {
+                "label": "Imagery"
+            }
+        },
+        {
+            "id": "5",
+            "type": "cms_sync",
+            "position": {
+                "x": 800,
+                "y": 300
+            },
+            "data": {
+                "label": "Brand Book"
+            }
+        }
+    ],
+    "edges": [
+        {
+            "id": "e1-2",
+            "source": "1",
+            "target": "2"
+        },
+        {
+            "id": "e1-3",
+            "source": "1",
+            "target": "3"
+        },
+        {
+            "id": "e1-4", "source": "1",
+            "target": "4"
+        },
+        {
+            "id": "e2-5", "source": "2",
+            "target": "5"
+        },
+        {
+            "id": "e3-5", "source": "3",
+            "target": "5"
+        },
+        {
+            "id": "e4-5", "source": "4",
+            "target": "5"
+        }
+    ]
+}

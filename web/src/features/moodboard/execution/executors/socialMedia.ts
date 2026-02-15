@@ -3,10 +3,12 @@ import { PortValues } from '../types';
 
 registerExecutor('social_poster', {
     async execute(inputs: PortValues, context): Promise<PortValues> {
-        const platform = (inputs.platform as string) || (context.nodeSettings.platform as string) || 'instagram';
+        const content = (inputs.content as string) || (inputs.prompt as string) || (context.nodeSettings.content as string) || (context.nodeSettings.prompt as string) || '';
+        const platform = (inputs.platform as string) || (context.nodeSettings.platform as string) || (Array.isArray(context.nodeSettings.tags) ? context.nodeSettings.tags[0] : 'instagram');
+
         return {
             post_id: `post_${Date.now()}`,
-            status: { platform, published: false, stub: true, content: inputs.content },
+            status: { platform, published: false, stub: true, content },
         };
     }
 });

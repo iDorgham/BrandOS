@@ -1,0 +1,67 @@
+{
+    "id": "competitor_watch",
+    "label": "Autonomous Competitor Watch",
+    "description": "Comparison-driven strategy updates and alerts.",
+    "category": "Intelligence Lab",
+    "nodes": [
+        {
+            "id": "1",
+            "type": "competitor",
+            "position": {
+                "x": 100,
+                "y": 200
+            },
+            "data": {
+                "label": "Watch List"
+            }
+        },
+        {
+            "id": "2",
+            "type": "web_ref",
+            "position": {
+                "x": 400,
+                "y": 200
+            },
+            "data": {
+                "label": "Scrape Updates"
+            }
+        },
+        {
+            "id": "3",
+            "type": "logic",
+            "position": {
+                "x": 700,
+                "y": 200
+            },
+            "data": {
+                "label": "Compare Strategy"
+            }
+        },
+        {
+            "id": "4",
+            "type": "slack",
+            "position": {
+                "x": 1000,
+                "y": 200
+            },
+            "data": {
+                "label": "Strategic Alert"
+            }
+        }
+    ],
+    "edges": [
+        {
+            "id": "e1-2",
+            "source": "1",
+            "target": "2"
+        },
+        {
+            "id": "e2-3", "source": "2",
+            "target": "3"
+        },
+        {
+            "id": "e3-4", "source": "3",
+            "target": "4"
+        }
+    ]
+}

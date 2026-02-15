@@ -1,0 +1,52 @@
+{
+    "id": "campaign_auditor",
+    "label": "Campaign Lifecycle Auditor",
+    "description": "Automated campaign reporting and archiving.",
+    "category": "Growth & Ads",
+    "nodes": [
+        {
+            "id": "1",
+            "type": "google_ads",
+            "position": {
+                "x": 100,
+                "y": 200
+            },
+            "data": {
+                "label": "Campaign"
+            }
+        },
+        {
+            "id": "2",
+            "type": "text",
+            "position": {
+                "x": 400,
+                "y": 200
+            },
+            "data": {
+                "label": "Summary"
+            }
+        },
+        {
+            "id": "3",
+            "type": "email_sender",
+            "position": {
+                "x": 700,
+                "y": 200
+            },
+            "data": {
+                "label": "Final Report"
+            }
+        }
+    ],
+    "edges": [
+        {
+            "id": "e1-2",
+            "source": "1",
+            "target": "2"
+        },
+        {
+            "id": "e2-3", "source": "2",
+            "target": "3"
+        }
+    ]
+}

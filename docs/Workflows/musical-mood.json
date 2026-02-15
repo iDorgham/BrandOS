@@ -1,0 +1,74 @@
+{
+    "id": "musical_mood",
+    "label": "Musical Mood Matcher",
+    "description": "Generate visual palettes and moods inspired by Spotify tracks.",
+    "category": "Intelligence Lab",
+    "nodes": [
+        {
+            "id": "1",
+            "type": "spotify",
+            "position": {
+                "x": 100,
+                "y": 200
+            },
+            "data": {
+                "label": "Track Context"
+            }
+        },
+        {
+            "id": "2",
+            "type": "palette",
+            "position": {
+                "x": 400,
+                "y": 100
+            },
+            "data": {
+                "label": "Rhythm Palette"
+            }
+        },
+        {
+            "id": "3",
+            "type": "midjourney",
+            "position": {
+                "x": 400,
+                "y": 300
+            },
+            "data": {
+                "label": "Melody Visualizer"
+            }
+        },
+        {
+            "id": "4",
+            "type": "image",
+            "position": {
+                "x": 800,
+                "y": 200
+            },
+            "data": {
+                "label": "Audio-Visual Kit"
+            }
+        }
+    ],
+    "edges": [
+        {
+            "id": "e1-2",
+            "source": "1",
+            "target": "2"
+        },
+        {
+            "id": "e1-3",
+            "source": "1",
+            "target": "3"
+        },
+        {
+            "id": "e2-4",
+            "source": "2",
+            "target": "4"
+        },
+        {
+            "id": "e3-4",
+            "source": "3",
+            "target": "4"
+        }
+    ]
+}

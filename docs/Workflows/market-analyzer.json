@@ -1,0 +1,53 @@
+{
+    "id": "market_analyzer",
+    "label": "Contextual Market Analyzer",
+    "description": "Adapt brand strategy based on weather and market trends.",
+    "category": "Intelligence Lab",
+    "nodes": [
+        {
+            "id": "1",
+            "type": "weather",
+            "position": {
+                "x": 100,
+                "y": 100
+            },
+            "data": {
+                "label": "Local Weather"
+            }
+        },
+        {
+            "id": "2",
+            "type": "engine",
+            "position": {
+                "x": 100,
+                "y": 300
+            },
+            "data": {
+                "label": "Context Engine"
+            }
+        },
+        {
+            "id": "3",
+            "type": "attribute",
+            "position": {
+                "x": 400,
+                "y": 200
+            },
+            "data": {
+                "label": "Strategy Update"
+            }
+        }
+    ],
+    "edges": [
+        {
+            "id": "e1-2",
+            "source": "1",
+            "target": "2"
+        },
+        {
+            "id": "e2-3",
+            "source": "2",
+            "target": "3"
+        }
+    ]
+}

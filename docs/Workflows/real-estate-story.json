@@ -1,0 +1,53 @@
+{
+    "id": "real_estate_story",
+    "label": "Real Estate Storyteller",
+    "description": "Property visual storytelling and listing automation.",
+    "category": "Content Engine",
+    "nodes": [
+        {
+            "id": "1",
+            "type": "attribute",
+            "position": {
+                "x": 100,
+                "y": 200
+            },
+            "data": {
+                "label": "Property Stats"
+            }
+        },
+        {
+            "id": "2",
+            "type": "content_gen",
+            "position": {
+                "x": 400,
+                "y": 200
+            },
+            "data": {
+                "label": "Listing Copy"
+            }
+        },
+        {
+            "id": "3",
+            "type": "social_poster",
+            "position": {
+                "x": 700,
+                "y": 200
+            },
+            "data": {
+                "label": "Market Blast"
+            }
+        }
+    ],
+    "edges": [
+        {
+            "id": "e1-2",
+            "source": "1",
+            "target": "2"
+        },
+        {
+            "id": "e2-3",
+            "source": "2",
+            "target": "3"
+        }
+    ]
+}

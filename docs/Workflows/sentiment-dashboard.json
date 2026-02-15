@@ -1,0 +1,53 @@
+{
+    "id": "sentiment_dashboard",
+    "label": "Customer Sentiment Dashboard",
+    "description": "Process incoming feedback via webhooks and log to Google Sheets.",
+    "category": "Intelligence Lab",
+    "nodes": [
+        {
+            "id": "1",
+            "type": "webhook",
+            "position": {
+                "x": 100,
+                "y": 200
+            },
+            "data": {
+                "label": "Inbound Feedback"
+            }
+        },
+        {
+            "id": "2",
+            "type": "mood_gauge",
+            "position": {
+                "x": 400,
+                "y": 200
+            },
+            "data": {
+                "label": "Sentiment Check"
+            }
+        },
+        {
+            "id": "3",
+            "type": "google_sheet",
+            "position": {
+                "x": 700,
+                "y": 200
+            },
+            "data": {
+                "label": "Log Results"
+            }
+        }
+    ],
+    "edges": [
+        {
+            "id": "e1-2",
+            "source": "1",
+            "target": "2"
+        },
+        {
+            "id": "e2-3",
+            "source": "2",
+            "target": "3"
+        }
+    ]
+}

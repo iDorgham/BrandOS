@@ -1,0 +1,53 @@
+{
+    "id": "influencer_outreach",
+    "label": "Influencer Outreach Bot",
+    "description": "Automate influencer research and personalized email outreach.",
+    "category": "Growth & Ads",
+    "nodes": [
+        {
+            "id": "1",
+            "type": "research",
+            "position": {
+                "x": 100,
+                "y": 200
+            },
+            "data": {
+                "label": "Influencer Hunt"
+            }
+        },
+        {
+            "id": "2",
+            "type": "content_gen",
+            "position": {
+                "x": 400,
+                "y": 200
+            },
+            "data": {
+                "label": "Draft Pitch"
+            }
+        },
+        {
+            "id": "3",
+            "type": "email_sender",
+            "position": {
+                "x": 700,
+                "y": 200
+            },
+            "data": {
+                "label": "Send Outreach"
+            }
+        }
+    ],
+    "edges": [
+        {
+            "id": "e1-2",
+            "source": "1",
+            "target": "2"
+        },
+        {
+            "id": "e2-3",
+            "source": "2",
+            "target": "3"
+        }
+    ]
+}

@@ -1,0 +1,67 @@
+{
+    "id": "saas_broadcaster",
+    "label": "SaaS Release Broadcaster",
+    "description": "Automated engineering-to-marketing release sync.",
+    "category": "Automations",
+    "nodes": [
+        {
+            "id": "1",
+            "type": "api_request",
+            "position": {
+                "x": 100,
+                "y": 200
+            },
+            "data": {
+                "label": "Commit Log"
+            }
+        },
+        {
+            "id": "2",
+            "type": "content_gen",
+            "position": {
+                "x": 400,
+                "y": 200
+            },
+            "data": {
+                "label": "Release Notes"
+            }
+        },
+        {
+            "id": "3",
+            "type": "email_sender",
+            "position": {
+                "x": 700,
+                "y": 100
+            },
+            "data": {
+                "label": "User Blast"
+            }
+        },
+        {
+            "id": "4",
+            "type": "social_poster",
+            "position": {
+                "x": 700,
+                "y": 300
+            },
+            "data": {
+                "label": "Social Update"
+            }
+        }
+    ],
+    "edges": [
+        {
+            "id": "e1-2",
+            "source": "1",
+            "target": "2"
+        },
+        {
+            "id": "e2-3", "source": "2",
+            "target": "3"
+        },
+        {
+            "id": "e2-4", "source": "2",
+            "target": "4"
+        }
+    ]
+}

@@ -1,0 +1,95 @@
+{
+    "id": "creative_brainstormer",
+    "label": "Creative Brainstormer",
+    "description": "Multi-variant asset generation with team voting.",
+    "category": "Content Engine",
+    "nodes": [
+        {
+            "id": "1",
+            "type": "attribute",
+            "position": {
+                "x": 100,
+                "y": 300
+            },
+            "data": {
+                "label": "Theme Seed"
+            }
+        },
+        {
+            "id": "2",
+            "type": "midjourney",
+            "position": {
+                "x": 400,
+                "y": 100
+            },
+            "data": {
+                "label": "Visual A"
+            }
+        },
+        {
+            "id": "3",
+            "type": "midjourney",
+            "position": {
+                "x": 400,
+                "y": 300
+            },
+            "data": {
+                "label": "Visual B"
+            }
+        },
+        {
+            "id": "4",
+            "type": "midjourney",
+            "position": {
+                "x": 400,
+                "y": 500
+            },
+            "data": {
+                "label": "Visual C"
+            }
+        },
+        {
+            "id": "5",
+            "type": "telegram",
+            "position": {
+                "x": 700,
+                "y": 300
+            },
+            "data": {
+                "label": "Team Poll"
+            }
+        }
+    ],
+    "edges": [
+        {
+            "id": "e1-2",
+            "source": "1",
+            "target": "2"
+        },
+        {
+            "id": "e1-3",
+            "source": "1",
+            "target": "3"
+        },
+        {
+            "id": "e1-4",
+            "source": "1",
+            "target": "4"
+        },
+        {
+            "id": "e2-5",
+            "source": "2",
+            "target": "5"
+        },
+        {
+            "id": "e3-5",
+            "source": "3",
+            "target": "5"
+        },
+        {
+            "id": "e4-5",
+            "source": "4",
+            "target": "5"
+        }
+    ]
+}

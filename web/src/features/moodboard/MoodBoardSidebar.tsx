@@ -1,7 +1,33 @@
 import React, { useState, useCallback, useRef, useEffect } from 'react';
-import { ChevronRight, ChevronDown, Share2, FileOutput, Package, Search, Star, Clock, List, LayoutGrid, Grid3X3, ChevronUp, ArrowUpDown } from 'lucide-react';
+import { ChevronRight, ChevronDown, Share2, FileOutput, Package, Search, Star, Clock, List, LayoutGrid, Grid3X3, ChevronUp, ArrowUpDown, Palette, PenTool, Cpu, Target, Layers } from 'lucide-react';
 import { useNodeManager } from '@/hooks/useNodeManager';
-import { MoodNodeDefinition } from './NodeRegistry';
+import { MoodNodeDefinition, NODE_REGISTRY } from './NodeRegistry';
+
+type SidebarProfile = 'ALL' | 'DESIGN' | 'CONTENT' | 'AUTOMATION' | 'MARKETING';
+
+const SIDEBAR_PROFILES: Record<SidebarProfile, { label: string; icon: any; nodeIds?: string[] }> = {
+    ALL: { label: 'All', icon: Grid3X3 },
+    DESIGN: {
+        label: 'Design',
+        icon: Palette,
+        nodeIds: ['image', 'text', 'palette', 'typography', 'texture', 'icons', 'preset', 'attribute', 'section', 'midjourney']
+    },
+    CONTENT: {
+        label: 'Content',
+        icon: PenTool,
+        nodeIds: ['image', 'text', 'title', 'content_gen', 'headline_gen', 'seo_optimizer', 'hashtag_gen', 'content_rewriter', 'paragraph', 'story_creator']
+    },
+    AUTOMATION: {
+        label: 'Auto',
+        icon: Cpu,
+        nodeIds: ['image', 'text', 'trigger', 'engine', 'switch', 'receiver', 'logic', 'webhook', 'api_request', 'slack', 'telegram', 'whatsapp', 'google_sheet', 'cms_sync']
+    },
+    MARKETING: {
+        label: 'Market',
+        icon: Target,
+        nodeIds: ['image', 'text', 'meta_ads', 'google_ads', 'social_poster', 'scheduler', 'research', 'content_plan', 'competitor', 'web_ref', 'email_sender']
+    }
+};
 
 interface MoodBoardSidebarProps {
     isSidebarOpen: boolean;
@@ -61,6 +87,7 @@ export const MoodBoardSidebar: React.FC<MoodBoardSidebarProps> = ({
     filteredNodes = [],
 }) => {
     const { getInstalledNodes } = useNodeManager();
+    const [activeProfile, setActiveProfile] = useState<SidebarProfile>('ALL');
 
     // Resizable sidebar
     const [sidebarWidth, setSidebarWidth] = useState(() => {
@@ -108,6 +135,11 @@ export const MoodBoardSidebar: React.FC<MoodBoardSidebarProps> = ({
         <button
             key={tool.id}
             onClick={() => addNode(tool.id)}
+            draggable={true}
+            onDragStart={(e) => {
+                e.dataTransfer.setData('application/reactflow/type', tool.id);
+                e.dataTransfer.effectAllowed = 'move';
+            }}
             className={`
                 w-full flex items-center h-10 border-l-2 border-transparent hover:border-primary/40 transition-all duration-200 group/tool text-muted-foreground/60 hover:text-foreground
                 ${isSidebarMini ? 'justify-center px-0' : 'gap-3 px-1 hover:bg-primary/5'}
@@ -138,6 +170,11 @@ export const MoodBoardSidebar: React.FC<MoodBoardSidebarProps> = ({
         <button
             key={tool.id}
             onClick={() => addNode(tool.id)}
+            draggable={true}
+            onDragStart={(e) => {
+                e.dataTransfer.setData('application/reactflow/type', tool.id);
+                e.dataTransfer.effectAllowed = 'move';
+            }}
             className="flex flex-col items-center gap-1.5 p-2 border border-border/40 hover:border-primary/40 hover:bg-primary/5 transition-all group/tool relative"
             title={tool.description}
         >
@@ -160,6 +197,11 @@ export const MoodBoardSidebar: React.FC<MoodBoardSidebarProps> = ({
         <button
             key={tool.id}
             onClick={() => addNode(tool.id)}
+            draggable={true}
+            onDragStart={(e) => {
+                e.dataTransfer.setData('application/reactflow/type', tool.id);
+                e.dataTransfer.effectAllowed = 'move';
+            }}
             className="w-8 h-8 flex items-center justify-center bg-card border border-border/40 hover:border-primary/50 hover:bg-primary/10 transition-all group/tool"
             title={`${tool.label} — ${tool.description}`}
         >
@@ -168,10 +210,16 @@ export const MoodBoardSidebar: React.FC<MoodBoardSidebarProps> = ({
     );
 
     const renderNodeList = (nodes: MoodNodeDefinition[], grouped = false) => {
+        // Filter by logic: If it's a profile other than ALL, only show nodes in that profile's ID list
+        const profileNodeIds = SIDEBAR_PROFILES[activeProfile].nodeIds;
+        const profileFilteredNodes = profileNodeIds
+            ? nodes.filter(n => profileNodeIds.includes(n.id))
+            : nodes;
+
         if (browserViewMode === 'grid') {
             return (
                 <div className="grid grid-cols-2 gap-1 p-1">
-                    {nodes.map(tool => renderGridNode(tool))}
+                    {profileFilteredNodes.map(tool => renderGridNode(tool))}
                 </div>
             );
         }
@@ -179,7 +227,7 @@ export const MoodBoardSidebar: React.FC<MoodBoardSidebarProps> = ({
         if (browserViewMode === 'compact') {
             return (
                 <div className="flex flex-wrap gap-1 p-1">
-                    {nodes.map(tool => renderCompactNode(tool))}
+                    {profileFilteredNodes.map(tool => renderCompactNode(tool))}
                 </div>
             );
         }
@@ -187,7 +235,7 @@ export const MoodBoardSidebar: React.FC<MoodBoardSidebarProps> = ({
         // List mode (default)
         if (grouped) {
             return CATEGORIES.map(category => {
-                const categoryNodes = nodes.filter(n => n.category.toLowerCase() === category.toLowerCase());
+                const categoryNodes = profileFilteredNodes.filter(n => n.category.toLowerCase() === category.toLowerCase());
                 if (categoryNodes.length === 0) return null;
 
                 const isCollapsed = collapsedCategories.has(category);
@@ -215,7 +263,7 @@ export const MoodBoardSidebar: React.FC<MoodBoardSidebarProps> = ({
 
         return (
             <div className="mt-1">
-                {nodes.map(tool => renderNodeButton(tool as MoodNodeDefinition))}
+                {profileFilteredNodes.map(tool => renderNodeButton(tool as MoodNodeDefinition))}
             </div>
         );
     };
@@ -233,6 +281,38 @@ export const MoodBoardSidebar: React.FC<MoodBoardSidebarProps> = ({
                 {/* Scanline overlay */}
                 <div className="absolute inset-0 pointer-events-none opacity-[0.02] z-0">
                     <div className="absolute inset-0 bg-[linear-gradient(rgba(18,16,16,0)_50%,rgba(0,0,0,0.1)_50%),linear-gradient(90deg,rgba(255,0,0,0.03),rgba(0,255,0,0.01),rgba(0,0,255,0.03))] bg-[length:100%_2px,3px_100%]" />
+                </div>
+
+                {/* Profile Selector */}
+                <div className={`p-1.5 border-b border-border/20 bg-muted/10 flex gap-1 ${isSidebarMini ? 'flex-col items-center' : ''}`}>
+                    {(Object.keys(SIDEBAR_PROFILES) as SidebarProfile[]).map(profileKey => {
+                        const profile = SIDEBAR_PROFILES[profileKey];
+                        const isActive = activeProfile === profileKey;
+                        return (
+                            <button
+                                key={profileKey}
+                                onClick={() => setActiveProfile(profileKey)}
+                                className={`
+                                    flex items-center justify-center rounded-sm transition-all duration-300 relative overflow-hidden group/prof
+                                    ${isSidebarMini ? 'w-8 h-8' : 'flex-1 py-2 px-1 gap-1'}
+                                    ${isActive
+                                        ? 'bg-zinc-100 dark:bg-zinc-800 text-foreground border border-border/40 shadow-sm shadow-black/20'
+                                        : 'text-muted-foreground/30 hover:text-muted-foreground/60 hover:bg-muted/30 border border-transparent'}
+                                `}
+                                title={profile.label}
+                            >
+                                {isActive && (
+                                    <div className="absolute top-0 left-0 w-full h-[1px] bg-primary animate-in fade-in slide-in-from-top-1 duration-500" />
+                                )}
+                                <profile.icon size={isSidebarMini ? 14 : 11} className={`transition-colors duration-300 ${isActive ? 'text-primary' : ''}`} strokeWidth={isActive ? 2.5 : 1.5} />
+                                {!isSidebarMini && (
+                                    <span className={`text-[7.5px] font-mono font-black uppercase tracking-[0.1em] transition-all duration-300 ${isActive ? 'opacity-100 translate-y-0' : 'opacity-40 translate-y-0.5'}`}>
+                                        {profile.label}
+                                    </span>
+                                )}
+                            </button>
+                        );
+                    })}
                 </div>
 
                 {/* Header: View mode + Tabs */}

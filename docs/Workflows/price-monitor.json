@@ -1,0 +1,53 @@
+{
+    "id": "price_monitor",
+    "label": "Competitor Price Monitor",
+    "description": "Monitor competitor URLs and alert team on Slack upon changes.",
+    "category": "Intelligence Lab",
+    "nodes": [
+        {
+            "id": "1",
+            "type": "web_ref",
+            "position": {
+                "x": 100,
+                "y": 200
+            },
+            "data": {
+                "label": "Watch URL"
+            }
+        },
+        {
+            "id": "2",
+            "type": "logic",
+            "position": {
+                "x": 400,
+                "y": 200
+            },
+            "data": {
+                "label": "Change detected?"
+            }
+        },
+        {
+            "id": "3",
+            "type": "slack",
+            "position": {
+                "x": 700,
+                "y": 200
+            },
+            "data": {
+                "label": "Alert Team"
+            }
+        }
+    ],
+    "edges": [
+        {
+            "id": "e1-2",
+            "source": "1",
+            "target": "2"
+        },
+        {
+            "id": "e2-3",
+            "source": "2",
+            "target": "3"
+        }
+    ]
+}

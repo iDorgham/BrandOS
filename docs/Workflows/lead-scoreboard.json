@@ -1,0 +1,69 @@
+{
+    "id": "lead_scoreboard",
+    "label": "B2B Lead Scoreboard",
+    "description": "CRM-integrated lead scoring and tiered outreach.",
+    "category": "Automations",
+    "nodes": [
+        {
+            "id": "1",
+            "type": "api_request",
+            "position": {
+                "x": 100,
+                "y": 200
+            },
+            "data": {
+                "label": "CRM Intake"
+            }
+        },
+        {
+            "id": "2",
+            "type": "logic",
+            "position": {
+                "x": 400,
+                "y": 200
+            },
+            "data": {
+                "label": "Lead Scoring"
+            }
+        },
+        {
+            "id": "3",
+            "type": "email_sender",
+            "position": {
+                "x": 700,
+                "y": 100
+            },
+            "data": {
+                "label": "Hot Lead Email"
+            }
+        },
+        {
+            "id": "4",
+            "type": "email_sender",
+            "position": {
+                "x": 700,
+                "y": 300
+            },
+            "data": {
+                "label": "Warm Nurture"
+            }
+        }
+    ],
+    "edges": [
+        {
+            "id": "e1-2",
+            "source": "1",
+            "target": "2"
+        },
+        {
+            "id": "e2-3",
+            "source": "2",
+            "target": "3"
+        },
+        {
+            "id": "e2-4",
+            "source": "2",
+            "target": "4"
+        }
+    ]
+}

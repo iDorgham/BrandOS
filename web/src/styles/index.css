@@ -90,6 +90,7 @@ html {
     /* #161616 in HSL */
     --foreground: 0 0% 95.7%;
     /* #f4f4f4 in HSL */
+    color-scheme: dark;
   }
 
   .light {
@@ -150,6 +151,17 @@ html {
     /* #ffffff */
     --foreground: 0 0% 8.6%;
     /* #161616 */
+    color-scheme: light;
+  }
+
+  select option {
+    background-color: #161616;
+    color: #f4f4f4;
+  }
+
+  .light select option {
+    background-color: #ffffff;
+    color: #161616;
   }
 
   body {

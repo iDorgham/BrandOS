@@ -10,6 +10,7 @@ export const ImageNode = React.memo(({ id, data, selected }: { id: string; data:
     const fileInputRef = useRef<HTMLInputElement>(null);
     const [isEditing, setIsEditing] = useState(false);
     const [tempLabel, setTempLabel] = useState(data.label);
+    const [isDraggingOver, setIsDraggingOver] = useState(false);
 
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
@@ -79,12 +80,67 @@ export const ImageNode = React.memo(({ id, data, selected }: { id: string; data:
                 </div>
             )}
             <div
-                className="relative flex-1 bg-muted/30 overflow-hidden group/img cursor-crosshair transition-all min-h-0 flex flex-col justify-center"
+                className={`relative flex-1 bg-muted/30 overflow-hidden group/img cursor-crosshair transition-all min-h-0 flex flex-col justify-center ${isDraggingOver ? 'ring-2 ring-primary ring-inset bg-primary/5' : ''}`}
                 onClick={() => fileInputRef.current?.click()}
+                onDragOver={(e) => {
+                    e.preventDefault();
+                    if (e.dataTransfer.types.includes('Files')) {
+                        setIsDraggingOver(true);
+                    }
+                }}
+                onDragLeave={() => setIsDraggingOver(false)}
+                onDrop={(e) => {
+                    e.preventDefault();
+                    setIsDraggingOver(false);
+                    const file = e.dataTransfer.files?.[0];
+                    if (file && file.type.startsWith('image/')) {
+                        const reader = new FileReader();
+                        reader.onload = () => {
+                            const imageUrl = reader.result as string;
+                            const img = new Image();
+                            img.onload = () => {
+                                const maxWidth = 500;
+                                const aspectRatio = img.height / img.width;
+                                const width = Math.min(img.width, maxWidth);
+                                const height = width * aspectRatio;
+                                const finalWidth = width;
+                                const finalHeight = height + 40 + 20;
+
+                                data.onChange?.(id, {
+                                    imageUrl,
+                                    width: img.width,
+                                    height: img.height
+                                }, {
+                                    width: finalWidth,
+                                    height: finalHeight
+                                });
+                                toast.success('Source asset successfully hot-swapped');
+                            };
+                            img.src = imageUrl;
+                        };
+                        reader.readAsDataURL(file);
+                    }
+                }}
             >
                 {data.imageUrl ? (
                     <>
-                        <img src={data.imageUrl} alt={String(data.label || '')} className="w-full h-full object-cover transition-all duration-700 contrast-[1.05] saturate-[0.95]" />
+                        <img
+                            src={data.imageUrl}
+                            alt={String(data.label || '')}
+                            className="w-full h-full object-cover transition-all duration-300"
+                            style={{
+                                filter: `
+                                    contrast(${(data.contrast as number) ?? 105}%) 
+                                    saturate(${(data.saturation as number) ?? 95}%)
+                                    brightness(${(data.brightness as number) ?? 100}%)
+                                    grayscale(${(data.grayscale as number) ?? 0}%)
+                                    sepia(${(data.sepia as number) ?? 0}%)
+                                    blur(${(data.blur as number) ?? 0}px)
+                                    hue-rotate(${(data.hueRotate as number) ?? 0}deg)
+                                    invert(${(data.invert as number) ?? 0}%)
+                                `
+                            }}
+                        />
 
                         {/* Technical Viewport Overlay - Architectural Grid */}
                         <div className="absolute inset-0 border border-zinc-200 dark:border-zinc-800 opacity-0 group-hover/img:opacity-100 transition-all duration-300 pointer-events-none">

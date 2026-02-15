@@ -1,0 +1,51 @@
+{
+    "id": "logo_version_ctrl",
+    "label": "Logo Version Control",
+    "description": "Identity evolution tracking and storage.",
+    "category": "Brand Architecture",
+    "nodes": [
+        {
+            "id": "1",
+            "type": "midjourney",
+            "position": {
+                "x": 100,
+                "y": 200
+            },
+            "data": {
+                "label": "Logo v1"
+            }
+        },
+        {
+            "id": "2",
+            "type": "midjourney",
+            "position": {
+                "x": 400,
+                "y": 200
+            },
+            "data": {
+                "label": "Logo v2"
+            }
+        },
+        {
+            "id": "3",
+            "type": "google_sheet",
+            "position": {
+                "x": 700,
+                "y": 200
+            },
+            "data": {
+                "label": "History Map"
+            }
+        }
+    ],
+    "edges": [
+        {
+            "id": "e1-3", "source": "1",
+            "target": "3"
+        },
+        {
+            "id": "e2-3", "source": "2",
+            "target": "3"
+        }
+    ]
+}

@@ -1,0 +1,52 @@
+{
+    "id": "automotive_config",
+    "label": "Automotive Configurator",
+    "description": "Visual asset generation for car customization.",
+    "category": "Brand Architecture",
+    "nodes": [
+        {
+            "id": "1",
+            "type": "attribute",
+            "position": {
+                "x": 100,
+                "y": 200
+            },
+            "data": {
+                "label": "Model Specs"
+            }
+        },
+        {
+            "id": "2",
+            "type": "palette",
+            "position": {
+                "x": 400,
+                "y": 200
+            },
+            "data": {
+                "label": "Car Color"
+            }
+        },
+        {
+            "id": "3",
+            "type": "midjourney",
+            "position": {
+                "x": 700,
+                "y": 200
+            },
+            "data": {
+                "label": "Render"
+            }
+        }
+    ],
+    "edges": [
+        {
+            "id": "e1-2",
+            "source": "1",
+            "target": "2"
+        },
+        {
+            "id": "e2-3", "source": "2",
+            "target": "3"
+        }
+    ]
+}

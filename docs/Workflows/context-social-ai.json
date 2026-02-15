@@ -1,0 +1,52 @@
+{
+    "id": "context_social_ai",
+    "label": "Contextual Social AI",
+    "description": "Real-time environment-aware social media posting.",
+    "category": "Automations",
+    "nodes": [
+        {
+            "id": "1",
+            "type": "weather",
+            "position": {
+                "x": 100,
+                "y": 200
+            },
+            "data": {
+                "label": "Environment"
+            }
+        },
+        {
+            "id": "2",
+            "type": "content_gen",
+            "position": {
+                "x": 400,
+                "y": 200
+            },
+            "data": {
+                "label": "Contextual Post"
+            }
+        },
+        {
+            "id": "3",
+            "type": "social_poster",
+            "position": {
+                "x": 700,
+                "y": 200
+            },
+            "data": {
+                "label": "Live Post"
+            }
+        }
+    ],
+    "edges": [
+        {
+            "id": "e1-2",
+            "source": "1",
+            "target": "2"
+        },
+        {
+            "id": "e2-3", "source": "2",
+            "target": "3"
+        }
+    ]
+}

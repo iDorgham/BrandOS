@@ -1,0 +1,74 @@
+{
+    "id": "archetype_lab",
+    "label": "Brand Archetype Lab",
+    "description": "Iterative logo generation based on archetype traits.",
+    "category": "Brand Architecture",
+    "nodes": [
+        {
+            "id": "1",
+            "type": "attribute",
+            "position": {
+                "x": 100,
+                "y": 200
+            },
+            "data": {
+                "label": "Archetype"
+            }
+        },
+        {
+            "id": "2",
+            "type": "midjourney",
+            "position": {
+                "x": 400,
+                "y": 200
+            },
+            "data": {
+                "label": "Logo Archetype"
+            }
+        },
+        {
+            "id": "3",
+            "type": "palette",
+            "position": {
+                "x": 400,
+                "y": 400
+            },
+            "data": {
+                "label": "Archetype Palette"
+            }
+        },
+        {
+            "id": "4",
+            "type": "image",
+            "position": {
+                "x": 800,
+                "y": 300
+            },
+            "data": {
+                "label": "Identity Concept"
+            }
+        }
+    ],
+    "edges": [
+        {
+            "id": "e1-2",
+            "source": "1",
+            "target": "2"
+        },
+        {
+            "id": "e1-3",
+            "source": "1",
+            "target": "3"
+        },
+        {
+            "id": "e2-4",
+            "source": "2",
+            "target": "4"
+        },
+        {
+            "id": "e3-4",
+            "source": "3",
+            "target": "4"
+        }
+    ]
+}

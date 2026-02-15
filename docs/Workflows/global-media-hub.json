@@ -1,0 +1,101 @@
+{
+    "id": "global_media_hub",
+    "label": "Global Media Hub",
+    "description": "Centralized media distribution with priority routing.",
+    "category": "Automations",
+    "nodes": [
+        {
+            "id": "1",
+            "type": "webhook",
+            "position": {
+                "x": 100,
+                "y": 200
+            },
+            "data": {
+                "label": "Asset Influx"
+            }
+        },
+        {
+            "id": "2",
+            "type": "switch",
+            "position": {
+                "x": 400,
+                "y": 200
+            },
+            "data": {
+                "label": "Tier Router"
+            }
+        },
+        {
+            "id": "3",
+            "type": "telegram",
+            "position": {
+                "x": 700,
+                "y": 100
+            },
+            "data": {
+                "label": "VIP Broadcast"
+            }
+        },
+        {
+            "id": "4",
+            "type": "whatsapp",
+            "position": {
+                "x": 700,
+                "y": 200
+            },
+            "data": {
+                "label": "Direct Line"
+            }
+        },
+        {
+            "id": "5",
+            "type": "slack",
+            "position": {
+                "x": 700,
+                "y": 300
+            },
+            "data": {
+                "label": "Staff Channel"
+            }
+        },
+        {
+            "id": "6",
+            "type": "email_sender",
+            "position": {
+                "x": 700,
+                "y": 400
+            },
+            "data": {
+                "label": "Record Arch"
+            }
+        }
+    ],
+    "edges": [
+        {
+            "id": "e1-2",
+            "source": "1",
+            "target": "2"
+        },
+        {
+            "id": "e2-3",
+            "source": "2",
+            "target": "3"
+        },
+        {
+            "id": "e2-4",
+            "source": "2",
+            "target": "4"
+        },
+        {
+            "id": "e2-5",
+            "source": "2",
+            "target": "5"
+        },
+        {
+            "id": "e2-6",
+            "source": "2",
+            "target": "6"
+        }
+    ]
+}

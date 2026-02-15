@@ -1,0 +1,52 @@
+{
+    "id": "customer_intel_deck",
+    "label": "Customer Intelligence Deck",
+    "description": "Large-scale feedback synthesis and reporting.",
+    "category": "Intelligence Lab",
+    "nodes": [
+        {
+            "id": "1",
+            "type": "webhook",
+            "position": {
+                "x": 100,
+                "y": 200
+            },
+            "data": {
+                "label": "Inbound Stream"
+            }
+        },
+        {
+            "id": "2",
+            "type": "text",
+            "position": {
+                "x": 400,
+                "y": 200
+            },
+            "data": {
+                "label": "Synthesis"
+            }
+        },
+        {
+            "id": "3",
+            "type": "google_sheet",
+            "position": {
+                "x": 700,
+                "y": 200
+            },
+            "data": {
+                "label": "Log Summary"
+            }
+        }
+    ],
+    "edges": [
+        {
+            "id": "e1-2",
+            "source": "1",
+            "target": "2"
+        },
+        {
+            "id": "e2-3", "source": "2",
+            "target": "3"
+        }
+    ]
+}

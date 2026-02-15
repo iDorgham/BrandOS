@@ -1,0 +1,52 @@
+{
+    "id": "prompt_optimizer",
+    "label": "Prompt Optimizer Loop",
+    "description": "Automated quality checks and refinement for AI prompts.",
+    "category": "Automations",
+    "nodes": [
+        {
+            "id": "1",
+            "type": "attribute",
+            "position": {
+                "x": 100,
+                "y": 200
+            },
+            "data": {
+                "label": "Request"
+            }
+        },
+        {
+            "id": "2",
+            "type": "logic",
+            "position": {
+                "x": 400,
+                "y": 200
+            },
+            "data": {
+                "label": "Optimizer"
+            }
+        },
+        {
+            "id": "3",
+            "type": "content_gen",
+            "position": {
+                "x": 700,
+                "y": 200
+            },
+            "data": {
+                "label": "Final Result"
+            }
+        }
+    ],
+    "edges": [
+        {
+            "id": "e1-2",
+            "source": "1",
+            "target": "2"
+        },
+        {
+            "id": "e2-3", "source": "2",
+            "target": "3"
+        }
+    ]
+}

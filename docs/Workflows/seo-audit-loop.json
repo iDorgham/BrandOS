@@ -1,0 +1,69 @@
+{
+    "id": "seo_audit_loop",
+    "label": "SEO Content Audit",
+    "description": "Monitor live site SEO and trigger content refreshes.",
+    "category": "Content Engine",
+    "nodes": [
+        {
+            "id": "1",
+            "type": "web_ref",
+            "position": {
+                "x": 100,
+                "y": 200
+            },
+            "data": {
+                "label": "Target Landing"
+            }
+        },
+        {
+            "id": "2",
+            "type": "seo_optimizer",
+            "position": {
+                "x": 400,
+                "y": 200
+            },
+            "data": {
+                "label": "Score Check"
+            }
+        },
+        {
+            "id": "3",
+            "type": "research",
+            "position": {
+                "x": 700,
+                "y": 200
+            },
+            "data": {
+                "label": "New Keywords"
+            }
+        },
+        {
+            "id": "4",
+            "type": "content_gen",
+            "position": {
+                "x": 1000,
+                "y": 200
+            },
+            "data": {
+                "label": "Update Content"
+            }
+        }
+    ],
+    "edges": [
+        {
+            "id": "e1-2",
+            "source": "1",
+            "target": "2"
+        },
+        {
+            "id": "e2-3",
+            "source": "2",
+            "target": "3"
+        },
+        {
+            "id": "e3-4",
+            "source": "3",
+            "target": "4"
+        }
+    ]
+}

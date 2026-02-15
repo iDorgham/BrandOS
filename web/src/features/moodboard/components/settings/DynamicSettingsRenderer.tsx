@@ -75,10 +75,10 @@ const FieldRenderer: React.FC<{
                 <select
                     value={(val as string) || ''}
                     onChange={(e) => onChange(e.target.value)}
-                    className="w-full h-7 bg-muted/10 border border-border/20 text-[11px] px-2 outline-none focus:border-primary/40 transition-colors appearance-none cursor-pointer"
+                    className="w-full h-7 bg-muted/10 border border-border/20 text-[11px] px-2 outline-none focus:border-primary/40 transition-colors cursor-pointer text-foreground"
                 >
                     {field.options?.map(opt => (
-                        <option key={opt.value} value={opt.value}>{opt.label}</option>
+                        <option key={opt.value} value={opt.value} className="bg-[#161616] text-[#f4f4f4]">{opt.label}</option>
                     ))}
                 </select>
             );

@@ -22,18 +22,20 @@ registerExecutor('weather', {
 });
 
 registerExecutor('competitor', {
-    async execute(inputs: PortValues): Promise<PortValues> {
-        const name = (inputs.name_in as string) || '';
+    async execute(inputs: PortValues, context): Promise<PortValues> {
+        const name = (inputs.name_in as string) || (inputs.competitorName as string) || (context.nodeSettings.competitorName as string) || '';
+        const share = typeof inputs.share_in === 'number' ? inputs.share_in : (typeof inputs.marketShare === 'number' ? inputs.marketShare : (typeof context.nodeSettings.marketShare === 'number' ? context.nodeSettings.marketShare : 20));
+
         return {
-            analysis_out: { name, stub: true },
-            share_out: 0,
+            analysis_out: { name, share, stub: true },
+            share_out: share,
         };
     }
 });
 
 registerExecutor('web_ref', {
-    async execute(inputs: PortValues): Promise<PortValues> {
-        const url = (inputs.url_in as string) || '';
+    async execute(inputs: PortValues, context): Promise<PortValues> {
+        const url = (inputs.url_in as string) || (inputs.linkUrl as string) || (context.nodeSettings.linkUrl as string) || '';
         return {
             html_out: `<!-- stub for ${url} -->`,
             meta_out: { url, fetched: false },
@@ -42,9 +44,10 @@ registerExecutor('web_ref', {
 });
 
 registerExecutor('cms_sync', {
-    async execute(inputs: PortValues): Promise<PortValues> {
+    async execute(inputs: PortValues, context): Promise<PortValues> {
+        const data = inputs.data_in || inputs.content || context.nodeSettings.content || {};
         return {
-            synced_out: inputs.data_in || {},
+            synced_out: data,
             status_out: true,
         };
     }

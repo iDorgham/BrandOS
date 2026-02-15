@@ -1,0 +1,53 @@
+{
+    "id": "dynamic_web",
+    "label": "Dynamic Web Experience",
+    "description": "Adapt CMS content based on real-time environmental data.",
+    "category": "Automations",
+    "nodes": [
+        {
+            "id": "1",
+            "type": "weather",
+            "position": {
+                "x": 100,
+                "y": 200
+            },
+            "data": {
+                "label": "Local Weather"
+            }
+        },
+        {
+            "id": "2",
+            "type": "logic",
+            "position": {
+                "x": 400,
+                "y": 200
+            },
+            "data": {
+                "label": "Condition Logic"
+            }
+        },
+        {
+            "id": "3",
+            "type": "cms_sync",
+            "position": {
+                "x": 700,
+                "y": 200
+            },
+            "data": {
+                "label": "Update Site"
+            }
+        }
+    ],
+    "edges": [
+        {
+            "id": "e1-2",
+            "source": "1",
+            "target": "2"
+        },
+        {
+            "id": "e2-3",
+            "source": "2",
+            "target": "3"
+        }
+    ]
+}
