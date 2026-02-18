@@ -24,11 +24,11 @@ export const useNodeBrowser = () => {
     const { getInstalledNodes } = useNodeManager();
     const initial = loadState();
 
-    const [viewMode, setViewModeState] = useState<NodeBrowserState['viewMode']>(initial.viewMode || 'list');
+    const [viewMode, setViewModeState] = useState<NodeBrowserState['viewMode']>(initial.viewMode || 'grid');
     const [favorites, setFavorites] = useState<string[]>(initial.favorites || []);
     const [recentlyUsed, setRecentlyUsed] = useState<string[]>(initial.recentlyUsed || []);
     const [searchQuery, setSearchQuery] = useState('');
-    const [sortBy, setSortByState] = useState<NodeBrowserState['sortBy']>(initial.sortBy || 'category');
+    const [sortBy, setSortByState] = useState<NodeBrowserState['sortBy']>(initial.sortBy || 'name');
     const [activeTab, setActiveTab] = useState<'all' | 'favorites' | 'recent'>('all');
 
     const persist = useCallback((updates: Partial<NodeBrowserState>) => {

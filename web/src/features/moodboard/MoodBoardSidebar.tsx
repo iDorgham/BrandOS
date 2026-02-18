@@ -3,10 +3,10 @@ import { ChevronRight, ChevronDown, Share2, FileOutput, Package, Search, Star, C
 import { useNodeManager } from '@/hooks/useNodeManager';
 import { MoodNodeDefinition, NODE_REGISTRY } from './NodeRegistry';
 
-type SidebarProfile = 'ALL' | 'DESIGN' | 'CONTENT' | 'AUTOMATION' | 'MARKETING';
+type SidebarProfile = 'GENERAL' | 'DESIGN' | 'CONTENT' | 'AUTOMATION' | 'MARKETING';
 
 const SIDEBAR_PROFILES: Record<SidebarProfile, { label: string; icon: any; nodeIds?: string[] }> = {
-    ALL: { label: 'All', icon: Grid3X3 },
+    GENERAL: { label: 'General', icon: Grid3X3 },
     DESIGN: {
         label: 'Design',
         icon: Palette,
@@ -87,7 +87,7 @@ export const MoodBoardSidebar: React.FC<MoodBoardSidebarProps> = ({
     filteredNodes = [],
 }) => {
     const { getInstalledNodes } = useNodeManager();
-    const [activeProfile, setActiveProfile] = useState<SidebarProfile>('ALL');
+    const [activeProfile, setActiveProfile] = useState<SidebarProfile>('GENERAL');
 
     // Resizable sidebar
     const [sidebarWidth, setSidebarWidth] = useState(() => {
@@ -141,8 +141,10 @@ export const MoodBoardSidebar: React.FC<MoodBoardSidebarProps> = ({
                 e.dataTransfer.effectAllowed = 'move';
             }}
             className={`
-                w-full flex items-center h-10 border-l-2 border-transparent hover:border-primary/40 transition-all duration-200 group/tool text-muted-foreground/60 hover:text-foreground
-                ${isSidebarMini ? 'justify-center px-0' : 'gap-3 px-1 hover:bg-primary/5'}
+                flex items-center transition-all duration-200 group/tool text-muted-foreground/60 hover:text-foreground
+                ${isSidebarMini 
+                    ? 'w-10 h-10 justify-center mx-auto rounded-md hover:bg-primary/10 mb-1' 
+                    : 'w-full h-8 border-l-2 border-transparent gap-3 px-1 hover:bg-primary/5 hover:border-primary/40'}
             `}
             title={isSidebarMini ? tool.label : undefined}
         >
@@ -151,7 +153,7 @@ export const MoodBoardSidebar: React.FC<MoodBoardSidebarProps> = ({
             </div>
             {!isSidebarMini && (
                 <>
-                    <span className="text-[10px] font-mono font-bold tracking-[0.1em] uppercase flex-1 text-left">{tool.label}</span>
+                    <span className="text-[10px] font-mono font-bold tracking-[0.1em] uppercase flex-1 text-left truncate">{tool.label}</span>
                     {showFavorite && toggleFavorite && (
                         <button
                             onClick={(e) => { e.stopPropagation(); toggleFavorite(tool.id); }}
@@ -175,21 +177,21 @@ export const MoodBoardSidebar: React.FC<MoodBoardSidebarProps> = ({
                 e.dataTransfer.setData('application/reactflow/type', tool.id);
                 e.dataTransfer.effectAllowed = 'move';
             }}
-            className="flex flex-col items-center gap-1.5 p-2 border border-border/40 hover:border-primary/40 hover:bg-primary/5 transition-all group/tool relative"
+            className="flex flex-col items-center gap-1.5 p-2.5 border border-border/40 bg-muted/5 hover:border-primary/50 hover:bg-primary/10 transition-all group/tool relative rounded-xs"
             title={tool.description}
         >
             {toggleFavorite && (
                 <button
                     onClick={(e) => { e.stopPropagation(); toggleFavorite(tool.id); }}
-                    className="absolute top-0.5 right-0.5 opacity-0 group-hover/tool:opacity-100 transition-opacity p-0.5"
+                    className="absolute top-1 right-1 opacity-0 group-hover/tool:opacity-100 transition-opacity p-0.5"
                 >
-                    <Star size={8} className={favorites.includes(tool.id) ? 'text-amber-400 fill-amber-400' : 'text-muted-foreground/40'} />
+                    <Star size={10} className={favorites.includes(tool.id) ? 'text-amber-400 fill-amber-400' : 'text-muted-foreground/40'} />
                 </button>
             )}
-            <div className="w-8 h-8 flex items-center justify-center bg-card border border-border/40 group-hover/tool:border-primary/50 group-hover/tool:bg-primary/10 transition-all">
-                <tool.icon size={14} className="group-hover/tool:text-primary transition-colors text-muted-foreground/60" strokeWidth={2.5} />
+            <div className="w-10 h-10 flex items-center justify-center bg-card border border-border/40 shadow-sm group-hover/tool:border-primary/50 group-hover/tool:shadow-primary/5 transition-all">
+                <tool.icon size={16} className="group-hover/tool:text-primary transition-colors text-muted-foreground/50" strokeWidth={2.5} />
             </div>
-            <span className="text-[8px] font-mono font-bold tracking-[0.1em] uppercase text-muted-foreground/60 group-hover/tool:text-foreground transition-colors text-center leading-tight">{tool.label}</span>
+            <span className="text-[9px] font-mono font-black tracking-widest uppercase text-muted-foreground/40 group-hover/tool:text-foreground transition-colors text-center leading-tight">{tool.label}</span>
         </button>
     );
 
@@ -271,11 +273,12 @@ export const MoodBoardSidebar: React.FC<MoodBoardSidebarProps> = ({
     return (
         <div
             className={`
-                absolute left-0 top-10 bottom-6 z-20
+                absolute left-0 top-[48px] bottom-6 z-20
                 transition-all duration-300 ease-out
+                border-r border-border/40
                 ${isSidebarOpen ? 'translate-x-0 opacity-100' : '-translate-x-full opacity-0 pointer-events-none'}
             `}
-            style={{ width: isSidebarMini ? 56 : sidebarWidth }}
+            style={{ width: isSidebarMini ? 60 : sidebarWidth }}
         >
             <div className="h-full bg-card/90 backdrop-blur-xl border-r border-border/40 flex flex-col relative overflow-visible group/sidebar">
                 {/* Scanline overlay */}
@@ -283,37 +286,52 @@ export const MoodBoardSidebar: React.FC<MoodBoardSidebarProps> = ({
                     <div className="absolute inset-0 bg-[linear-gradient(rgba(18,16,16,0)_50%,rgba(0,0,0,0.1)_50%),linear-gradient(90deg,rgba(255,0,0,0.03),rgba(0,255,0,0.01),rgba(0,0,255,0.03))] bg-[length:100%_2px,3px_100%]" />
                 </div>
 
-                {/* Profile Selector */}
-                <div className={`p-1.5 border-b border-border/20 bg-muted/10 flex gap-1 ${isSidebarMini ? 'flex-col items-center' : ''}`}>
-                    {(Object.keys(SIDEBAR_PROFILES) as SidebarProfile[]).map(profileKey => {
-                        const profile = SIDEBAR_PROFILES[profileKey];
-                        const isActive = activeProfile === profileKey;
-                        return (
-                            <button
-                                key={profileKey}
-                                onClick={() => setActiveProfile(profileKey)}
-                                className={`
-                                    flex items-center justify-center rounded-sm transition-all duration-300 relative overflow-hidden group/prof
-                                    ${isSidebarMini ? 'w-8 h-8' : 'flex-1 py-2 px-1 gap-1'}
-                                    ${isActive
-                                        ? 'bg-zinc-100 dark:bg-zinc-800 text-foreground border border-border/40 shadow-sm shadow-black/20'
-                                        : 'text-muted-foreground/30 hover:text-muted-foreground/60 hover:bg-muted/30 border border-transparent'}
-                                `}
-                                title={profile.label}
+                {/* Profile Selector - Consolidated into Sleek Select */}
+                {!isSidebarMini && (
+                    <div className="p-2 border-b border-border/20 bg-muted/5">
+                        <div className="relative group/select">
+                            <select
+                                value={activeProfile}
+                                onChange={(e) => setActiveProfile(e.target.value as SidebarProfile)}
+                                className="
+                                    w-full bg-card/50 border border-border/40 rounded-sm py-1.5 pl-8 pr-2
+                                    text-[9px] font-mono font-black uppercase tracking-widest text-foreground
+                                    appearance-none cursor-pointer hover:bg-primary/5 hover:border-primary/40 
+                                    transition-all duration-300 outline-none
+                                "
                             >
-                                {isActive && (
-                                    <div className="absolute top-0 left-0 w-full h-[1px] bg-primary animate-in fade-in slide-in-from-top-1 duration-500" />
-                                )}
-                                <profile.icon size={isSidebarMini ? 14 : 11} className={`transition-colors duration-300 ${isActive ? 'text-primary' : ''}`} strokeWidth={isActive ? 2.5 : 1.5} />
-                                {!isSidebarMini && (
-                                    <span className={`text-[7.5px] font-mono font-black uppercase tracking-[0.1em] transition-all duration-300 ${isActive ? 'opacity-100 translate-y-0' : 'opacity-40 translate-y-0.5'}`}>
-                                        {profile.label}
-                                    </span>
-                                )}
-                            </button>
-                        );
-                    })}
-                </div>
+                                {(Object.keys(SIDEBAR_PROFILES) as SidebarProfile[]).map(profileKey => (
+                                    <option key={profileKey} value={profileKey}>
+                                        {SIDEBAR_PROFILES[profileKey].label}
+                                    </option>
+                                ))}
+                            </select>
+                            <div className="absolute left-2.5 top-1/2 -translate-y-1/2 pointer-events-none transition-transform duration-300 group-focus-within/select:scale-110">
+                                {React.createElement(SIDEBAR_PROFILES[activeProfile].icon, {
+                                    size: 11,
+                                    className: "text-primary",
+                                    strokeWidth: 2.5
+                                })}
+                            </div>
+                            <div className="absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none opacity-40">
+                                <ChevronDown size={10} />
+                            </div>
+                            <div className="absolute bottom-0 left-0 h-[1px] bg-primary/40 w-0 group-focus-within/select:w-full transition-all duration-500" />
+                        </div>
+                    </div>
+                )}
+
+                {isSidebarMini && (
+                    <div className="p-2 border-b border-border/20 bg-muted/10 flex flex-col items-center gap-1.5 py-4">
+                        <div className="w-8 h-8 flex items-center justify-center rounded-sm bg-primary/10 text-primary border border-primary/40 relative group/mini-prof" title={SIDEBAR_PROFILES[activeProfile].label}>
+                            {React.createElement(SIDEBAR_PROFILES[activeProfile].icon, {
+                                size: 14,
+                                strokeWidth: 2.5
+                            })}
+                            <div className="absolute top-0 right-0 w-1.5 h-1.5 bg-primary rounded-full animate-pulse border border-background shadow-sm" />
+                        </div>
+                    </div>
+                )}
 
                 {/* Header: View mode + Tabs */}
                 {!isSidebarMini && (

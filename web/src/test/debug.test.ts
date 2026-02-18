@@ -4,7 +4,7 @@ import path from 'path';
 import { PORT_SPECS } from '../features/moodboard/execution/portSpecs';
 
 test('debug wave-6', () => {
-    const file = path.resolve(__dirname, '../../../docs/Workflows/wave-6/saas-broadcaster.json');
+    const file = path.resolve(__dirname, '../../../docs/Workflows/saas-broadcaster.json');
     const content = JSON.parse(fs.readFileSync(file, 'utf-8'));
     console.log('ID:', content.id);
     content.nodes.forEach(n => {

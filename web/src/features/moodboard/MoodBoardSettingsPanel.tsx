@@ -6,7 +6,6 @@ import { MoodNodeData } from './types';
 import { BrandProfile } from '@/types';
 import { SettingsPanelFrame, PanelTab } from './components/settings/SettingsPanelFrame';
 import { AssetsTab } from './components/settings/AssetsTab';
-import { GuideTab } from './components/settings/GuideTab';
 import { LayersTab } from './components/settings/LayersTab';
 import { NodeInspector } from './components/settings/NodeInspector';
 import { CanvasSettings } from './components/settings/CanvasSettings';
@@ -142,9 +141,6 @@ export const MoodBoardSettingsPanel = React.memo(({
                     <AssetsTab brand={brand} />
                 )}
 
-                {activeTab === 'guide' && (
-                    <GuideTab />
-                )}
 
             </SettingsPanelFrame>
 

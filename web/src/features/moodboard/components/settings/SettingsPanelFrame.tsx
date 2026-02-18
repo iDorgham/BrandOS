@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Palette, Settings, Layers, ImageUp, Keyboard } from 'lucide-react';
+import { Palette, Settings, Layers, ImageUp } from 'lucide-react';
 
-export type PanelTab = 'inspector' | 'layers' | 'assets' | 'guide';
+export type PanelTab = 'inspector' | 'layers' | 'assets';
 
 interface SettingsPanelFrameProps {
     isOpen: boolean;
@@ -54,12 +54,11 @@ export const SettingsPanelFrame: React.FC<SettingsPanelFrameProps> = ({
         { id: 'inspector', icon: Settings, label: 'Inspector' },
         { id: 'layers', icon: Layers, label: 'Layers' },
         { id: 'assets', icon: Palette, label: 'Assets' },
-        { id: 'guide', icon: Keyboard, label: 'Keys' },
     ];
 
     return (
         <aside
-            className={`absolute right-0 top-0 bottom-6 bg-background/95 backdrop-blur-xl border-l border-border/40 z-20 flex flex-col transition-all duration-400 ease-[cubic-bezier(0.2,0,0,1)] ${!isOpen ? 'translate-x-full' : ''}`}
+            className={`absolute right-0 top-[48px] bottom-6 bg-card/90 backdrop-blur-xl border-l border-border/40 z-20 flex flex-col transition-all duration-400 ease-[cubic-bezier(0.2,0,0,1)] ${!isOpen ? 'translate-x-[280px] pointer-events-none opacity-0' : 'translate-x-0'}`}
             style={{ width: width }}
         >
             {/* Resize Handle */}

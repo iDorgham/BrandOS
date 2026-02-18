@@ -109,6 +109,7 @@ import { ResearchNode } from './ResearchNode';
 import { ContentPlanNode } from './ContentPlanNode';
 import { MetaAdsNode } from './MetaAdsNode';
 import { GoogleAdsNode } from './GoogleAdsNode';
+import { ShapeNode } from './ShapeNode';
 
 export const nodeTypes = {
     image: ImageNode,
@@ -166,4 +167,9 @@ export const nodeTypes = {
     content_plan: ContentPlanNode,
     meta_ads: MetaAdsNode,
     google_ads: GoogleAdsNode,
+    // Shape Nodes
+    square: ShapeNode,
+    circle: ShapeNode,
+    triangle: ShapeNode,
+    hexagon: ShapeNode,
 };

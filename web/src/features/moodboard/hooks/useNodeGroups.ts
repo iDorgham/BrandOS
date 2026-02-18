@@ -82,7 +82,7 @@ export const useNodeGroups = (
                 isCollapsed: false,
                 groupId,
             },
-            zIndex: 0,
+            zIndex: -1,
         };
 
         setNodes(nds => {
@@ -95,7 +95,7 @@ export const useNodeGroups = (
                             x: n.position.x - bounds.x,
                             y: n.position.y - bounds.y
                         },
-                        extent: 'parent' as const,
+                        // extent: 'parent' as const, // Removed to allow dragging out
                     };
                 }
                 return n;
@@ -188,10 +188,147 @@ export const useNodeGroups = (
     }, [ungroupNodes]);
 
     const refreshGroupBounds = useCallback(() => {
-        // With parentId, relative positions handle most of this, 
-        // but we might need to adjust parent size if children move outside.
-        // For now, React Flow handles the movement coordination.
-    }, []);
+        setNodes(nds => {
+            const groups = nds.filter(n => n.type === 'groupNode' && !n.data.isCollapsed);
+            if (groups.length === 0) return nds;
+
+            let hasChanges = false;
+            const updates = new Map<string, any>(); // Map<nodeId, Partial<Node>>
+
+            groups.forEach(group => {
+                const children = nds.filter(n => n.parentId === group.id);
+                if (children.length === 0) return;
+
+                let minX = Infinity;
+                let minY = Infinity;
+                let maxX = -Infinity;
+                let maxY = -Infinity;
+
+                children.forEach(child => {
+                    // Use child updates if available (though unlikely in this synchronous loop)
+                    const x = child.position.x;
+                    const y = child.position.y;
+                    const w = child.measured?.width || child.width || parseInt(child.style?.width as string) || 0;
+                    const h = child.measured?.height || child.height || parseInt(child.style?.height as string) || 0;
+
+                    if (x < minX) minX = x;
+                    if (y < minY) minY = y;
+                    if (x + w > maxX) maxX = x + w;
+                    if (y + h > maxY) maxY = y + h;
+                });
+
+                // Add padding
+                const PADDING = 20;
+
+                // If children are within bounds and not negative, and group is large enough, 
+                // do we SHRINK? Maybe not, prevents jitter. Only Expand.
+                // CURRENT LOGIC: Auto-Expand Only.
+
+                // Current Group Bounds
+                const gW = parseInt(group.style?.width as string) || 0;
+                const gH = parseInt(group.style?.height as string) || 0;
+
+                let newGW = gW;
+                let newGH = gH;
+                let shiftX = 0;
+                let shiftY = 0;
+
+                // 1. Check Negative Expansion (Left/Top)
+                if (minX < PADDING) {
+                    shiftX = minX - PADDING; // negative value
+                    newGW += -shiftX;
+                }
+                if (minY < PADDING + 30) { // +30 for header
+                    shiftY = minY - (PADDING + 30);
+                    newGH += -shiftY;
+                }
+
+                // 2. Check Positive Expansion (Right/Bottom)
+                // If we shifted, effective maxX overlaps more? 
+                // Let's think: changing origin implies we move children.
+                // New limit = maxX - shiftX (since shiftX is negative, this increases maxX relative to new origin?)
+                // Actually: New Width must cover (maxX - minX) + PADDING*2
+
+                // Let's just recalculate desired bounds from scratch based on content
+                const contentWidth = maxX - minX;
+                const contentHeight = maxY - minY;
+
+                const desiredWidth = Math.max(gW, contentWidth + PADDING * 2);
+                const desiredHeight = Math.max(gH, contentHeight + PADDING * 2 + 30);
+
+                // If we have negative overflow, we must shift.
+                // If we have positive overflow, we must expand.
+
+                const expansionRight = (maxX + PADDING) - gW;
+                const expansionBottom = (maxY + PADDING) - gH;
+
+                let finalShiftX = 0;
+                let finalShiftY = 0;
+                let finalWidth = gW;
+                let finalHeight = gH;
+                let groupChanged = false;
+
+                // Handle Left Overflow
+                if (minX < PADDING) {
+                    finalShiftX = minX - PADDING; // e.g., -50
+                    finalWidth += -finalShiftX;
+                    groupChanged = true;
+                }
+
+                // Handle Top Overflow
+                const TOP_OFFSET = 40; // Header space roughly
+                if (minY < TOP_OFFSET) {
+                    finalShiftY = minY - TOP_OFFSET;
+                    finalHeight += -finalShiftY;
+                    groupChanged = true;
+                }
+
+                // Handle Right Overflow (relative to potentially new origin?)
+                // Actually if we shift origin left by 50, effectively the right boundary moves left by 50 in world space?
+                // No, "Width" increases. 
+                // If we shift X by -50, and Width by +50, the Right Edge stays in place.
+                // We need to check if content extends BEYOND current width.
+
+                if (maxX > finalWidth + finalShiftX - PADDING) {
+                    finalWidth = Math.max(finalWidth, maxX - finalShiftX + PADDING);
+                    groupChanged = true;
+                }
+                if (maxY > finalHeight + finalShiftY - PADDING) {
+                    finalHeight = Math.max(finalHeight, maxY - finalShiftY + PADDING);
+                    groupChanged = true;
+                }
+
+                if (groupChanged) {
+                    updates.set(group.id, {
+                        id: group.id,
+                        position: { x: group.position.x + finalShiftX, y: group.position.y + finalShiftY },
+                        style: { ...group.style, width: finalWidth, height: finalHeight }
+                    });
+                    hasChanges = true;
+
+                    // If we shifted, we must shift ALL children in opposite direction
+                    if (finalShiftX !== 0 || finalShiftY !== 0) {
+                        children.forEach(c => {
+                            updates.set(c.id, {
+                                id: c.id,
+                                position: { x: c.position.x - finalShiftX, y: c.position.y - finalShiftY }
+                            });
+                        });
+                    }
+                }
+            });
+
+            if (!hasChanges) return nds;
+
+            return nds.map(n => {
+                if (updates.has(n.id)) {
+                    const update = updates.get(n.id);
+                    return { ...n, ...update };
+                }
+                return n;
+            });
+        });
+    }, [setNodes]);
 
     const moveGroup = useCallback((groupId: string, dx: number, dy: number) => {
         setNodes(nds => nds.map(n =>

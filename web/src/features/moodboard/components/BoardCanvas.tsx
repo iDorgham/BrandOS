@@ -29,7 +29,6 @@ interface BoardCanvasProps {
     onPaneMouseMove: (e: React.MouseEvent) => void;
     onPaneMouseUp: () => void;
     onPaneContextMenu: (event: any) => void;
-    onPaneDoubleClick: (event: React.MouseEvent) => void;
     onDragOver: (event: React.DragEvent) => void;
     onDrop: (event: React.DragEvent) => void;
     nodeTypes: any;
@@ -41,6 +40,9 @@ interface BoardCanvasProps {
     onConnectStart?: (event: any, params: any) => void;
     onConnectEnd?: () => void;
     connectionLineColor?: string;
+    onNodeDragStop?: (event: React.MouseEvent, node: Node, nodes: Node[]) => void;
+    onNodeDrag?: (event: React.MouseEvent, node: Node, nodes: Node[]) => void;
+    onNodeDragStart?: (event: React.MouseEvent, node: Node) => void;
 }
 
 export const BoardCanvas: React.FC<BoardCanvasProps> = ({
@@ -57,7 +59,6 @@ export const BoardCanvas: React.FC<BoardCanvasProps> = ({
     onPaneMouseMove,
     onPaneMouseUp,
     onPaneContextMenu,
-    onPaneDoubleClick,
     onDragOver,
     onDrop,
     nodeTypes,
@@ -68,7 +69,10 @@ export const BoardCanvas: React.FC<BoardCanvasProps> = ({
     isValidConnection,
     onConnectStart,
     onConnectEnd,
-    connectionLineColor
+    connectionLineColor,
+    onNodeDragStop,
+    onNodeDrag,
+    onNodeDragStart
 }) => {
     const connectionLineStyle = useMemo(() => ({
         stroke: connectionLineColor || 'hsl(var(--primary))',
@@ -90,7 +94,6 @@ export const BoardCanvas: React.FC<BoardCanvasProps> = ({
             onMouseMove={onPaneMouseMove}
             onMouseUp={onPaneMouseUp}
             onPaneContextMenu={onPaneContextMenu}
-            onDoubleClick={onPaneDoubleClick}
             onDragOver={onDragOver}
             onDrop={onDrop}
             onEdgeDoubleClick={(_, edge) => onEdgesDelete([edge])}
@@ -100,6 +103,9 @@ export const BoardCanvas: React.FC<BoardCanvasProps> = ({
             isValidConnection={isValidConnection}
             onConnectStart={onConnectStart}
             onConnectEnd={onConnectEnd}
+            onNodeDragStop={onNodeDragStop}
+            onNodeDrag={onNodeDrag}
+            onNodeDragStart={onNodeDragStart}
             connectionLineStyle={connectionLineStyle}
             selectionOnDrag={activeTool === 'pointer'}
             panOnDrag={activeTool === 'hand' ? [0, 1, 2] : false}

@@ -4,8 +4,7 @@ import { MoodNodeData } from '../../types';
 import { NODE_REGISTRY } from '../../NodeRegistry';
 import {
     Eye, EyeOff, Lock, Unlock, Trash2, ChevronDown, ChevronRight,
-    Search, ImageUp, GripVertical, MousePointer2, Copy,
-    ArrowUp, ArrowDown, Layers, Plus
+    Search, ImageUp, Copy, Layers, Plus, Folder, File, GripVertical
 } from 'lucide-react';
 
 interface LayersTabProps {
@@ -16,6 +15,8 @@ interface LayersTabProps {
     onDuplicateNode?: (nodeId: string) => void;
     onAddNode?: (type: string) => void;
     onImageUpload?: (event: React.ChangeEvent<HTMLInputElement>) => void;
+    // New prop for reparenting (handled in parent or we assume standard reactflow usage)
+    onReparentNode?: (nodeId: string, newParentId: string | undefined) => void;
 }
 
 // Get display info for a node
@@ -25,8 +26,9 @@ const getNodeInfo = (node: Node<MoodNodeData>) => {
     const colorClass = registryEntry?.defaultColor || 'bg-slate-500';
     const typeName = registryEntry?.label || node.type || 'Node';
     const displayName = node.data.label || node.data.content?.slice(0, 30) || typeName;
+    const isGroup = node.type === 'groupNode';
 
-    return { Icon, colorClass, typeName, displayName };
+    return { Icon, colorClass, typeName, displayName, isGroup };
 };
 
 export const LayersTab: React.FC<LayersTabProps> = ({
@@ -36,85 +38,171 @@ export const LayersTab: React.FC<LayersTabProps> = ({
     updateNodeData,
     onDuplicateNode,
     onAddNode,
-    onImageUpload
+    onImageUpload,
 }) => {
     const [searchQuery, setSearchQuery] = useState('');
-    const [collapsedCategories, setCollapsedCategories] = useState<Set<string>>(new Set());
-    const [sortBy, setSortBy] = useState<'position' | 'type' | 'name'>('position');
+    const [collapsedGroups, setCollapsedGroups] = useState<Set<string>>(new Set());
     const fileInputRef = useRef<HTMLInputElement>(null);
-    const { fitView } = useReactFlow();
+    const { fitView, setNodes } = useReactFlow();
 
-    const selectedNodes = useMemo(() => nodes.filter(n => n.selected), [nodes]);
-
-    // Filter and sort nodes
-    const filteredNodes = useMemo(() => {
-        let result = [...nodes];
-
-        if (searchQuery) {
-            const q = searchQuery.toLowerCase();
-            result = result.filter(n => {
-                const info = getNodeInfo(n);
-                return info.displayName.toLowerCase().includes(q)
-                    || info.typeName.toLowerCase().includes(q)
-                    || n.type?.toLowerCase().includes(q);
-            });
-        }
-
-        switch (sortBy) {
-            case 'type':
-                result.sort((a, b) => (a.type || '').localeCompare(b.type || ''));
-                break;
-            case 'name':
-                result.sort((a, b) => {
-                    const nameA = a.data.label || a.data.content || '';
-                    const nameB = b.data.label || b.data.content || '';
-                    return nameA.localeCompare(nameB);
-                });
-                break;
-            case 'position':
-            default:
-                // Reverse so top-most (last rendered) appears first in the list
-                result.reverse();
-                break;
-        }
-
-        return result;
-    }, [nodes, searchQuery, sortBy]);
-
-    // Group by type
-    const groupedNodes = useMemo(() => {
-        const groups: Record<string, Node<MoodNodeData>[]> = {};
-        filteredNodes.forEach(n => {
-            const category = NODE_REGISTRY.find(r => r.id === n.type)?.category || 'OTHER';
-            if (!groups[category]) groups[category] = [];
-            groups[category].push(n);
-        });
-        return groups;
-    }, [filteredNodes]);
-
-    const toggleCategory = (cat: string) => {
-        setCollapsedCategories(prev => {
+    const toggleGroup = (id: string) => {
+        setCollapsedGroups(prev => {
             const next = new Set(prev);
-            if (next.has(cat)) next.delete(cat); else next.add(cat);
+            if (next.has(id)) next.delete(id); else next.add(id);
             return next;
         });
     };
 
+    // --- REPARENTING & REORDERING LOGIC ---
+    const handleDrop = useCallback((draggedNodeId: string, targetNodeId: string | undefined) => {
+        if (draggedNodeId === targetNodeId) return;
+
+        setNodes((nds) => {
+            const draggedNode = nds.find(n => n.id === draggedNodeId);
+            const targetNode = targetNodeId ? nds.find(n => n.id === targetNodeId) : null;
+
+            if (!draggedNode) return nds;
+
+            // Determine if parent is changing
+            const isReparenting = targetNodeId !== draggedNode.parentId;
+
+            // Calculate new position if reparenting
+            let newPos = { ...draggedNode.position };
+            let newParentId = draggedNode.parentId;
+
+            if (isReparenting) {
+                // 1. Unparenting (Target is Root)
+                if (!targetNodeId && draggedNode.parentId) {
+                    newParentId = undefined;
+                    const currentParent = nds.find(n => n.id === draggedNode.parentId);
+                    if (currentParent) {
+                        newPos.x += currentParent.position.x;
+                        newPos.y += currentParent.position.y;
+                    }
+                }
+                // 2. Parenting (Target is Group)
+                else if (targetNodeId && targetNode) {
+                    newParentId = targetNodeId;
+                    let absX = draggedNode.position.x;
+                    let absY = draggedNode.position.y;
+
+                    if (draggedNode.parentId) {
+                        const currentParent = nds.find(n => n.id === draggedNode.parentId);
+                        if (currentParent) {
+                            absX += currentParent.position.x;
+                            absY += currentParent.position.y;
+                        }
+                    }
+
+                    newPos.x = absX - targetNode.position.x;
+                    newPos.y = absY - targetNode.position.y;
+                }
+            }
+
+            // Move the node in the array (Reordering)
+            // If target is undefined (root drop), effectively move to end? Or specific index?
+            // React Flow renders in array order. Last = Top.
+            // Our Drop logic doesn't easily give "index", just "target".
+            // If dropping ON a group, it becomes the Last Child (Top).
+            // If dropping ON a sibling (not implemented here fully), we'd insert before/after.
+
+            // For now, let's just move it to the end of the array to ensure it's "on top" of its new context,
+            // OR if it's just reordering within same parent, we move it to end of that group's children list (top z-index).
+
+            // Filter out dragged node
+            const remainingNodes = nds.filter(n => n.id !== draggedNodeId);
+
+            const updatedNode = {
+                ...draggedNode,
+                parentId: newParentId,
+                position: newPos,
+                extent: undefined // Ensure free movement
+            };
+
+            // append to end (Topmost visual)
+            return [...remainingNodes, updatedNode];
+        });
+
+    }, [setNodes]);
+
+
+    // Build Tree Structure
+    const nodeTree = useMemo(() => {
+        const tree: any[] = [];
+        const map = new Map<string, any>();
+
+        // 1. Map all nodes
+        nodes.forEach(n => {
+            map.set(n.id, { ...n, children: [] });
+        });
+
+        // 2. Build hierarchy (Parent -> Children)
+        nodes.forEach(n => {
+            if (n.parentId && map.has(n.parentId)) {
+                map.get(n.parentId).children.push(map.get(n.id));
+            } else {
+                tree.push(map.get(n.id));
+            }
+        });
+
+        // 3. Sort (Manual Reordering Support)
+        // If we want manual reordering, we must rely on the array order (render order).
+        // React Flow renders [0] at bottom, [length-1] at top.
+        // Layers Panel usually shows [length-1] at TOP (Visual Top).
+
+        // So we strictly follow the `nodes` array order.
+        // `nodes` comes from React Flow state.
+        // The tree construction above naturally preserves order if iterated purely?
+        // Map iteration order is insertion order usually.
+
+        // Let's refine step 2:
+        // We want children arrays to respect the order they appear in `nodes`.
+        // `nodes` is our source of truth for Z-index.
+
+        // Check: `nodes.forEach` runs 0..N (Bottom..Top).
+        // So children.push() builds Bottom..Top list.
+        // Tree.push() builds Bottom..Top list.
+
+        // In the UI display (`map`), we usually want Top..Bottom (Reverse Order).
+        // So we should reverse the validation lists for display.
+
+        // Helper to reverse children for display
+        const reverseChildren = (list: any[]) => {
+            list.reverse(); // Now Top..Bottom
+            list.forEach(node => {
+                if (node.children.length > 0) reverseChildren(node.children);
+            });
+        };
+
+        // Reverse the root list
+        tree.reverse();
+
+        // Reverse all children lists
+        tree.forEach(node => {
+            if (node.children.length > 0) reverseChildren(node.children);
+        });
+
+        // Remove forced group sorting to allow manual Z-index control if desired.
+        // If users want groups on top, they must move them there.
+
+        return tree;
+
+    }, [nodes]);
+
+
     const handleFocusNode = useCallback((nodeId: string) => {
         onSelectNode(nodeId);
-        // Brief delay for selection to propagate, then fit
         setTimeout(() => {
             fitView({ nodes: [{ id: nodeId }] as any, duration: 300, padding: 0.5 });
         }, 50);
     }, [onSelectNode, fitView]);
 
     const nodeCount = nodes.length;
-    const selectedCount = selectedNodes.length;
+    const selectedCount = nodes.filter(n => n.selected).length;
 
     return (
         <div className="flex flex-col h-full animate-in fade-in slide-in-from-right-4 duration-300">
-
-            {/* Header bar with counts + actions */}
+            {/* Header bar */}
             <div className="px-3 py-2 border-b border-border/20 flex items-center justify-between shrink-0">
                 <div className="flex items-center gap-2">
                     <Layers size={12} className="text-primary" />
@@ -128,7 +216,6 @@ export const LayersTab: React.FC<LayersTabProps> = ({
                     )}
                 </div>
                 <div className="flex items-center gap-0.5">
-                    {/* Image upload button */}
                     <button
                         onClick={() => fileInputRef.current?.click()}
                         className="h-6 w-6 flex items-center justify-center text-muted-foreground/40 hover:text-primary hover:bg-muted/20 transition-colors"
@@ -136,14 +223,7 @@ export const LayersTab: React.FC<LayersTabProps> = ({
                     >
                         <ImageUp size={12} />
                     </button>
-                    <input
-                        type="file"
-                        ref={fileInputRef}
-                        className="hidden"
-                        accept="image/*"
-                        onChange={onImageUpload}
-                    />
-                    {/* Quick add */}
+                    <input type="file" ref={fileInputRef} className="hidden" accept="image/*" onChange={onImageUpload} />
                     {onAddNode && (
                         <button
                             onClick={() => onAddNode('label')}
@@ -163,165 +243,190 @@ export const LayersTab: React.FC<LayersTabProps> = ({
                     <input
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
-                        placeholder="Filter nodes..."
+                        placeholder="Filter layers..."
                         className="flex-1 bg-transparent text-[10px] outline-none placeholder:text-muted-foreground/20"
                     />
-                    {searchQuery && (
-                        <span className="text-[8px] font-mono text-muted-foreground/40">{filteredNodes.length}</span>
-                    )}
                 </div>
             </div>
 
-            {/* Sort controls */}
-            <div className="px-3 py-1 border-b border-border/10 flex items-center gap-1 shrink-0">
-                <span className="text-[8px] text-muted-foreground/40 uppercase tracking-wider mr-1">Sort</span>
-                {(['position', 'type', 'name'] as const).map(s => (
-                    <button
-                        key={s}
-                        onClick={() => setSortBy(s)}
-                        className={`text-[8px] px-1.5 py-0.5 uppercase tracking-wider transition-colors ${sortBy === s
-                            ? 'text-primary bg-primary/10 font-bold'
-                            : 'text-muted-foreground/30 hover:text-muted-foreground'
-                            }`}
-                    >
-                        {s}
-                    </button>
-                ))}
-            </div>
-
-            {/* Node List */}
-            <div className="flex-1 overflow-y-auto custom-scrollbar">
-                {sortBy === 'type' ? (
-                    // Grouped view
-                    Object.entries(groupedNodes).map(([category, categoryNodes]) => (
-                        <div key={category}>
-                            <button
-                                onClick={() => toggleCategory(category)}
-                                className="w-full flex items-center gap-1.5 px-3 py-1.5 text-left hover:bg-muted/10 transition-colors border-b border-border/5"
-                            >
-                                {collapsedCategories.has(category)
-                                    ? <ChevronRight size={9} className="text-muted-foreground/30" />
-                                    : <ChevronDown size={9} className="text-muted-foreground/30" />
-                                }
-                                <span className="text-[8px] font-bold uppercase tracking-[0.15em] text-muted-foreground/50">
-                                    {category.replace(/_/g, ' ')}
-                                </span>
-                                <span className="text-[8px] font-mono text-muted-foreground/20 ml-auto">{categoryNodes.length}</span>
-                            </button>
-                            {!collapsedCategories.has(category) && categoryNodes.map(node => (
-                                <NodeRow
-                                    key={node.id}
-                                    node={node}
-                                    onSelect={() => handleFocusNode(node.id)}
-                                    onDelete={() => onDeleteNode(node.id)}
-                                    onToggleLock={() => updateNodeData(node.id, { isLocked: !node.data.isLocked })}
-                                    onToggleVisibility={() => updateNodeData(node.id, {}, { opacity: (node.style?.opacity as number || 1) > 0 ? 0 : 1 })}
-                                    onDuplicate={onDuplicateNode ? () => onDuplicateNode(node.id) : undefined}
-                                />
-                            ))}
-                        </div>
-                    ))
-                ) : (
-                    // Flat list
-                    filteredNodes.map(node => (
-                        <NodeRow
+            {/* Tree List */}
+            <div className="flex-1 overflow-y-auto custom-scrollbar p-1">
+                {/* Root Drop Zone */}
+                <div
+                    onDragOver={(e) => { e.preventDefault(); e.dataTransfer.dropEffect = "move"; }}
+                    onDrop={(e) => {
+                        e.preventDefault();
+                        const nodeId = e.dataTransfer.getData('nodeId');
+                        handleDrop(nodeId, undefined); // Unparent
+                    }}
+                    className="min-h-full"
+                >
+                    {nodeTree.map(node => (
+                        <LayerItem
                             key={node.id}
                             node={node}
-                            onSelect={() => handleFocusNode(node.id)}
-                            onDelete={() => onDeleteNode(node.id)}
-                            onToggleLock={() => updateNodeData(node.id, { isLocked: !node.data.isLocked })}
-                            onToggleVisibility={() => updateNodeData(node.id, {}, { opacity: (node.style?.opacity as number || 1) > 0 ? 0 : 1 })}
-                            onDuplicate={onDuplicateNode ? () => onDuplicateNode(node.id) : undefined}
+                            level={0}
+                            collapsedGroups={collapsedGroups}
+                            onToggleCollapse={toggleGroup}
+                            onSelectNode={handleFocusNode}
+                            onDeleteNode={onDeleteNode}
+                            updateNodeData={updateNodeData}
+                            onDuplicateNode={onDuplicateNode}
+                            onDrop={handleDrop}
+                            searchQuery={searchQuery}
                         />
-                    ))
-                )}
-
-                {filteredNodes.length === 0 && (
-                    <div className="p-6 flex flex-col items-center justify-center text-center gap-2">
-                        <Layers size={16} className="text-muted-foreground/20" />
-                        <span className="text-[9px] text-muted-foreground/30 uppercase tracking-wider">
-                            {searchQuery ? 'No matching nodes' : 'Canvas is empty'}
-                        </span>
-                    </div>
-                )}
+                    ))}
+                    {nodeTree.length === 0 && (
+                        <div className="p-6 flex flex-col items-center justify-center text-center gap-2 opacity-50">
+                            <span className="text-[10px]">No layers</span>
+                        </div>
+                    )}
+                </div>
             </div>
         </div>
     );
 };
 
-// Individual node row in the layers list
-const NodeRow: React.FC<{
-    node: Node<MoodNodeData>;
-    onSelect: () => void;
-    onDelete: () => void;
-    onToggleLock: () => void;
-    onToggleVisibility: () => void;
-    onDuplicate?: () => void;
-}> = ({ node, onSelect, onDelete, onToggleLock, onToggleVisibility, onDuplicate }) => {
+// Recursive Layer Item
+// Recursive Layer Item
+interface LayerItemProps {
+    node: any;
+    level: number;
+    collapsedGroups: Set<string>;
+    onToggleCollapse: (id: string) => void;
+    onSelectNode: (id: string) => void;
+    onDeleteNode: (id: string) => void;
+    updateNodeData: (id: string, data: Partial<MoodNodeData>, style?: React.CSSProperties) => void;
+    onDuplicateNode?: (id: string) => void;
+    onDrop: (draggedId: string, targetId: string | undefined) => void;
+    searchQuery: string;
+}
+
+const LayerItem: React.FC<LayerItemProps> = ({
+    node,
+    level,
+    collapsedGroups,
+    onToggleCollapse,
+    onSelectNode,
+    onDeleteNode,
+    updateNodeData,
+    onDuplicateNode,
+    onDrop,
+    searchQuery
+}) => {
     const [isHovered, setIsHovered] = useState(false);
-    const { Icon, colorClass, typeName, displayName } = getNodeInfo(node);
+    const { Icon, colorClass, typeName, displayName, isGroup } = getNodeInfo(node);
+    const isCollapsed = collapsedGroups.has(node.id);
+
+    // Search filtering
+    const matchesSearch = !searchQuery || displayName.toLowerCase().includes(searchQuery.toLowerCase()) || typeName.toLowerCase().includes(searchQuery.toLowerCase());
+    const hasMatchingChildren = node.children.some((child: any) => {
+        // Simple hack: if there's a query, and we are a group, always render if children match
+        return true;
+    });
+
+    if (!matchesSearch && searchQuery && !hasMatchingChildren) return null;
+
     const isHidden = (node.style?.opacity as number || 1) <= 0;
     const isSelected = node.selected;
 
     return (
-        <div
-            className={`group flex items-center gap-1.5 px-2 py-1 cursor-pointer transition-all duration-100 border-b border-border/5 ${isSelected
-                ? 'bg-primary/10 border-l-2 border-l-primary'
-                : 'hover:bg-muted/10 border-l-2 border-l-transparent'
-                } ${isHidden ? 'opacity-30' : ''}`}
-            onClick={onSelect}
-            onMouseEnter={() => setIsHovered(true)}
-            onMouseLeave={() => setIsHovered(false)}
-        >
-            {/* Type indicator dot */}
-            <div className={`w-2 h-2 shrink-0 ${colorClass}`} />
+        <div className="select-none">
+            <div
+                draggable
+                onDragStart={(e) => {
+                    e.dataTransfer.setData('nodeId', node.id);
+                    e.dataTransfer.effectAllowed = 'move';
+                }}
+                onDragOver={(e) => {
+                    e.preventDefault();
+                    e.dataTransfer.dropEffect = 'move';
+                }}
+                onDrop={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    const draggedId = e.dataTransfer.getData('nodeId');
+                    if (isGroup) {
+                        onDrop(draggedId, node.id);
+                    }
+                }}
+                className={`
+                    group flex items-center gap-1.5 px-2 py-1 cursor-pointer transition-all duration-100 
+                    border border-transparent rounded-sm mb-[1px]
+                    ${isSelected ? 'bg-primary/20 border-primary/20' : 'hover:bg-muted/10'}
+                    ${isHidden ? 'opacity-40' : ''}
+                `}
+                style={{ paddingLeft: `${level * 12 + 8}px` }}
+                onClick={(e) => {
+                    e.stopPropagation();
+                    onSelectNode(node.id);
+                }}
+                onMouseEnter={() => setIsHovered(true)}
+                onMouseLeave={() => setIsHovered(false)}
+            >
+                {/* Collapse Toggle for Groups */}
+                {isGroup ? (
+                    <button
+                        onClick={(e) => { e.stopPropagation(); onToggleCollapse(node.id); }}
+                        className="p-0.5 hover:text-white text-muted-foreground/50 transition-colors"
+                    >
+                        {isCollapsed
+                            ? <ChevronRight size={10} />
+                            : <ChevronDown size={10} />
+                        }
+                    </button>
+                ) : (
+                    <div className="w-[14px]" /> // Spacer
+                )}
 
-            {/* Icon */}
-            {Icon && <Icon size={11} className={`shrink-0 ${isSelected ? 'text-primary' : 'text-muted-foreground/40'}`} />}
+                {/* Icon */}
+                {Icon ? <Icon size={12} className={isSelected ? 'text-primary' : 'text-muted-foreground'} /> : <File size={12} />}
 
-            {/* Name + type */}
-            <div className="flex-1 min-w-0 flex flex-col">
-                <span className={`text-[10px] truncate leading-tight ${isSelected ? 'text-primary font-semibold' : 'text-foreground/80'}`}>
+                {/* Label */}
+                <span className={`text-[10px] truncate flex-1 ${isSelected ? 'text-white' : 'text-muted-foreground'}`}>
                     {displayName}
                 </span>
-                <span className="text-[7px] font-mono text-muted-foreground/30 uppercase tracking-wider leading-tight">
-                    {typeName}
-                </span>
+
+                {/* Actions */}
+                <div className={`flex items-center gap-0.5 shrink-0 ${isHovered || isSelected ? 'opacity-100' : 'opacity-0'} group-hover:opacity-100 transition-opacity`}>
+                    <button onClick={(e) => { e.stopPropagation(); updateNodeData(node.id, {}, { opacity: isHidden ? 1 : 0 }); }} className="p-1 hover:text-white text-muted-foreground/30">
+                        {isHidden ? <EyeOff size={10} /> : <Eye size={10} />}
+                    </button>
+                    <button onClick={(e) => { e.stopPropagation(); updateNodeData(node.id, { isLocked: !node.data.isLocked }); }} className="p-1 hover:text-white text-muted-foreground/30">
+                        {node.data.isLocked ? <Lock size={10} /> : <Unlock size={10} />}
+                    </button>
+                    {onDuplicateNode && (
+                        <button onClick={(e) => { e.stopPropagation(); onDuplicateNode(node.id); }} className="p-1 hover:text-white text-muted-foreground/30">
+                            <Copy size={10} />
+                        </button>
+                    )}
+                    <button onClick={(e) => { e.stopPropagation(); onDeleteNode(node.id); }} className="p-1 hover:text-red-400 text-muted-foreground/30">
+                        <Trash2 size={10} />
+                    </button>
+                </div>
             </div>
 
-            {/* Actions (shown on hover or selected) */}
-            <div className={`flex items-center gap-0.5 shrink-0 transition-opacity ${isHovered || isSelected ? 'opacity-100' : 'opacity-0'}`}>
-                {onDuplicate && (
-                    <button
-                        onClick={(e) => { e.stopPropagation(); onDuplicate(); }}
-                        className="h-5 w-5 flex items-center justify-center text-muted-foreground/30 hover:text-foreground transition-colors"
-                        title="Duplicate"
-                    >
-                        <Copy size={9} />
-                    </button>
-                )}
-                <button
-                    onClick={(e) => { e.stopPropagation(); onToggleVisibility(); }}
-                    className={`h-5 w-5 flex items-center justify-center transition-colors ${isHidden ? 'text-muted-foreground/20' : 'text-muted-foreground/30 hover:text-foreground'}`}
-                    title={isHidden ? 'Show' : 'Hide'}
-                >
-                    {isHidden ? <EyeOff size={9} /> : <Eye size={9} />}
-                </button>
-                <button
-                    onClick={(e) => { e.stopPropagation(); onToggleLock(); }}
-                    className={`h-5 w-5 flex items-center justify-center transition-colors ${node.data.isLocked ? 'text-primary/60' : 'text-muted-foreground/30 hover:text-foreground'}`}
-                    title={node.data.isLocked ? 'Unlock' : 'Lock'}
-                >
-                    {node.data.isLocked ? <Lock size={9} /> : <Unlock size={9} />}
-                </button>
-                <button
-                    onClick={(e) => { e.stopPropagation(); onDelete(); }}
-                    className="h-5 w-5 flex items-center justify-center text-muted-foreground/20 hover:text-destructive transition-colors"
-                    title="Delete"
-                >
-                    <Trash2 size={9} />
-                </button>
-            </div>
+            {/* Children */}
+            {isGroup && !isCollapsed && node.children.length > 0 && (
+                <div>
+                    {node.children.map((child: any) => (
+                        <LayerItem
+                            key={child.id}
+                            node={child}
+                            level={level + 1}
+                            collapsedGroups={collapsedGroups}
+                            onToggleCollapse={onToggleCollapse}
+                            onSelectNode={onSelectNode}
+                            onDeleteNode={onDeleteNode}
+                            updateNodeData={updateNodeData}
+                            onDuplicateNode={onDuplicateNode}
+                            onDrop={onDrop}
+                            searchQuery={searchQuery}
+                        />
+                    ))}
+                </div>
+            )}
         </div>
     );
 };
+

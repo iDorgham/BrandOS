@@ -35,6 +35,28 @@ export const useMoodboards = (brandId: string) => {
 
     // Create a new moodboard
     const createMoodboard = useCallback(async (name: string, description?: string) => {
+        if (!brandId) {
+            toast.error('Brand context missing. Cannot create moodboard.');
+            throw new Error('Brand context missing');
+        }
+
+        const tempId = `temp-${Date.now()}`;
+        const tempMoodboard: Moodboard = {
+            id: tempId,
+            brandId,
+            userId: 'current-user', // Placeholder, updated by service
+            name,
+            description,
+            isActive: true,
+            nodes: [],
+            edges: [],
+            createdAt: Date.now(),
+            updatedAt: Date.now(),
+        };
+
+        // Optimistic Update
+        setMoodboards(prev => [tempMoodboard, ...prev]);
+
         try {
             const newMoodboard = await moodboardService.createMoodboard({
                 brandId,
@@ -44,11 +66,15 @@ export const useMoodboards = (brandId: string) => {
                 nodes: [],
                 edges: [],
             });
-            setMoodboards(prev => [newMoodboard, ...prev]);
+
+            // Replace temp with actual
+            setMoodboards(prev => prev.map(m => m.id === tempId ? newMoodboard : m));
             toast.success('Moodboard created!');
             return newMoodboard;
         } catch (error) {
             console.error('Failed to create moodboard:', error);
+            // Rollback
+            setMoodboards(prev => prev.filter(m => m.id !== tempId));
             toast.error('Failed to create moodboard');
             throw error;
         }
